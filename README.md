@@ -170,6 +170,5 @@ MedCP is released under the [MIT License](LICENSE).
 - **Model Context Protocol**: Enables secure local AI integration
 
 <div align="center">
-  <p><strong>Ready to revolutionize your medical data analysis?</strong></p>
   <p><a href="../../releases">Download MedCP Extension</a> | <a href="../../issues">Report Issues</a> | <a href="mailto:wanjun.gu@ucsf.edu">Contact</a></p>
 </div>
