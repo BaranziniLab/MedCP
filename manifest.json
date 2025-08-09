@@ -1,0 +1,171 @@
+{
+  "dxt_version": "0.1",
+  "name": "MedCP",
+  "version": "0.1.0",
+  "description": "MedCP - Medical Context Protocol Server: An MCP server that integrates electronic health record databases and a large-scale heterogeneous knowledge graph for rapid clinical record query and fast biomedical knowledge inference.",
+  "author": {
+    "name": "Wanjun Gu",
+    "email": "wanjun.gu@ucsf.edu",
+    "url": "https://broccolito.github.io/"
+  },
+  "icon": "logo.png",
+  "server": {
+    "type": "python",
+    "entry_point": "server/main.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with", "fastmcp>=2.11.2",
+        "--with", "pymssql>=2.3.7",
+        "--with", "neo4j>=5.28.2",
+        "${__dirname}/server/main.py"
+      ],
+      "env": {
+        "MEDCP_LOG_LEVEL": "${user_config.MEDCP_LOG_LEVEL}",
+        "MEDCP_NAMESPACE": "${user_config.MEDCP_NAMESPACE}",
+        "KNOWLEDGE_GRAPH_URI":       "${user_config.KNOWLEDGE_GRAPH_URI}",
+        "KNOWLEDGE_GRAPH_USERNAME":  "${user_config.KNOWLEDGE_GRAPH_USERNAME}",
+        "KNOWLEDGE_GRAPH_PASSWORD":  "${user_config.KNOWLEDGE_GRAPH_PASSWORD}",
+        "KNOWLEDGE_GRAPH_DATABASE":  "${user_config.KNOWLEDGE_GRAPH_DATABASE}",
+        "CLINICAL_RECORDS_SERVER":   "${user_config.CLINICAL_RECORDS_SERVER}",
+        "CLINICAL_RECORDS_DATABASE": "${user_config.CLINICAL_RECORDS_DATABASE}",
+        "CLINICAL_RECORDS_USERNAME": "${user_config.CLINICAL_RECORDS_USERNAME}",
+        "CLINICAL_RECORDS_PASSWORD": "${user_config.CLINICAL_RECORDS_PASSWORD}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "get_knowledge_graph_schema",
+      "description": "List all nodes, their attributes and their relationships in the biomedical knowledge graph. This provides the schema for drug-disease associations, protein interactions, pathways, and other biomedical entities. Requires APOC plugin to be installed and enabled."
+    },
+    {
+      "name": "query_knowledge_graph",
+      "description": "Execute a read-only Cypher query on the biomedical knowledge graph for fast knowledge inference. Supports queries for drug-disease associations, protein interactions, pathways, and other biomedical relationships."
+    },
+    {
+      "name": "query_clinical_records",
+      "description": "Execute a READ-ONLY SQL query on electronic health records for rapid clinical data retrieval. Only SELECT queries are allowed for security and data integrity."
+    },
+    {
+      "name": "list_clinical_tables",
+      "description": "List all available clinical data tables in the electronic health records database. Returns table schema, name, type, and full qualified name for each table."
+    }
+  ],
+  "prompts": [
+    {
+      "name": "biomedical_knowledge_inference",
+      "description": "Query biomedical knowledge graph to find drug-disease associations, protein interactions, and pathways",
+      "text": "I need to analyze biomedical relationships in the knowledge graph. Please help me:\n1. First, show me the knowledge graph schema to understand available nodes and relationships\n2. Query for drug-disease associations for a specific condition\n3. Find protein interactions related to the identified drugs\n4. Identify relevant biological pathways\n\nPlease start by showing me the available node types and relationships in the biomedical knowledge graph."
+    },
+    {
+      "name": "clinical_data_analysis",
+      "description": "Analyze electronic health records for clinical insights",
+      "text": "I want to analyze clinical data from the electronic health records. Please help me:\n1. First, list all available clinical tables to understand the data structure\n2. Query patient demographics and basic statistics\n3. Analyze specific clinical outcomes or conditions\n4. Cross-reference findings with biomedical knowledge if needed\n\nPlease start by showing me what clinical data tables are available."
+    },
+    {
+      "name": "integrated_medical_analysis",
+      "description": "Combine clinical records with biomedical knowledge for comprehensive medical analysis",
+      "text": "I need to perform an integrated analysis combining clinical data with biomedical knowledge. Please help me:\n1. Examine clinical records for patterns related to a specific condition\n2. Query the biomedical knowledge graph for relevant drug-disease associations\n3. Find protein targets and pathways associated with identified drugs\n4. Provide insights that combine both clinical observations and biomedical knowledge\n\nLet's start by exploring both the clinical data structure and biomedical knowledge schema."
+    }
+  ],
+  "user_config": {
+    "KNOWLEDGE_GRAPH_URI": {
+      "type": "string",
+      "title": "Knowledge Graph URI",
+      "description": "URI for the Neo4j biomedical knowledge graph (default: SPOKE knowledge graph)",
+      "required": true,
+      "default": "bolt://spokedev.cgl.ucsf.edu:7687",
+      "sensitive": false
+    },
+    "KNOWLEDGE_GRAPH_USERNAME": {
+      "type": "string",
+      "title": "Knowledge Graph Username",
+      "description": "Username for the Neo4j biomedical knowledge graph database",
+      "required": true,
+      "sensitive": false
+    },
+    "KNOWLEDGE_GRAPH_PASSWORD": {
+      "type": "string",
+      "title": "Knowledge Graph Password",
+      "description": "Password for the Neo4j biomedical knowledge graph database",
+      "required": true,
+      "sensitive": true
+    },
+    "KNOWLEDGE_GRAPH_DATABASE": {
+      "type": "string",
+      "title": "Knowledge Graph Database Name",
+      "description": "Name of the Neo4j database containing biomedical knowledge (default: SPOKE knowledge graph)",
+      "required": true,
+      "default": "spoke",
+      "sensitive": false
+    },
+    "CLINICAL_RECORDS_SERVER": {
+      "type": "string",
+      "title": "Clinical Records Server",
+      "description": "SQL Server for electronic health records database (default: UCSF EHR database)",
+      "required": true,
+      "default": "QCDIDDWDB001.ucsfmedicalcenter.org",
+      "sensitive": false
+    },
+    "CLINICAL_RECORDS_DATABASE": {
+      "type": "string",
+      "title": "Clinical Records Database",
+      "description": "Name of the SQL Server database containing electronic health records",
+      "required": true,
+      "default": "OMOP_DEID",
+      "sensitive": false
+    },
+    "CLINICAL_RECORDS_USERNAME": {
+      "type": "string",
+      "title": "Clinical Records Username",
+      "description": "Username for the electronic health records SQL Server database",
+      "required": true,
+      "sensitive": true
+    },
+    "CLINICAL_RECORDS_PASSWORD": {
+      "type": "string",
+      "title": "Clinical Records Password",
+      "description": "Password for the electronic health records SQL Server database",
+      "required": true,
+      "sensitive": true
+    },
+    "MEDCP_NAMESPACE": {
+      "type": "string",
+      "title": "MedCP Namespace",
+      "description": "Tool namespace prefix for MedCP tools (optional)",
+      "required": false,
+      "default": "MedCP",
+      "sensitive": false
+    },
+    "MEDCP_LOG_LEVEL": {
+      "type": "string",
+      "title": "Log Level",
+      "description": "Logging level for MedCP server (DEBUG, INFO, WARNING, ERROR)",
+      "required": false,
+      "default": "INFO",
+      "sensitive": false
+    }
+  },
+  "keywords": [
+    "medical",
+    "healthcare",
+    "biomedical",
+    "knowledge-graph",
+    "clinical-records",
+    "electronic-health-records",
+    "ehr",
+    "neo4j",
+    "sql-server",
+    "drug-discovery",
+    "protein-interactions",
+    "pathways",
+    "clinical-data",
+    "medical-informatics",
+    "bioinformatics",
+    "healthcare-analytics",
+    "medical-research"
+  ],
+  "license": "MIT"
+}
