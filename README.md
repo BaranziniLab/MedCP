@@ -1,10 +1,12 @@
-# MedCP: Medical Model Context Protocol <img src="logo.png" align="right" alt="MedCP Logo" width="100"/>
+# MedCP: Medical Model Context Protocol <img src="assets/logo.png" align="right" alt="MedCP Logo" width="100"/>
 
 <br>
 
 ## Overview
 
 **MedCP** transforms Claude Desktop into a powerful medical AI assistant by providing **secure, local access** to electronic health records and biomedical knowledge graphs. Process sensitive health data entirely on your machine while delivering instant access to clinical insights.
+
+![](assets/schematics.png)
 
 ### Key Features
 
