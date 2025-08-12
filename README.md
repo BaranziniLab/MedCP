@@ -29,22 +29,27 @@ Visit [claude.ai/download](https://claude.ai/download) and install the latest ve
 
 **2. Install UV Package Manager**
 
-*macOS:*
+**macOS:**
+
+First install [homebrew](https://brew.sh) if not installed already.
+Then install the uv package manager via homebrew:
 
 ``` bash
-# Option 1: Using the installer script
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Option 2: Using Homebrew
 brew install uv
 ```
 
-*Windows:*
+**Windows:**
+
+Install uv via powershell:
+
 ``` powershell
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-*Linux:*
+**Linux:**
+
+Install uv via bash script:
+
 ``` bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
