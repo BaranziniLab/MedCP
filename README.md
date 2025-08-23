@@ -34,6 +34,19 @@ Visit [claude.ai/download](https://claude.ai/download) and install the latest ve
 **macOS:**
 
 First install [homebrew](https://brew.sh) if not installed already.
+
+Then, deactivate any conda or virtual environment and check the native python version on your mac:
+
+```sh
+python3 --version
+```
+
+If your python version is older than 3.13, try to get the most up-to-date python installed:
+
+```sh
+brew install python
+```
+
 Then install the uv package manager via homebrew:
 
 ``` bash
