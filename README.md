@@ -97,7 +97,7 @@ After installation, you'll need to configure your database connections in Claude
 
 ### Biomedical Knowledge Graph
 
-MedCP uses the SPOKE knowledge graph by default ([Himmelstein et al., 2023](https://academic.oup.com/bioinformatics/article/39/2/btad080/7033465)), which contains comprehensive biomedical relationships including drug-disease associations, protein interactions, and biological pathways.
+MedCP uses the SPOKE knowledge graph by default ([Morris et al., 2023](https://academic.oup.com/bioinformatics/article/39/2/btad080/7033465)), which contains comprehensive biomedical relationships including drug-disease associations, protein interactions, and biological pathways.
 
 | Parameter | Description | Example |
 |-----------|-------------|---------|
@@ -184,7 +184,7 @@ MedCP is released under the [MIT License](LICENSE).
 
 ## Acknowledgments
 
-- **SPOKE Knowledge Graph**: [Himmelstein et al., 2023](https://academic.oup.com/bioinformatics/article/39/2/btad080/7033465)
+- **SPOKE Knowledge Graph**: [Morris et al., 2023](https://academic.oup.com/bioinformatics/article/39/2/btad080/7033465)
 - **UCSF Clinical Data**: [UCSF Research Data Portal](https://data.ucsf.edu/research/ucsf-data)
 - **Desktop Extensions**: Built on Anthropic's DXT specification
 - **Model Context Protocol**: Enables secure local AI integration
