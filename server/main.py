@@ -156,124 +156,85 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
             """
             List all nodes, their attributes and their relationships in the biomedical knowledge graph.
             This provides the schema for drug-disease associations, protein interactions, pathways, 
-            and other biomedical entities. Uses native Cypher queries only.
+            and other biomedical entities. Requires APOC plugin to be installed and enabled.
             """
             
-            def get_native_schema() -> dict:
-                """Get schema information using native Cypher queries"""
-                schema_info = {
-                    "nodes": {},
-                    "relationships": {},
-                    "summary": {
-                        "total_nodes": 0,
-                        "total_relationships": 0,
-                        "node_labels": [],
-                        "relationship_types": []
-                    }
-                }
+            def clean_schema(schema: dict) -> dict:
+                """Clean and simplify schema output"""
+                cleaned = {}
+                for key, entry in schema.items():
+                    new_entry = {"type": entry["type"]}
+                    
+                    if "count" in entry:
+                        new_entry["count"] = entry["count"]
+                    
+                    if "labels" in entry and entry["labels"]:
+                        new_entry["labels"] = entry["labels"]
+                    
+                    # Clean properties
+                    if "properties" in entry:
+                        clean_props = {}
+                        for pname, pinfo in entry["properties"].items():
+                            cp = {}
+                            for attr in ["indexed", "type"]:
+                                if attr in pinfo:
+                                    cp[attr] = pinfo[attr]
+                            if cp:
+                                clean_props[pname] = cp
+                        if clean_props:
+                            new_entry["properties"] = clean_props
+                    
+                    # Clean relationships
+                    if "relationships" in entry:
+                        rels_out = {}
+                        for rel_name, rel in entry["relationships"].items():
+                            cr = {}
+                            if "direction" in rel:
+                                cr["direction"] = rel["direction"]
+                            if "labels" in rel and rel["labels"]:
+                                cr["labels"] = rel["labels"]
+                            
+                            # Clean relationship properties
+                            if "properties" in rel:
+                                clean_rprops = {}
+                                for rpname, rpinfo in rel["properties"].items():
+                                    crp = {}
+                                    for attr in ["indexed", "type"]:
+                                        if attr in rpinfo:
+                                            crp[attr] = rpinfo[attr]
+                                    if crp:
+                                        clean_rprops[rpname] = crp
+                                if clean_rprops:
+                                    cr["properties"] = clean_rprops
+                            
+                            if cr:
+                                rels_out[rel_name] = cr
+                        
+                        if rels_out:
+                            new_entry["relationships"] = rels_out
+                    
+                    cleaned[key] = new_entry
                 
-                try:
-                    with kg_driver.session(database=config.knowledge_graph.database) as session:
-                        # Get node labels and counts
-                        labels_result = session.execute_read(_read_knowledge_graph, 
-                            "CALL db.labels() YIELD label RETURN label ORDER BY label", {})
-                        labels_data = json.loads(labels_result)
-                        node_labels = [record["label"] for record in labels_data]
-                        schema_info["summary"]["node_labels"] = node_labels
-                        
-                        # Get relationship types
-                        rels_result = session.execute_read(_read_knowledge_graph,
-                            "CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType ORDER BY relationshipType", {})
-                        rels_data = json.loads(rels_result)
-                        rel_types = [record["relationshipType"] for record in rels_data]
-                        schema_info["summary"]["relationship_types"] = rel_types
-                        
-                        # Get counts and sample properties for each node label
-                        for label in node_labels:
-                            try:
-                                # Get count using native Cypher
-                                count_query = f"MATCH (n:`{label}`) RETURN count(n) as count"
-                                count_result = session.execute_read(_read_knowledge_graph, count_query, {})
-                                count_data = json.loads(count_result)
-                                node_count = count_data[0]["count"] if count_data else 0
-                                
-                                # Get sample properties using native Cypher
-                                props_query = f"MATCH (n:`{label}`) RETURN keys(n) as props LIMIT 10"
-                                props_result = session.execute_read(_read_knowledge_graph, props_query, {})
-                                props_data = json.loads(props_result)
-                                
-                                # Collect unique properties
-                                all_props = set()
-                                for record in props_data:
-                                    all_props.update(record.get("props", []))
-                                
-                                schema_info["nodes"][label] = {
-                                    "count": node_count,
-                                    "properties": sorted(list(all_props)),
-                                    "type": "Node"
-                                }
-                                
-                            except Exception as e:
-                                logger.warning(f"Could not get details for label {label}: {e}")
-                                schema_info["nodes"][label] = {
-                                    "count": 0,
-                                    "properties": [],
-                                    "type": "Node"
-                                }
-                        
-                        # Get sample information for relationships
-                        for rel_type in rel_types:
-                            try:
-                                # Get count using native Cypher
-                                count_query = f"MATCH ()-[r:`{rel_type}`]->() RETURN count(r) as count"
-                                count_result = session.execute_read(_read_knowledge_graph, count_query, {})
-                                count_data = json.loads(count_result)
-                                rel_count = count_data[0]["count"] if count_data else 0
-                                
-                                # Get sample properties using native Cypher
-                                props_query = f"MATCH ()-[r:`{rel_type}`]->() RETURN keys(r) as props LIMIT 10"
-                                props_result = session.execute_read(_read_knowledge_graph, props_query, {})
-                                props_data = json.loads(props_result)
-                                
-                                # Collect unique properties
-                                all_props = set()
-                                for record in props_data:
-                                    all_props.update(record.get("props", []))
-                                
-                                schema_info["relationships"][rel_type] = {
-                                    "count": rel_count,
-                                    "properties": sorted(list(all_props)),
-                                    "type": "Relationship"
-                                }
-                                
-                            except Exception as e:
-                                logger.warning(f"Could not get details for relationship {rel_type}: {e}")
-                                schema_info["relationships"][rel_type] = {
-                                    "count": 0,
-                                    "properties": [],
-                                    "type": "Relationship"
-                                }
-                        
-                        # Calculate totals
-                        schema_info["summary"]["total_nodes"] = sum(
-                            info["count"] for info in schema_info["nodes"].values() 
-                            if isinstance(info["count"], int)
-                        )
-                        schema_info["summary"]["total_relationships"] = sum(
-                            info["count"] for info in schema_info["relationships"].values()
-                            if isinstance(info["count"], int)
-                        )
-                        
-                        return schema_info
-                        
-                except Exception as e:
-                    logger.error(f"Native schema extraction failed: {e}")
-                    raise ToolError(f"Could not extract schema information: {e}")
+                return cleaned
+            
+            get_schema_query = "CALL apoc.meta.schema();"
             
             try:
-                schema_info = get_native_schema()
-                return ToolResult(content=[TextContent(type="text", text=json.dumps(schema_info, indent=2))])
-                        
+                with kg_driver.session(database=config.knowledge_graph.database) as session:
+                    results_json_str = session.execute_read(_read_knowledge_graph, get_schema_query, {})
+                    
+                    schema = json.loads(results_json_str)[0].get('value')
+                    schema_clean = clean_schema(schema)
+                    
+                    return ToolResult(content=[TextContent(type="text", text=json.dumps(schema_clean))])
+                    
+            except ClientError as e:
+                if "Neo.ClientError.Procedure.ProcedureNotFound" in str(e):
+                    raise ToolError("Knowledge graph APOC plugin not installed. Please install and enable APOC for biomedical knowledge inference.")
+                else:
+                    raise ToolError(f"Knowledge graph client error: {e}")
+            except Neo4jError as e:
+                raise ToolError(f"Knowledge graph error: {e}")
             except Exception as e:
                 logger.error(f"Error retrieving knowledge graph schema: {e}")
                 raise ToolError(f"Unexpected error retrieving biomedical knowledge schema: {e}")
@@ -299,7 +260,6 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
             
             try:
                 with kg_driver.session(database=config.knowledge_graph.database) as session:
-                    # Updated to use execute_read instead of read_transaction
                     results_json_str = session.execute_read(_read_knowledge_graph, cypher_query, parameters)
                     
                     logger.debug(f"Knowledge graph query returned {len(results_json_str)} characters")
