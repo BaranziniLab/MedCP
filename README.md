@@ -55,21 +55,38 @@ That's it!
 Run MedCP directly from the repository using `uvx` without installation:
 
 ```bash
-# Set your credentials as environment variables
+# Required: Set your credentials as environment variables
+# At least ONE of the following database configurations must be provided:
+
+# Option A: Knowledge Graph only (biomedical knowledge inference)
 export KNOWLEDGE_GRAPH_URI="bolt://your-neo4j-server:7687"
 export KNOWLEDGE_GRAPH_USERNAME="your_username"
 export KNOWLEDGE_GRAPH_PASSWORD="your_password"
 export KNOWLEDGE_GRAPH_DATABASE="neo4j"
 
-# Optional: Clinical records database
+# Option B: Clinical Records only (EHR queries)
 export CLINICAL_RECORDS_SERVER="your-server.hospital.org"
 export CLINICAL_RECORDS_DATABASE="your_database"
 export CLINICAL_RECORDS_USERNAME="your_username"
 export CLINICAL_RECORDS_PASSWORD="your_password"
 
+# Option C: Both (for integrated medical analysis)
+# Set all environment variables above
+
 # Run from GitHub
 uvx --from git+https://github.com/BaranziniLab/MedCP medcp
 ```
+
+**Important Notes:**
+- If only Knowledge Graph is configured, you'll have access to:
+  - `get_knowledge_graph_schema` - List all biomedical entities and relationships
+  - `query_knowledge_graph` - Query drug-disease associations, protein interactions, etc.
+
+- If only Clinical Records is configured, you'll have access to:
+  - `list_clinical_tables` - List available EHR tables
+  - `query_clinical_records` - Query patient records with SQL
+
+- If both are configured, you'll have access to all tools for integrated analysis
 
 Or run from a local clone:
 
