@@ -33,7 +33,7 @@ That's all! Python and all dependencies are bundled with the extension.
 
 ## Installation
 
-### Quick Install
+### Option 1: Quick Install (Claude Desktop Extension)
 
 1. **Download the Extension**
    - Go to [Releases](../../releases)
@@ -49,6 +49,42 @@ That's all! Python and all dependencies are bundled with the extension.
    - Enter your database credentials (details below)
 
 That's it!
+
+### Option 2: Run with uvx (Universal)
+
+Run MedCP directly from the repository using `uvx` without installation:
+
+```bash
+# Set your credentials as environment variables
+export KNOWLEDGE_GRAPH_URI="bolt://your-neo4j-server:7687"
+export KNOWLEDGE_GRAPH_USERNAME="your_username"
+export KNOWLEDGE_GRAPH_PASSWORD="your_password"
+export KNOWLEDGE_GRAPH_DATABASE="neo4j"
+
+# Optional: Clinical records database
+export CLINICAL_RECORDS_SERVER="your-server.hospital.org"
+export CLINICAL_RECORDS_DATABASE="your_database"
+export CLINICAL_RECORDS_USERNAME="your_username"
+export CLINICAL_RECORDS_PASSWORD="your_password"
+
+# Run from GitHub
+uvx --from git+https://github.com/BaranziniLab/MedCP medcp
+```
+
+Or run from a local clone:
+
+```bash
+# Clone the repository
+git clone https://github.com/BaranziniLab/MedCP.git
+cd MedCP
+
+# Set environment variables (see .env.example)
+export KNOWLEDGE_GRAPH_URI="bolt://localhost:7687"
+# ... set other variables ...
+
+# Run with uvx
+uvx --from . medcp
+```
 
 
 ## Configuration
