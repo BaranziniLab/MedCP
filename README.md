@@ -19,55 +19,17 @@
 ## Prerequisites
 
 ### System Requirements
-- **Claude Desktop** 1.0.0+ with DXT support
+- **Claude Desktop** 1.0.0+ with MCPB extension support
 - **Operating System**: macOS 11+ or Windows 10+
-- **Python** 3.11+ with [uv package manager](https://docs.astral.sh/uv/)
+- **Python** Included (standalone runtime bundled with extension)
 - **Memory**: 8GB RAM minimum, 16GB recommended
 
 ### Install Required Software
 
-**1. Download Claude Desktop**
+**Download Claude Desktop**
 Visit [claude.ai/download](https://claude.ai/download) and install the latest version.
 
-**2. Install UV Package Manager**
-
-**macOS:**
-
-First install [homebrew](https://brew.sh) if not installed already.
-
-Then, deactivate any conda or virtual environment and check the native python version on your mac:
-
-```sh
-python3 --version
-```
-
-If your python version is older than 3.13, try to get the most up-to-date python installed:
-
-```sh
-brew install python
-```
-
-Then install the uv package manager via homebrew:
-
-``` bash
-brew install uv
-```
-
-**Windows:**
-
-Install uv via powershell:
-
-``` powershell
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-**Linux:**
-
-Install uv via bash script:
-
-``` bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+That's all! Python and all dependencies are bundled with the extension.
 
 ## Installation
 
@@ -75,10 +37,10 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 1. **Download the Extension**
    - Go to [Releases](../../releases)
-   - Download the latest `MedCP.dxt` file
+   - Download the latest `MedCP.mcpb` file
 
 2. **Install in Claude Desktop**
-   - Double-click the `MedCP.dxt` file
+   - Double-click the `MedCP.mcpb` file
    - Claude Desktop will open the installation dialog
    - Click **"Install"**
 
@@ -151,7 +113,7 @@ Configure access to your clinical database. For UCSF users, see the [UCSF Resear
 ## Troubleshooting
 
 ### Extension Not Loading
-1. Verify Claude Desktop supports DXT extensions
+1. Verify Claude Desktop supports MCPB extensions
 2. Check that all required configuration fields are completed
 3. Restart Claude Desktop after configuration changes
 
@@ -186,7 +148,7 @@ MedCP is released under the [MIT License](LICENSE).
 
 - **SPOKE Knowledge Graph**: [Morris et al., 2023](https://academic.oup.com/bioinformatics/article/39/2/btad080/7033465)
 - **UCSF Clinical Data**: [UCSF Research Data Portal](https://data.ucsf.edu/research/ucsf-data)
-- **Desktop Extensions**: Built on Anthropic's DXT specification
+- **Desktop Extensions**: Built using Model Context Protocol Bundle (MCPB) format
 - **Model Context Protocol**: Enables secure local AI integration
 
 <div align="center">

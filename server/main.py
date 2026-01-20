@@ -104,7 +104,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
     # Set up logging
     logging.basicConfig(level=getattr(logging, config.log_level.upper()))
     
-    mcp = FastMCP("MedCP", dependencies=["neo4j", "pymssql", "pydantic"])
+    mcp = FastMCP("MedCP")
     namespace_prefix = _format_namespace(config.namespace)
     
     # Knowledge graph driver initialization
