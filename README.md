@@ -4,7 +4,7 @@
 
 ## Overview
 
-**MedCP** transforms Claude Desktop into a powerful medical AI assistant by providing **secure, local access** to electronic health records and biomedical knowledge graphs. Process sensitive health data entirely on your machine while delivering instant access to clinical insights.
+**MedCP** transforms Claude Desktop into a powerful medical AI assistant by providing **secure, local access** to electronic health records and biomedical knowledge graphs. Process sensitive health data entirely on your machine while delivering instant access to clinical insights. If a plain python function-calling version of this software is of interest, please check out [fMedCP](https://github.com/BaranziniLab/fMedCP), which can be run directly from the terminal.
 
 ![](assets/schematics.png)
 
