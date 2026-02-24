@@ -186,6 +186,26 @@ Configure access to your clinical database. For UCSF users, see the [UCSF Resear
 - **Bug Reports**: [Create an issue](../../issues)
 - **Security Issues**: Contact the development team privately
 
+## Data Privacy and Legal Disclaimer
+
+**IMPORTANT NOTICE — DATA PRIVACY, COMPLIANCE, AND LIMITATION OF LIABILITY**
+
+MedCP is a software tool designed to facilitate access to electronic health records and biomedical data through local, institution-controlled infrastructure. By installing, configuring, or using MedCP in any capacity, you acknowledge and agree to the following:
+
+1. **Institutional Compliance Responsibility.** It is the sole responsibility of the user to ensure that all use of this tool complies with the data governance policies, privacy regulations, and data use agreements applicable to their institution, including but not limited to the Health Insurance Portability and Accountability Act (HIPAA), the General Data Protection Regulation (GDPR), the California Consumer Privacy Act (CCPA), and any other applicable federal, state, local, or international laws and regulations governing the collection, storage, access, and use of personal health information or sensitive data.
+
+2. **No Warranty of Regulatory Compliance.** MedCP is provided "as is," without warranty of any kind, express or implied. The authors, developers, and affiliated institutions make no representations or warranties that the use of this tool will satisfy any specific regulatory, legal, or institutional data privacy requirement. Users are solely responsible for obtaining any necessary institutional review board (IRB) approvals, data use agreements, or other authorizations required before accessing or processing any patient data.
+
+3. **Limitation of Liability.** To the fullest extent permitted by applicable law, the authors, contributors, and affiliated institutions (including the Baranzini Lab and the University of California, San Francisco) shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages arising out of or related to the use, misuse, or inability to use this tool, including but not limited to any unauthorized access to or disclosure of protected health information, any violation of applicable privacy laws or institutional data use policies, or any other improper or unlawful use of this software or the data accessed through it.
+
+4. **User Accountability.** Any misuse, unauthorized sharing, or improper handling of data accessed through MedCP is the exclusive responsibility of the user. The authors disclaim all liability for actions taken by users that violate applicable laws, regulations, or institutional policies.
+
+5. **No Clinical Advice.** MedCP is intended solely as a research and informational tool. It does not constitute medical advice, clinical decision support approved for patient care, or a validated clinical diagnostic system. It must not be used as the sole basis for any clinical or medical decisions.
+
+By using this software, you confirm that you have read, understood, and agreed to this disclaimer, and that you will use MedCP in full accordance with all applicable legal and institutional requirements.
+
+---
+
 ## License
 
 MedCP is released under the [MIT License](LICENSE).
