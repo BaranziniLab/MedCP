@@ -50,10 +50,14 @@ export CLINICAL_RECORDS_USERNAME=reader
 export CLINICAL_RECORDS_PASSWORD=•••••
 ```
 
-For the MySQL and SQL Server backends, `CLINICAL_RECORDS_PORT` is optional. To
-connect a Neo4j SPOKE knowledge graph, also set `KNOWLEDGE_GRAPH_URI`,
-`KNOWLEDGE_GRAPH_USERNAME`, `KNOWLEDGE_GRAPH_PASSWORD`, and
-`KNOWLEDGE_GRAPH_DATABASE`.
+For the MySQL and SQL Server backends, `CLINICAL_RECORDS_PORT` is optional. The
+clinical database itself is optional too — omit every `CLINICAL_RECORDS_*`
+variable to run MedCP as a SPOKE-only tool.
+
+The knowledge graph defaults to the bundled **SPOKE production graph** with no
+credentials. Set `KNOWLEDGE_GRAPH_URI` / `_USERNAME` / `_PASSWORD` / `_DATABASE`
+only to use your own Neo4j graph instead (or `MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` to
+turn it off).
 
 `MEDCP_SOURCE` controls which build of the core is launched. It defaults to the
 pinned GitHub release; point it at a local checkout for development:
