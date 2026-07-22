@@ -12,9 +12,28 @@
 
 - **Local Processing** - All data processing happens on your machine
 - **EHR Integration** - Query electronic health records with natural language
+- **Pluggable SQL backend** - Point MedCP at **SQL Server**, **MySQL/MariaDB**, or a **local SQLite** file
+- **Runs in your agent** - One shared core, packaged for **Claude Code**, **Codex CLI**, **BioRouter**, and **Claude Desktop**
 - **Biomedical Knowledge** - Access comprehensive drug-disease associations and protein interactions
 - **Real-time Analysis** - Instant clinical decision support
 - **Secure Storage** - Credentials encrypted in OS keychain
+
+### Integrations
+
+The MedCP server is exposed to several AI coding agents through thin, cleanly
+separated layers in [`integrations/`](integrations) — all launching the same
+core in [`src/medcp/`](src/medcp):
+
+| Agent | Integration | Prebuilt artifact |
+|---|---|---|
+| **Claude Code** | [`integrations/claude-code`](integrations/claude-code) (plugin) | `medcp-claude-code-plugin.zip` |
+| **Codex CLI** | [`integrations/codex`](integrations/codex) (MCP server) | `medcp-codex.zip` |
+| **BioRouter** | [`integrations/biorouter`](integrations/biorouter) (`.brxt` extension) | `MedCP.brxt` |
+| **Claude Desktop** | root [`manifest.json`](manifest.json) (`.mcpb`) | `MedCP.mcpb` |
+
+Built artifacts and per-OS install steps live in the latest
+[`releases/`](releases) folder (see `INSTALL.md` there). Rebuild everything with
+`python3 scripts/build_releases.py`.
 
 ## Prerequisites
 
@@ -123,14 +142,32 @@ MedCP uses the SPOKE knowledge graph by default ([Morris et al., 2023](https://a
 
 ### Electronic Health Records
 
-Configure access to your clinical database. For UCSF users, see the [UCSF Research Data](https://data.ucsf.edu/research/ucsf-data) portal for access information.
+Configure access to your clinical database. MedCP supports three SQL backends,
+selected with **`CLINICAL_RECORDS_BACKEND`**. For UCSF users, see the
+[UCSF Research Data](https://data.ucsf.edu/research/ucsf-data) portal for access
+information.
+
+**`mssql` (SQL Server, default) / `mysql` (MySQL / MariaDB):**
 
 | Parameter | Description | Example |
 |-----------|-------------|---------|
-| **Clinical Records Server** | SQL Server hostname | `your-ehr-server.hospital.org` |
-| **Database Name** | Clinical database name | `OMOP_DEID` |
-| **Username** | Database username | `clinical_user` |
-| **Password** | Database password | `secure_clinical_password` |
+| **`CLINICAL_RECORDS_BACKEND`** | `mssql` or `mysql` | `mssql` |
+| **`CLINICAL_RECORDS_SERVER`** | Database hostname | `your-ehr-server.hospital.org` |
+| **`CLINICAL_RECORDS_DATABASE`** | Clinical database name | `OMOP_DEID` |
+| **`CLINICAL_RECORDS_USERNAME`** | Database username | `clinical_user` |
+| **`CLINICAL_RECORDS_PASSWORD`** | Database password | `secure_clinical_password` |
+| **`CLINICAL_RECORDS_PORT`** | TCP port (optional) | `1433` / `3306` |
+
+**`sqlite` (local file):**
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| **`CLINICAL_RECORDS_BACKEND`** | `sqlite` | `sqlite` |
+| **`CLINICAL_RECORDS_SQLITE_PATH`** | Absolute path to the `.sqlite` file | `/data/omop.sqlite` |
+
+The SQLite backend opens the file **read-only** and needs no server or
+credentials — ideal for local testing (e.g. the OMOP dataset in
+[`benchmarks/sham-dataset`](benchmarks/sham-dataset)).
 
 ### Optional Settings
 
