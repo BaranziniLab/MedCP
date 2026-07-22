@@ -33,11 +33,41 @@ logger = logging.getLogger("MedCP")
 SQLBackend = Literal["mssql", "mysql", "sqlite"]
 
 
+def _load_spoke_defaults() -> dict:
+    """Return the default SPOKE (production) knowledge-graph connection.
+
+    The credentials for the lab-hosted, read-only SPOKE graph are shipped
+    obfuscated so they are not sitting in plaintext in the repo, letting users
+    query SPOKE out of the box without supplying any credentials of their own.
+
+    NOTE: this is obfuscation, not secrecy — the derivation key ships with the
+    code, so a determined reader can recover the value. SPOKE prod is a shared,
+    read-only research graph, so this is acceptable; do not use this mechanism
+    for genuinely sensitive secrets.
+    """
+    import base64
+    from cryptography.fernet import Fernet
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+    salt = b"medcp-spoke-defaults-v1"
+    passphrase = b"".join([b"MedCP", b"::", b"spoke", b"-prod", b"::", b"kg-default", b"-2026"])
+    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=200_000)
+    key = base64.urlsafe_b64encode(kdf.derive(passphrase))
+    token = (
+        b"gAAAAABqYQ53ZEor9C6vOTxH8TAl2mEjUwzHbY9kvim7kDPqJOY4fkr2bvBxci1dKfbaNS3bu"
+        b"CsqdBIOtq4E3a9dGIblWzPDtkylRL9lu1v6gB3K-GePbVnsVWPm7aFawa89yz6ZkOXOgED_2G"
+        b"VLdOOYoxbE9MS0C4dMhpJipffIw6BcRF9-i616diHoTdjzaMtBVhDWHeHcELBq2J-X_BpQj6Jd"
+        b"tss-UA=="
+    )
+    return json.loads(Fernet(key).decrypt(token))
+
+
 class KnowledgeGraphConfig(BaseModel):
-    """Biomedical knowledge graph configuration (Neo4j)"""
+    """Biomedical knowledge graph configuration (Neo4j or compatible)"""
     uri: str = Field(..., description="Knowledge graph connection URI (e.g., bolt://localhost:7687)")
-    username: str = Field(..., description="Knowledge graph database username")
-    password: str = Field(..., description="Knowledge graph database password")
+    username: str = Field("neo4j", description="Knowledge graph database username")
+    password: str = Field("", description="Knowledge graph database password")
     database: str = Field("neo4j", description="Knowledge graph database name")
 
 
@@ -492,6 +522,11 @@ def _int_or_none(value: Optional[str]) -> Optional[int]:
         return None
 
 
+def _env_bool(value: Optional[str]) -> bool:
+    """Parse a truthy environment value ('1', 'true', 'yes', 'on')."""
+    return str(value or "").strip().lower() in ("1", "true", "yes", "on")
+
+
 def main(
     transport: Literal["stdio", "sse", "http"] = "stdio",
     knowledge_graph_uri: Optional[str] = None,
@@ -505,6 +540,7 @@ def main(
     clinical_records_password: Optional[str] = None,
     clinical_records_port: Optional[int] = None,
     clinical_records_sqlite_path: Optional[str] = None,
+    disable_knowledge_graph: bool = False,
     namespace: str = "",
     log_level: str = "INFO",
     host: str = "127.0.0.1",
@@ -516,16 +552,28 @@ def main(
     # Build configuration
     config_dict: dict[str, Any] = {"namespace": namespace, "log_level": log_level}
 
-    # Add knowledge graph config if provided
-    if knowledge_graph_uri and knowledge_graph_username and knowledge_graph_password:
-        kg_config = {
-            "uri": knowledge_graph_uri,
-            "username": knowledge_graph_username,
-            "password": knowledge_graph_password,
+    # Knowledge graph selection:
+    #   * user supplies their own KNOWLEDGE_GRAPH_URI  -> use their graph
+    #   * nothing supplied                             -> default to SPOKE (prod),
+    #     whose read-only credentials ship obfuscated so no config is needed
+    #   * explicitly disabled                          -> no knowledge graph
+    user_kg_uri = (knowledge_graph_uri or "").strip()
+    if disable_knowledge_graph:
+        logger.info("Knowledge graph disabled by configuration")
+    elif user_kg_uri:
+        config_dict["knowledge_graph"] = {
+            "uri": user_kg_uri,
+            "username": knowledge_graph_username or "neo4j",
+            "password": knowledge_graph_password or "",
+            "database": knowledge_graph_database or "neo4j",
         }
-        if knowledge_graph_database:
-            kg_config["database"] = knowledge_graph_database
-        config_dict["knowledge_graph"] = kg_config
+    else:
+        # No user-provided graph: fall back to the bundled SPOKE production graph.
+        try:
+            config_dict["knowledge_graph"] = _load_spoke_defaults()
+            logger.info("Using bundled SPOKE production knowledge graph (no user config supplied)")
+        except Exception as e:  # pragma: no cover - defensive
+            logger.error(f"Could not load bundled SPOKE defaults: {e}")
 
     # Add clinical records config if provided.
     backend = (clinical_records_backend or "mssql").strip().lower()
@@ -586,6 +634,7 @@ def main_from_env() -> None:
         clinical_records_password=os.getenv("CLINICAL_RECORDS_PASSWORD"),
         clinical_records_port=_int_or_none(os.getenv("CLINICAL_RECORDS_PORT")),
         clinical_records_sqlite_path=os.getenv("CLINICAL_RECORDS_SQLITE_PATH"),
+        disable_knowledge_graph=_env_bool(os.getenv("MEDCP_DISABLE_KNOWLEDGE_GRAPH")),
         namespace=os.getenv("MEDCP_NAMESPACE", "MedCP"),
         log_level=os.getenv("MEDCP_LOG_LEVEL", "INFO"),
     )

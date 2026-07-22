@@ -7,7 +7,7 @@ Command-line interface for the MedCP server.
 import logging
 import os
 
-from medcp.server import _int_or_none, main as server_main
+from medcp.server import _env_bool, _int_or_none, main as server_main
 
 
 logger = logging.getLogger("MedCP")
@@ -41,6 +41,7 @@ def main() -> None:
         clinical_records_password=os.getenv("CLINICAL_RECORDS_PASSWORD"),
         clinical_records_port=_int_or_none(os.getenv("CLINICAL_RECORDS_PORT")),
         clinical_records_sqlite_path=os.getenv("CLINICAL_RECORDS_SQLITE_PATH"),
+        disable_knowledge_graph=_env_bool(os.getenv("MEDCP_DISABLE_KNOWLEDGE_GRAPH")),
         namespace=os.getenv("MEDCP_NAMESPACE", "MedCP"),
         log_level=log_level,
     )
