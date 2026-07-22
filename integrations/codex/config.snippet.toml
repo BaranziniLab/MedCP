@@ -2,8 +2,13 @@
 # Append this block to ~/.codex/config.toml (or run ./install.sh to do it for you).
 #
 # It launches the shared `medcp` core with uvx — the same server used by the
-# Claude Code plugin and the BioRouter extension. Fill in the [.env] values for
-# the backend you use (sqlite / mysql / mssql).
+# Claude Code plugin and the BioRouter extension.
+#
+# Both databases are OPTIONAL:
+#   * Knowledge graph  — omit the KNOWLEDGE_GRAPH_* vars to use the bundled SPOKE
+#                        production graph automatically (no credentials needed).
+#   * Clinical records — omit the CLINICAL_RECORDS_* vars to run MedCP as a
+#                        SPOKE-only query tool (no EHR connection).
 
 [mcp_servers.medcp]
 command = "uvx"
@@ -11,21 +16,31 @@ args = ["--from", "git+https://github.com/BaranziniLab/MedCP@v0.8.0", "medcp"]
 startup_timeout_sec = 120
 
 [mcp_servers.medcp.env]
-# --- Clinical records backend: "sqlite" | "mysql" | "mssql" ---
-CLINICAL_RECORDS_BACKEND = "sqlite"
-# sqlite backend:
+# --- Clinical records / EHR (OPTIONAL) — pick ONE backend --------------------
+CLINICAL_RECORDS_BACKEND = "sqlite"          # "sqlite" | "mysql" | "mssql"
+# sqlite backend — needs only a local file path (no credentials):
 CLINICAL_RECORDS_SQLITE_PATH = "/absolute/path/to/database.sqlite"
-# mysql / mssql backends (uncomment and fill in instead):
-# CLINICAL_RECORDS_SERVER   = "db.example.org"
+# mysql backend — credentials for YOUR MySQL server (uncomment and fill in):
+# CLINICAL_RECORDS_SERVER   = "your-mysql-host"
 # CLINICAL_RECORDS_DATABASE = "omop"
-# CLINICAL_RECORDS_USERNAME = "reader"
-# CLINICAL_RECORDS_PASSWORD = "change-me"
+# CLINICAL_RECORDS_USERNAME = "your-mysql-user"
+# CLINICAL_RECORDS_PASSWORD = "your-mysql-password"
 # CLINICAL_RECORDS_PORT     = "3306"
-# --- Optional SPOKE knowledge graph (Neo4j) ---
-# KNOWLEDGE_GRAPH_URI      = "bolt://spokedev.cgl.ucsf.edu:7687"
+# mssql backend — credentials for YOUR SQL Server (uncomment and fill in):
+# CLINICAL_RECORDS_SERVER   = "your-sqlserver-host"
+# CLINICAL_RECORDS_DATABASE = "OMOP_DEID"
+# CLINICAL_RECORDS_USERNAME = "your-sqlserver-user"
+# CLINICAL_RECORDS_PASSWORD = "your-sqlserver-password"
+# CLINICAL_RECORDS_PORT     = "1433"
+
+# --- Knowledge graph (OPTIONAL) ---------------------------------------------
+# Leave these unset to use the bundled SPOKE production graph automatically.
+# Set them ONLY to point at your own Neo4j knowledge graph:
+# KNOWLEDGE_GRAPH_URI      = "bolt://your-neo4j-host:7687"
 # KNOWLEDGE_GRAPH_USERNAME = "neo4j"
-# KNOWLEDGE_GRAPH_PASSWORD = "change-me"
-# KNOWLEDGE_GRAPH_DATABASE = "spoke"
-# --- MedCP options ---
+# KNOWLEDGE_GRAPH_PASSWORD = "your-neo4j-password"
+# KNOWLEDGE_GRAPH_DATABASE = "neo4j"
+
+# --- MedCP options ----------------------------------------------------------
 MEDCP_NAMESPACE = "MedCP"
 MEDCP_LOG_LEVEL = "INFO"

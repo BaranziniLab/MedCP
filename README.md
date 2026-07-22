@@ -135,21 +135,33 @@ After installation, you'll need to configure your database connections in Claude
 
 **Settings → Extensions → MedCP**
 
-### Biomedical Knowledge Graph
+### Biomedical Knowledge Graph (optional)
 
-MedCP uses the SPOKE knowledge graph by default ([Morris et al., 2023](https://academic.oup.com/bioinformatics/article/39/2/btad080/7033465)), which contains comprehensive biomedical relationships including drug-disease associations, protein interactions, and biological pathways.
+**MedCP connects to the SPOKE knowledge graph by default — no credentials
+required.** SPOKE ([Morris et al., 2023](https://academic.oup.com/bioinformatics/article/39/2/btad080/7033465))
+contains comprehensive biomedical relationships including drug-disease
+associations, protein interactions, and biological pathways, and its read-only
+production connection ships built in. Leave every `KNOWLEDGE_GRAPH_*` variable
+unset to use it.
+
+To use **your own** Neo4j / compatible knowledge graph instead, set the following
+(these credentials are for *your* graph, not SPOKE). To turn the knowledge graph
+off entirely, set `MEDCP_DISABLE_KNOWLEDGE_GRAPH=1`.
 
 | Parameter | Description | Example |
 |-----------|-------------|---------|
-| **Knowledge Graph URI** | Neo4j connection URI | `bolt://your-neo4j-server:7687` |
-| **Username** | Neo4j database username | `your_username` |
-| **Password** | Neo4j database password | `your_secure_password` |
-| **Database Name** | Neo4j database name | `spoke` (default) |
+| **`KNOWLEDGE_GRAPH_URI`** | Your Neo4j connection URI | `bolt://your-neo4j-server:7687` |
+| **`KNOWLEDGE_GRAPH_USERNAME`** | Your Neo4j username | `neo4j` |
+| **`KNOWLEDGE_GRAPH_PASSWORD`** | Your Neo4j password | `your_secure_password` |
+| **`KNOWLEDGE_GRAPH_DATABASE`** | Your Neo4j database name | `neo4j` |
 
-### Electronic Health Records
+### Electronic Health Records (optional)
 
-Configure access to your clinical database. MedCP supports three SQL backends,
-selected with **`CLINICAL_RECORDS_BACKEND`**. For UCSF users, see the
+Configuring an EHR database is **optional** — omit every `CLINICAL_RECORDS_*`
+variable and MedCP runs as a SPOKE-only knowledge-graph tool. To connect clinical
+records, MedCP supports three SQL backends, selected with
+**`CLINICAL_RECORDS_BACKEND`**. Fill in only the settings for the backend you
+choose (the credentials below are for *your* database). For UCSF users, see the
 [UCSF Research Data](https://data.ucsf.edu/research/ucsf-data) portal for access
 information.
 
