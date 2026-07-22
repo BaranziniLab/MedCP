@@ -1,9 +1,35 @@
+# Files excluded from the Claude Desktop .mcpb bundle.
+# The bundle only needs: manifest.json, server/, .python/ (runtime), logo.png.
+
+# Secrets — NEVER bundle these
+.env
+.env.*
+!.env.example
+
+# Dev tooling / VCS
 .git/
-assets/
-.venv/
+.github/
+.githooks/
+.gitignore
+.gitattributes
 .vscode/
+.mcpbignore
+
+# Docs & assets not used at runtime
+assets/
 README.md
+
+# Python project sources (server/main.py is self-contained; the package lives in .python)
+src/
+pyproject.toml
 uv.lock
+.python-version
+
+# Other integration targets — packaged separately (see integrations/ + scripts/)
+integrations/
+scripts/
+
+# Build inputs / data / prior releases
 releases/
 benchmarks/
-src/
+.venv/
