@@ -1,0 +1,31 @@
+# MedCP MCP server for the Codex CLI.
+# Append this block to ~/.codex/config.toml (or run ./install.sh to do it for you).
+#
+# It launches the shared `medcp` core with uvx — the same server used by the
+# Claude Code plugin and the BioRouter extension. Fill in the [.env] values for
+# the backend you use (sqlite / mysql / mssql).
+
+[mcp_servers.medcp]
+command = "uvx"
+args = ["--from", "git+https://github.com/BaranziniLab/MedCP@v0.8.0", "medcp"]
+startup_timeout_sec = 120
+
+[mcp_servers.medcp.env]
+# --- Clinical records backend: "sqlite" | "mysql" | "mssql" ---
+CLINICAL_RECORDS_BACKEND = "sqlite"
+# sqlite backend:
+CLINICAL_RECORDS_SQLITE_PATH = "/absolute/path/to/database.sqlite"
+# mysql / mssql backends (uncomment and fill in instead):
+# CLINICAL_RECORDS_SERVER   = "db.example.org"
+# CLINICAL_RECORDS_DATABASE = "omop"
+# CLINICAL_RECORDS_USERNAME = "reader"
+# CLINICAL_RECORDS_PASSWORD = "change-me"
+# CLINICAL_RECORDS_PORT     = "3306"
+# --- Optional SPOKE knowledge graph (Neo4j) ---
+# KNOWLEDGE_GRAPH_URI      = "bolt://spokedev.cgl.ucsf.edu:7687"
+# KNOWLEDGE_GRAPH_USERNAME = "neo4j"
+# KNOWLEDGE_GRAPH_PASSWORD = "change-me"
+# KNOWLEDGE_GRAPH_DATABASE = "spoke"
+# --- MedCP options ---
+MEDCP_NAMESPACE = "MedCP"
+MEDCP_LOG_LEVEL = "INFO"

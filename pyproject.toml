@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "medcp"
-version = "0.3.0"
+version = "0.8.0"
 description = "An MCP server that integrates electronic health record databases and a large-scale heterogeneous knowledge graph for rapid clinical record query and fast biomedical knowledge inference"
 readme = "README.md"
 license = {text = "MIT"}
@@ -34,8 +34,19 @@ dependencies = [
     "fastmcp>=2.11.2",
     "neo4j>=5.28.2",
     "pydantic>=2.11.7",
-    "pymssql>=2.3.7",
+    "pymssql>=2.3.7",      # Microsoft SQL Server backend
+    "pymysql>=1.1.1",      # MySQL / MariaDB backend (pure Python)
+    # SQLite backend uses the Python standard library (sqlite3) — no dependency.
 ]
 requires-python = ">=3.11"
 
 scripts.medcp = "medcp.cli:main"
+
+[tool.uv]
+# fastmcp pulls `cryptography` transitively; cryptography >=49 (2026-06-12)
+# dropped x86_64 macOS wheels, forcing a from-source Rust build on Intel Macs.
+# Cap it there so Intel users still get a prebuilt wheel; arm64/Linux/Windows
+# keep the newest version.
+constraint-dependencies = [
+    "cryptography<49; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+]

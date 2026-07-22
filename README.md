@@ -2,34 +2,58 @@
 
 <br>
 
+**Contents:** [Overview](#overview) · [Integrations](#integrations) · [Installation](#installation) · [Configuration](#configuration) · [Usage](#usage-examples) · [Troubleshooting](#troubleshooting) · [Legal](#data-privacy-and-legal-disclaimer)
+
 ## Overview
 
-**MedCP** transforms Claude Desktop into a powerful medical AI assistant by providing **secure, local access** to electronic health records and biomedical knowledge graphs. Process sensitive health data entirely on your machine while delivering instant access to clinical insights. If a plain python function-calling version of this software is of interest, please check out [fMedCP](https://github.com/BaranziniLab/fMedCP), which can be run directly from the terminal.
+**MedCP** gives your AI agent **secure, local access** to electronic health records and biomedical knowledge graphs. Sensitive health data is processed entirely on your machine, and one shared core is packaged for **Claude Code**, **Codex CLI**, **BioRouter**, and **Claude Desktop**. If a plain Python function-calling version of this software is of interest, please check out [fMedCP](https://github.com/BaranziniLab/fMedCP), which can be run directly from the terminal.
 
-![](assets/schematics.png)
+![MedCP architecture schematic](assets/schematics.png)
 
 ### Key Features
 
 - **Local Processing** - All data processing happens on your machine
 - **EHR Integration** - Query electronic health records with natural language
+- **Pluggable SQL backend** - Point MedCP at **SQL Server**, **MySQL/MariaDB**, or a **local SQLite** file
+- **Runs in your agent** - One shared core, packaged for **Claude Code**, **Codex CLI**, **BioRouter**, and **Claude Desktop**
 - **Biomedical Knowledge** - Access comprehensive drug-disease associations and protein interactions
 - **Real-time Analysis** - Instant clinical decision support
 - **Secure Storage** - Credentials encrypted in OS keychain
 
+### Integrations
+
+The MedCP server is exposed to several AI coding agents through thin, cleanly
+separated layers in [`integrations/`](integrations/README.md) — all launching the
+same shared core in [`src/medcp/`](src/medcp):
+
+| Agent | Integration | Prebuilt artifact |
+| --- | --- | --- |
+| **Claude Code** | [`integrations/claude-code`](integrations/claude-code) (plugin) | `medcp-claude-code-plugin.zip` |
+| **Codex CLI** | [`integrations/codex`](integrations/codex) (MCP server) | `medcp-codex.zip` |
+| **BioRouter** | [`integrations/biorouter`](integrations/biorouter) (`.brxt` extension) | `MedCP.brxt` |
+| **Claude Desktop** | root [`manifest.json`](manifest.json) (`.mcpb`) | `MedCP.mcpb` |
+
+Built artifacts and per-OS install steps live in the latest
+[`releases/`](releases) folder (see `INSTALL.md` there). Rebuild the Claude Code,
+Codex, and BioRouter artifacts with `python3 scripts/build_releases.py`; the
+Claude Desktop `MedCP.mcpb` is packaged separately with `mcpb pack`.
+
 ## Prerequisites
 
-### System Requirements
+Requirements depend on how you run MedCP.
+
+### For the Claude Desktop extension
+
 - **Claude Desktop** 1.0.0+ with MCPB extension support
-- **Operating System**: macOS 11+ or Windows 10+
-- **Python** Included (standalone runtime bundled with extension)
-- **Memory**: 8GB RAM minimum, 16GB recommended
+- **Operating system**: macOS 11+ or Windows 10+
+- **Python**: included (standalone runtime bundled with the extension)
+- **Memory**: 8 GB RAM minimum, 16 GB recommended
 
-### Install Required Software
+Python and all dependencies ship inside the extension — just install Claude Desktop from [claude.ai/download](https://claude.ai/download).
 
-**Download Claude Desktop**
-Visit [claude.ai/download](https://claude.ai/download) and install the latest version.
+### For uvx and the agent integrations
 
-That's all! Python and all dependencies are bundled with the extension.
+- **[uv](https://docs.astral.sh/uv/)** — provides `uvx`/`uv`, used to launch the shared core for [Option 2](#option-2-run-with-uvx-universal) and for the Claude Code, Codex CLI, and BioRouter [integrations](#integrations).
 
 ## Installation
 
@@ -73,18 +97,19 @@ export CLINICAL_RECORDS_PASSWORD="your_password"
 # Option C: Both (for integrated medical analysis)
 # Set all environment variables above
 
-# Run from GitHub
-uvx --from git+https://github.com/BaranziniLab/MedCP medcp
+# Run from GitHub (pinned to the v0.8.0 release)
+uvx --from git+https://github.com/BaranziniLab/MedCP@v0.8.0 medcp
 ```
 
-**Important Notes:**
+**Important Notes:** tool names are prefixed with the `MEDCP_NAMESPACE` (default `MedCP`).
+
 - If only Knowledge Graph is configured, you'll have access to:
-  - `get_knowledge_graph_schema` - List all biomedical entities and relationships
-  - `query_knowledge_graph` - Query drug-disease associations, protein interactions, etc.
+  - `MedCP-get_knowledge_graph_schema` - List all biomedical entities and relationships
+  - `MedCP-query_knowledge_graph` - Query drug-disease associations, protein interactions, etc.
 
 - If only Clinical Records is configured, you'll have access to:
-  - `list_clinical_tables` - List available EHR tables
-  - `query_clinical_records` - Query patient records with SQL
+  - `MedCP-list_clinical_tables` - List available EHR tables
+  - `MedCP-query_clinical_records` - Query patient records with SQL
 
 - If both are configured, you'll have access to all tools for integrated analysis
 
@@ -123,14 +148,32 @@ MedCP uses the SPOKE knowledge graph by default ([Morris et al., 2023](https://a
 
 ### Electronic Health Records
 
-Configure access to your clinical database. For UCSF users, see the [UCSF Research Data](https://data.ucsf.edu/research/ucsf-data) portal for access information.
+Configure access to your clinical database. MedCP supports three SQL backends,
+selected with **`CLINICAL_RECORDS_BACKEND`**. For UCSF users, see the
+[UCSF Research Data](https://data.ucsf.edu/research/ucsf-data) portal for access
+information.
+
+**`mssql` (SQL Server, default) / `mysql` (MySQL / MariaDB):**
 
 | Parameter | Description | Example |
 |-----------|-------------|---------|
-| **Clinical Records Server** | SQL Server hostname | `your-ehr-server.hospital.org` |
-| **Database Name** | Clinical database name | `OMOP_DEID` |
-| **Username** | Database username | `clinical_user` |
-| **Password** | Database password | `secure_clinical_password` |
+| **`CLINICAL_RECORDS_BACKEND`** | `mssql` or `mysql` | `mssql` |
+| **`CLINICAL_RECORDS_SERVER`** | Database hostname | `your-ehr-server.hospital.org` |
+| **`CLINICAL_RECORDS_DATABASE`** | Clinical database name | `OMOP_DEID` |
+| **`CLINICAL_RECORDS_USERNAME`** | Database username | `clinical_user` |
+| **`CLINICAL_RECORDS_PASSWORD`** | Database password | `secure_clinical_password` |
+| **`CLINICAL_RECORDS_PORT`** | TCP port (optional) | `1433` / `3306` |
+
+**`sqlite` (local file):**
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| **`CLINICAL_RECORDS_BACKEND`** | `sqlite` | `sqlite` |
+| **`CLINICAL_RECORDS_SQLITE_PATH`** | Absolute path to the `.sqlite` file | `/data/omop.sqlite` |
+
+The SQLite backend opens the file **read-only** and needs no server or
+credentials — ideal for local testing (e.g. the OMOP dataset in
+[`benchmarks/sham-dataset`](benchmarks/sham-dataset)).
 
 ### Optional Settings
 
@@ -144,22 +187,22 @@ Configure access to your clinical database. For UCSF users, see the [UCSF Resear
 ## Usage Examples
 
 ### Query Patient Records
-```
+```text
 "Find all patients diagnosed with diabetes in the last 6 months and summarize their HbA1c trends"
 ```
 
 ### Drug Interaction Analysis
-```
+```text
 "Check for interactions between metformin, lisinopril, and atorvastatin for a 65-year-old patient with CKD stage 3"
 ```
 
 ### Clinical Guidelines
-```
+```text
 "What are the current evidence-based guidelines for treating community-acquired pneumonia in elderly patients?"
 ```
 
 ### Biomedical Research
-```
+```text
 "Find protein targets associated with Alzheimer's disease and identify potential drug compounds that interact with these proteins"
 ```
 

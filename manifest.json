@@ -1,9 +1,9 @@
 {
   "manifest_version": "0.2",
   "name": "MedCP",
-  "version": "0.3.0",
+  "version": "0.8.0",
   "description": "Medical Model Context Protocol Server for Claude Desktop",
-  "long_description": "MedCP is a specialized medical AI extension that integrates electronic health record databases and large-scale biomedical knowledge graphs directly into Claude Desktop. It enables natural language querying of clinical data (SQL Server/OMOP CDM), exploration of the SPOKE biomedical knowledge graph (Neo4j), and comprehensive analysis combining patient records with drug-disease associations, protein interactions, and biological pathways. The extension provides secure, local processing of sensitive health data with credentials encrypted in OS keychain, making it ideal for clinical decision support, medical research, and healthcare analytics.",
+  "long_description": "MedCP is a specialized medical AI extension that integrates electronic health record databases and large-scale biomedical knowledge graphs directly into Claude Desktop. It enables natural language querying of clinical data (SQL Server, MySQL/MariaDB, or a local SQLite file — e.g. OMOP CDM), exploration of the SPOKE biomedical knowledge graph (Neo4j), and comprehensive analysis combining patient records with drug-disease associations, protein interactions, and biological pathways. The extension provides secure, local processing of sensitive health data with credentials encrypted in OS keychain, making it ideal for clinical decision support, medical research, and healthcare analytics.",
   "author": {
     "name": "Wanjun Gu",
     "email": "wanjun.gu@ucsf.edu"
@@ -24,10 +24,13 @@
         "KNOWLEDGE_GRAPH_USERNAME":  "${user_config.KNOWLEDGE_GRAPH_USERNAME}",
         "KNOWLEDGE_GRAPH_PASSWORD":  "${user_config.KNOWLEDGE_GRAPH_PASSWORD}",
         "KNOWLEDGE_GRAPH_DATABASE":  "${user_config.KNOWLEDGE_GRAPH_DATABASE}",
+        "CLINICAL_RECORDS_BACKEND":  "${user_config.CLINICAL_RECORDS_BACKEND}",
         "CLINICAL_RECORDS_SERVER":   "${user_config.CLINICAL_RECORDS_SERVER}",
         "CLINICAL_RECORDS_DATABASE": "${user_config.CLINICAL_RECORDS_DATABASE}",
         "CLINICAL_RECORDS_USERNAME": "${user_config.CLINICAL_RECORDS_USERNAME}",
-        "CLINICAL_RECORDS_PASSWORD": "${user_config.CLINICAL_RECORDS_PASSWORD}"
+        "CLINICAL_RECORDS_PASSWORD": "${user_config.CLINICAL_RECORDS_PASSWORD}",
+        "CLINICAL_RECORDS_PORT":     "${user_config.CLINICAL_RECORDS_PORT}",
+        "CLINICAL_RECORDS_SQLITE_PATH": "${user_config.CLINICAL_RECORDS_SQLITE_PATH}"
       }
     }
   },
@@ -42,7 +45,7 @@
     },
     {
       "name": "query_clinical_records",
-      "description": "Execute a READ-ONLY SQL query on electronic health records for rapid clinical data retrieval. Only SELECT queries are allowed for security and data integrity."
+      "description": "Execute a READ-ONLY SQL query on electronic health records for rapid clinical data retrieval. Works against SQL Server, MySQL, or a local SQLite file. Only SELECT queries are allowed for security and data integrity."
     },
     {
       "name": "list_clinical_tables",
@@ -70,8 +73,8 @@
     "KNOWLEDGE_GRAPH_URI": {
       "type": "string",
       "title": "Knowledge Graph URI",
-      "description": "URI for the Neo4j biomedical knowledge graph (default: SPOKE knowledge graph)",
-      "required": true,
+      "description": "URI for the Neo4j biomedical knowledge graph (leave blank to run clinical-records only)",
+      "required": false,
       "default": "bolt://spokedev.cgl.ucsf.edu:7687",
       "sensitive": false
     },
@@ -79,53 +82,75 @@
       "type": "string",
       "title": "Knowledge Graph Username",
       "description": "Username for the Neo4j biomedical knowledge graph database",
-      "required": true,
+      "required": false,
       "sensitive": false
     },
     "KNOWLEDGE_GRAPH_PASSWORD": {
       "type": "string",
       "title": "Knowledge Graph Password",
       "description": "Password for the Neo4j biomedical knowledge graph database",
-      "required": true,
+      "required": false,
       "sensitive": true
     },
     "KNOWLEDGE_GRAPH_DATABASE": {
       "type": "string",
       "title": "Knowledge Graph Database Name",
       "description": "Name of the Neo4j database containing biomedical knowledge (default: SPOKE knowledge graph)",
-      "required": true,
+      "required": false,
       "default": "spoke",
+      "sensitive": false
+    },
+    "CLINICAL_RECORDS_BACKEND": {
+      "type": "string",
+      "title": "Clinical Records Backend",
+      "description": "SQL engine for the electronic health record database: 'mssql' (SQL Server), 'mysql' (MySQL/MariaDB), or 'sqlite' (local file)",
+      "required": false,
+      "default": "mssql",
       "sensitive": false
     },
     "CLINICAL_RECORDS_SERVER": {
       "type": "string",
       "title": "Clinical Records Server",
-      "description": "SQL Server for electronic health records database (default: UCSF EHR database)",
-      "required": true,
+      "description": "Server hostname for the EHR database (mssql/mysql backends only)",
+      "required": false,
       "default": "QCDIDDWDB001.ucsfmedicalcenter.org",
       "sensitive": false
     },
     "CLINICAL_RECORDS_DATABASE": {
       "type": "string",
       "title": "Clinical Records Database",
-      "description": "Name of the SQL Server database containing electronic health records",
-      "required": true,
+      "description": "Name of the EHR database (mssql/mysql backends only)",
+      "required": false,
       "default": "OMOP_DEID",
       "sensitive": false
     },
     "CLINICAL_RECORDS_USERNAME": {
       "type": "string",
       "title": "Clinical Records Username",
-      "description": "Username for the electronic health records SQL Server database",
-      "required": true,
+      "description": "Username for the EHR database (mssql/mysql backends only)",
+      "required": false,
       "sensitive": false
     },
     "CLINICAL_RECORDS_PASSWORD": {
       "type": "string",
       "title": "Clinical Records Password",
-      "description": "Password for the electronic health records SQL Server database",
-      "required": true,
+      "description": "Password for the EHR database (mssql/mysql backends only)",
+      "required": false,
       "sensitive": true
+    },
+    "CLINICAL_RECORDS_PORT": {
+      "type": "string",
+      "title": "Clinical Records Port",
+      "description": "Optional TCP port for the EHR database (mssql/mysql backends only)",
+      "required": false,
+      "sensitive": false
+    },
+    "CLINICAL_RECORDS_SQLITE_PATH": {
+      "type": "string",
+      "title": "Clinical Records SQLite Path",
+      "description": "Absolute path to the local SQLite database file (sqlite backend only)",
+      "required": false,
+      "sensitive": false
     },
     "MEDCP_NAMESPACE": {
       "type": "string",
@@ -166,6 +191,8 @@
     "Neo4j",
     "SPOKE",
     "SQL Server",
+    "MySQL",
+    "SQLite",
     "Drug Discovery",
     "Protein Interactions",
     "Pathways",
