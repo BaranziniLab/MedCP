@@ -465,8 +465,17 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
                     "WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' "
                     "ORDER BY name"
                 )
+            elif clinical_config.backend == "mysql":
+                # In MySQL, INFORMATION_SCHEMA.TABLES spans every database, so scope
+                # it to the connected one (otherwise mysql/sys system tables leak in).
+                query = (
+                    "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE "
+                    "FROM INFORMATION_SCHEMA.TABLES "
+                    "WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = DATABASE() "
+                    "ORDER BY TABLE_NAME"
+                )
             else:
-                # INFORMATION_SCHEMA.TABLES is supported by both SQL Server and MySQL
+                # SQL Server's INFORMATION_SCHEMA is already scoped to the current database.
                 query = (
                     "SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE "
                     "FROM INFORMATION_SCHEMA.TABLES "
