@@ -2,7 +2,7 @@
 
 <br>
 
-**Contents:** [Overview](#overview) · [Integrations](#integrations) · [Installation](#installation) · [Configuration](#configuration) · [Usage](#usage-examples) · [Troubleshooting](#troubleshooting) · [Legal](#data-privacy-and-legal-disclaimer)
+**Contents:** [Overview](#overview) · [Integrations](#integrations) · [Installation](#installation) · [Configuration](#configuration) · [Usage](#usage-examples) · [Testing](#testing) · [Troubleshooting](#troubleshooting) · [Legal](#data-privacy-and-legal-disclaimer)
 
 ## Overview
 
@@ -217,6 +217,41 @@ credentials — ideal for local testing (e.g. the OMOP dataset in
 ```text
 "Find protein targets associated with Alzheimer's disease and identify potential drug compounds that interact with these proteins"
 ```
+
+## Testing
+
+A synthetic OMOP dataset and ready-to-run tests live in
+[`benchmarks/sham-dataset`](benchmarks/sham-dataset) — no real patient data.
+
+**SQLite only (no setup):**
+
+```bash
+uv run --with fastmcp --with neo4j python benchmarks/sham-dataset/test_backends.py
+```
+
+This verifies the SQLite backend (32 tables, 100 patients, writes blocked) and
+the default SPOKE knowledge graph.
+
+**Against hosted MySQL / SQL Server:** the dataset is organized into
+[`sqlite/`](benchmarks/sham-dataset/sqlite),
+[`mysql/`](benchmarks/sham-dataset/mysql), and
+[`mssql/`](benchmarks/sham-dataset/mssql). The `mysql/` and `mssql/` folders each
+ship a `provision.sh` that stands up an AWS RDS instance, loads the dataset, and
+writes a git-ignored `.dbenv` you can `source` before running the tests:
+
+```bash
+cd benchmarks/sham-dataset/mysql
+export DB_PASSWORD='SomeStrongPassword123'   # RDS master password
+./provision.sh                                # create RDS MySQL + load ~468K rows
+source ./.dbenv
+python ../test_backends.py                     # sqlite + mysql + SPOKE
+./teardown.sh                                  # delete the instance when done
+```
+
+`test_backends.py` includes MySQL and/or SQL Server automatically once their
+connection variables are set. See
+[`benchmarks/sham-dataset/README.md`](benchmarks/sham-dataset/README.md) for
+details. All three backends have been verified to return identical results.
 
 ## Troubleshooting
 
