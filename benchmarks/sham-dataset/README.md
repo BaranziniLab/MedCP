@@ -2,7 +2,7 @@
 
 `sham_mimic_omop.sqlite` is a single self-contained SQLite database built from the
 MIMIC-IV demo dataset (100-patient subset) in the OMOP Common Data Model, downloaded
-from PhysioNet (https://physionet.org/content/mimic-iv-demo-omop/0.9/). See
+from [PhysioNet](https://physionet.org/content/mimic-iv-demo-omop/0.9/). See
 [SOURCE_README.md](SOURCE_README.md) for provenance and citations, and
 [LICENSE.txt](LICENSE.txt) for the data license (ODC-By 1.0).
 
@@ -22,7 +22,7 @@ conn = sqlite3.connect("benchmarks/sham-dataset/sham_mimic_omop.sqlite")
 32 OMOP CDM tables, 467,840 rows total. Non-empty tables:
 
 | Table | Rows | | Table | Rows |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | measurement | 338,550 | | condition_era | 3,771 |
 | observation | 31,390 | | fact_relationship | 1,752 |
 | procedure_occurrence | 18,447 | | visit_occurrence | 852 |
@@ -50,9 +50,13 @@ cohort_definition, cost, metadata, note, note_nlp, payer_plan_period, provider.
   `condition_concept_id = 4145513`) to `concept` returns nothing. To get
   human-readable names, join `*_source_concept_id` to `concept`, or use the
   `*_source_value` columns directly.
-- **Indexes** exist on `person_id`, `visit_occurrence_id`, `visit_detail_id`,
-  all `*_concept_id` columns, all `*_date`/`*_datetime` columns, and the
-  `concept`/`concept_relationship` key columns. `ANALYZE` has been run.
+- **Indexes** (124) cover the common access paths: on every event table,
+  `person_id`, `visit_occurrence_id`, the domain and source `*_concept_id`
+  columns, and the primary date column; small lookup tables (`concept`,
+  `concept_relationship`, `vocabulary`, …) are fully indexed on their key
+  columns. `ANALYZE` has been run. Other columns are unindexed to keep the
+  file under GitHub's 100 MB limit — full scans of the largest table
+  (338K rows) take ~16 ms, so unindexed filters remain fast.
 - Patient timelines are date-shifted (years like 2095/2113 are expected).
 
 Example — most common conditions with readable names:
