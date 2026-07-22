@@ -1,0 +1,121 @@
+{
+  "name": "medcp",
+  "display_name": "MedCP",
+  "description": "Query electronic health records (SQL Server, MySQL, or a local SQLite file — e.g. OMOP CDM) and the SPOKE biomedical knowledge graph. Read-only clinical data retrieval and fast biomedical knowledge inference.",
+  "version": "0.8.0",
+  "entry_point": "medcp",
+  "repository": "https://github.com/BaranziniLab/MedCP",
+  "tools_count": 4,
+  "env_vars": [
+    {
+      "key": "CLINICAL_RECORDS_BACKEND",
+      "required": false,
+      "auto_propagate": false,
+      "description": "Clinical records SQL engine: 'mssql', 'mysql', or 'sqlite'",
+      "secret": false,
+      "default": "sqlite"
+    },
+    {
+      "key": "CLINICAL_RECORDS_SQLITE_PATH",
+      "required": false,
+      "auto_propagate": false,
+      "description": "Absolute path to the local SQLite EHR database file (sqlite backend)",
+      "secret": false,
+      "default": ""
+    },
+    {
+      "key": "CLINICAL_RECORDS_SERVER",
+      "required": false,
+      "auto_propagate": false,
+      "description": "EHR database server host (mssql/mysql backends)",
+      "secret": false,
+      "default": ""
+    },
+    {
+      "key": "CLINICAL_RECORDS_DATABASE",
+      "required": false,
+      "auto_propagate": false,
+      "description": "EHR database name (mssql/mysql backends)",
+      "secret": false,
+      "default": ""
+    },
+    {
+      "key": "CLINICAL_RECORDS_USERNAME",
+      "required": false,
+      "auto_propagate": false,
+      "description": "EHR database username (mssql/mysql backends)",
+      "secret": false,
+      "default": ""
+    },
+    {
+      "key": "CLINICAL_RECORDS_PASSWORD",
+      "required": false,
+      "auto_propagate": false,
+      "description": "EHR database password (mssql/mysql backends)",
+      "secret": true,
+      "default": ""
+    },
+    {
+      "key": "CLINICAL_RECORDS_PORT",
+      "required": false,
+      "auto_propagate": false,
+      "description": "EHR database TCP port (mssql/mysql backends, optional)",
+      "secret": false,
+      "default": ""
+    },
+    {
+      "key": "KNOWLEDGE_GRAPH_URI",
+      "required": false,
+      "auto_propagate": false,
+      "description": "Neo4j URI for the SPOKE biomedical knowledge graph (optional)",
+      "secret": false,
+      "default": ""
+    },
+    {
+      "key": "KNOWLEDGE_GRAPH_USERNAME",
+      "required": false,
+      "auto_propagate": false,
+      "description": "Neo4j username (optional)",
+      "secret": false,
+      "default": ""
+    },
+    {
+      "key": "KNOWLEDGE_GRAPH_PASSWORD",
+      "required": false,
+      "auto_propagate": false,
+      "description": "Neo4j password (optional)",
+      "secret": true,
+      "default": ""
+    },
+    {
+      "key": "KNOWLEDGE_GRAPH_DATABASE",
+      "required": false,
+      "auto_propagate": false,
+      "description": "Neo4j database name (optional)",
+      "secret": false,
+      "default": "spoke"
+    },
+    {
+      "key": "MEDCP_NAMESPACE",
+      "required": false,
+      "auto_propagate": true,
+      "description": "Tool namespace prefix",
+      "secret": false,
+      "default": "MedCP"
+    },
+    {
+      "key": "MEDCP_LOG_LEVEL",
+      "required": false,
+      "auto_propagate": true,
+      "description": "Logging level (DEBUG, INFO, WARNING, ERROR)",
+      "secret": false,
+      "default": "INFO"
+    }
+  ],
+  "skills": [
+    {
+      "name": "medcp-clinical-records",
+      "description": "Query electronic health records (OMOP CDM) read-only across SQL Server, MySQL, or SQLite via MedCP"
+    }
+  ]
+}

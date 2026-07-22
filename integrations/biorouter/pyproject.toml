@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "medcp"
+version = "0.8.0"
+description = "MedCP Biorouter extension — read-only EHR (SQL Server / MySQL / SQLite) and SPOKE knowledge-graph MCP server"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Wanjun Gu", email = "wanjun.gu@ucsf.edu"},
+    {name = "Gianmarco Bellucci", email = "gianmarco.bellucci@ucsf.edu"}
+]
+keywords = [
+    "mcp",
+    "medical",
+    "clinical",
+    "biomedical",
+    "knowledge-graph",
+    "electronic-health-records",
+    "ehr",
+    "omop",
+    "neo4j",
+    "sqlite",
+    "mysql",
+    "sql-server",
+    "biorouter"
+]
+dependencies = [
+    "fastmcp>=2.11.2",
+    "neo4j>=5.28.2",
+    "pydantic>=2.11.7",
+    "pymssql>=2.3.7",      # Microsoft SQL Server backend
+    "pymysql>=1.1.1",      # MySQL / MariaDB backend (pure Python)
+    # SQLite backend uses the Python standard library (sqlite3) — no dependency.
+]
+requires-python = ">=3.11"
+
+# Biorouter runs `uv run --directory <install-dir> medcp`; the left-hand name
+# MUST equal manifest.json's "entry_point".
+[project.scripts]
+medcp = "medcp.cli:main"
+
+[tool.uv]
+# fastmcp pulls `cryptography` transitively; cryptography >=49 (2026-06-12)
+# dropped x86_64 macOS wheels, forcing a from-source Rust build on Intel Macs.
+# Cap it there so Intel users still get a prebuilt wheel; other platforms keep
+# the newest version. See the develop-biorouter-extension skill.
+constraint-dependencies = [
+    "cryptography<49; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/medcp"]
