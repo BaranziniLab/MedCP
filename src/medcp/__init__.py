@@ -6,7 +6,7 @@ heterogeneous knowledge graph for rapid clinical record query and fast biomedica
 knowledge inference.
 """
 
-__version__ = "0.3.0"
+__version__ = "0.8.0"
 
 from medcp.server import create_medcp_server, main, MedCPConfig
 
