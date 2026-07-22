@@ -1,12 +1,12 @@
 # MedCP integrations
 
 MedCP ships one **shared core** — the `medcp` Python package in
-[`../src/medcp`](../src/medcp) — and several thin, cleanly separated
-**integration layers** that expose that same core to different AI coding agents.
-Nothing in this directory reimplements the server; each target only carries the
-*external glue* (manifest, launch config, docs) specific to its host.
+[`../src/medcp`](../src/medcp) — plus several thin, cleanly separated
+**integrations** that expose that same core to different AI agents. Nothing in
+this directory reimplements the server; each target only carries the *external
+glue* (manifest, launch config, docs) specific to its host.
 
-```
+```text
               ┌──────────────────────────────┐
               │   shared core:  src/medcp/    │  ← tools + mssql/mysql/sqlite backends
               │   console script:  medcp      │
@@ -20,20 +20,23 @@ Claude Code    Codex     BioRouter     Claude Desktop        uvx / CLI
 
 | Target | Directory | How it launches the core | Artifact |
 |---|---|---|---|
-| **Claude Code** | [`claude-code/`](claude-code) | plugin `.mcp.json` → `uvx … medcp` | plugin folder / zip |
-| **Codex CLI** | [`codex/`](codex) | `~/.codex/config.toml` `[mcp_servers.medcp]` → `uvx … medcp` | config snippet + installer |
+| **Claude Code** | [`claude-code/`](claude-code) | plugin `.mcp.json` → `uvx … medcp` | `medcp-claude-code-plugin.zip` |
+| **Codex CLI** | [`codex/`](codex) | `~/.codex/config.toml` `[mcp_servers.medcp]` → `uvx … medcp` | `medcp-codex.zip` |
 | **BioRouter** | [`biorouter/`](biorouter) | `.brxt` bundle, `uv run medcp` | `MedCP.brxt` |
-| **Claude Desktop** | `../manifest.json` + `../server/` | bundled Python runs `server/main.py` | `MedCP.mcpb` |
+| **Claude Desktop** | [`../manifest.json`](../manifest.json) + [`../server/`](../server) | bundled Python runs `server/main.py` | `MedCP.mcpb` |
 
 ## Shared core = single source of truth
 
-The BioRouter extension and the Claude Desktop bundle need a self-contained copy
-of the Python package, so [`../scripts/build_releases.py`](../scripts/build_releases.py)
-**copies** `src/medcp/` into them at build time. Those copies are generated (and
-git-ignored) — never edit them by hand. Claude Code and Codex don't need a copy:
-they run the published/local package directly with `uvx`.
+The BioRouter extension needs a self-contained copy of the Python package, so
+[`../scripts/build_releases.py`](../scripts/build_releases.py) **copies**
+`src/medcp/` into [`biorouter/src/`](biorouter) at build time (generated and
+git-ignored — never edit it by hand). The same script also regenerates the Claude
+Desktop bundle's standalone [`../server/main.py`](../server/main.py) from
+`src/medcp/server.py`; that `.mcpb` is then packaged separately with `mcpb pack`.
+Claude Code and Codex need no copy — they run the published or local package
+directly with `uvx`.
 
-Edit behaviour in exactly one place: `src/medcp/`. Then rebuild.
+Change behaviour in exactly one place — `src/medcp/` — then rebuild.
 
 ## Configuration (all targets)
 

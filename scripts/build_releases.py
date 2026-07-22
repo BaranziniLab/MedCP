@@ -79,6 +79,20 @@ def _copy_core_into(dest_pkg: Path) -> None:
     )
 
 
+def sync_claude_desktop_server() -> None:
+    """Regenerate the Claude Desktop bundle's standalone server/main.py from the core.
+
+    The .mcpb bundle runs server/main.py with its own embedded Python runtime, so
+    it can't import the installed `medcp` package — it needs a self-contained copy
+    of the server module. Keeping it a generated mirror avoids drift. (The .mcpb
+    itself is packaged separately with `mcpb pack`.)
+    """
+    dest = REPO / "server" / "main.py"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(CORE / "server.py", dest)
+    print(f"[claude-desktop] synced {dest.relative_to(REPO)} from core")
+
+
 def build_biorouter(skip_lock: bool) -> Path:
     src_dir = INTEGRATIONS / "biorouter"
     print(f"[biorouter] copying core → {src_dir / 'src' / 'medcp'}")
@@ -147,6 +161,9 @@ def main() -> int:
 
     RELEASE_DIR.mkdir(parents=True, exist_ok=True)
     print(f"Building MedCP v{VERSION} artifacts into: {RELEASE_DIR}\n")
+
+    # Always keep the Claude Desktop bundle's server/main.py in sync with the core.
+    sync_claude_desktop_server()
 
     artifacts = []
     if args.only in ("all", "biorouter"):

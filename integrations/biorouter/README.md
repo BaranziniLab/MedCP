@@ -1,25 +1,27 @@
-# MedCP — Biorouter extension
+# MedCP — BioRouter extension
 
-A [Biorouter](https://biorouter.ucsf.edu) extension (`.brxt`) that exposes
+A [BioRouter](https://biorouter.ucsf.edu) extension (`.brxt`) that exposes
 MedCP's read-only clinical-records and knowledge-graph tools, plus a bundled
 `medcp-clinical-records` skill. It packages the shared `medcp` core as a
-self-contained Python MCP server.
+self-contained Python MCP server. See [`../README.md`](../README.md) for how
+this integration relates to the others.
 
-## What's in here
+## Layout
 
-```
+```text
 biorouter/
-├── manifest.json                         # Biorouter extension metadata + env vars
+├── manifest.json                         # BioRouter extension metadata + env vars
 ├── pyproject.toml                        # Python package (entry_point: medcp)
 ├── README.md
 ├── skills/medcp-clinical-records/SKILL.md
-└── src/medcp/                            # GENERATED: copy of ../../src/medcp (git-ignored)
+├── src/medcp/                            # GENERATED: copy of ../../src/medcp (git-ignored)
+└── uv.lock                               # GENERATED: uv lockfile (git-ignored)
 ```
 
 `src/medcp/` is **copied from the shared core** by
 [`../../scripts/build_releases.py`](../../scripts/build_releases.py) at build
-time — do not edit it here. Build the `.brxt` with that script (it also produces
-a committed `uv.lock`).
+time — do not edit it here. That script also generates the `uv.lock`. Both
+`src/` and `uv.lock` are git-ignored, but both are bundled into the `.brxt`.
 
 ## Build the .brxt
 
@@ -29,12 +31,13 @@ python3 ../../scripts/build_releases.py --only biorouter
 ```
 
 The script copies the core into `src/`, runs `uv lock` (verifying cross-platform
-wheel resolution, including Intel macOS), and zips the required entries
-(`manifest.json`, `README.md`, `pyproject.toml`, `src/`, `skills/`).
+wheel resolution, including Intel macOS), and zips the required entries:
+`manifest.json`, `README.md`, `pyproject.toml`, `src/`, `skills/`, and the
+generated `uv.lock`.
 
 ## Install
 
-Requires [`uv`](https://docs.astral.sh/uv/) — Biorouter runs `uv sync` on install.
+Requires [`uv`](https://docs.astral.sh/uv/) — BioRouter runs `uv sync` on install.
 
 ```bash
 # SQLite EHR (e.g. the sham OMOP dataset)
@@ -52,10 +55,10 @@ biorouter extension install "releases/MedCP v0.8/MedCP.brxt" \
 ```
 
 `--env` sets a plain variable; `--secret` stores the value in the OS keyring.
-Remove with `biorouter extension remove medcp`.
+Remove the extension with `biorouter extension remove medcp`.
 
 ## Use
 
-In a Biorouter session, ask e.g. *"List the clinical tables, then count patients
-by gender."* Biorouter auto-loads the `medcp-clinical-records` skill and calls the
-read-only MedCP tools.
+In a BioRouter session, ask e.g. *"List the clinical tables, then count patients
+by gender."* BioRouter auto-loads the `medcp-clinical-records` skill and calls
+the read-only MedCP tools.

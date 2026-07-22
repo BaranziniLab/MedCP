@@ -1,14 +1,17 @@
 # MedCP — Claude Code plugin
 
-Adds MedCP's MCP tools (`list_clinical_tables`, `query_clinical_records`,
-`query_knowledge_graph`, `get_knowledge_graph_schema`) to
-[Claude Code](https://claude.com/claude-code). The plugin does not bundle the
-server — its [`.mcp.json`](.mcp.json) launches the shared `medcp` core with
-`uvx`, so you always run the same engine as every other MedCP target.
+Adds MedCP's read-only MCP tools to [Claude Code](https://claude.com/claude-code):
+
+- `MedCP-list_clinical_tables`, `MedCP-query_clinical_records`
+- `MedCP-query_knowledge_graph`, `MedCP-get_knowledge_graph_schema` — registered only when a knowledge graph is configured
+
+Tool names are namespaced with the `MEDCP_NAMESPACE` prefix (default `MedCP`). The plugin does not bundle the server — its [`.mcp.json`](.mcp.json) launches the shared `medcp` core with `uvx`, so you always run the same engine as every other MedCP integration.
+
+Sections: [What's in here](#whats-in-here) · [Requirements](#requirements) · [Configuration](#configuration) · [Install](#install) · [Use](#use)
 
 ## What's in here
 
-```
+```text
 claude-code/
 ├── .claude-plugin/plugin.json   # plugin metadata
 ├── .mcp.json                    # launches `uvx … medcp` as an MCP server
@@ -18,14 +21,14 @@ claude-code/
 
 ## Requirements
 
-- Claude Code (`claude`) 2.x+
-- [`uv`](https://docs.astral.sh/uv/) on your PATH (provides `uvx`)
+- Claude Code (`claude`) 2.x or newer
+- [`uv`](https://docs.astral.sh/uv/) on your `PATH` (provides `uvx`)
 
 ## Configuration
 
 The plugin passes MedCP's environment variables through to the server. Set the
 ones you need in your shell (or a project `.env` you `source`) before starting
-Claude Code:
+Claude Code.
 
 ```bash
 # Local SQLite EHR (e.g. the bundled sham OMOP dataset)
@@ -47,6 +50,11 @@ export CLINICAL_RECORDS_USERNAME=reader
 export CLINICAL_RECORDS_PASSWORD=•••••
 ```
 
+For the MySQL and SQL Server backends, `CLINICAL_RECORDS_PORT` is optional. To
+connect a Neo4j SPOKE knowledge graph, also set `KNOWLEDGE_GRAPH_URI`,
+`KNOWLEDGE_GRAPH_USERNAME`, `KNOWLEDGE_GRAPH_PASSWORD`, and
+`KNOWLEDGE_GRAPH_DATABASE`.
+
 `MEDCP_SOURCE` controls which build of the core is launched. It defaults to the
 pinned GitHub release; point it at a local checkout for development:
 
@@ -58,13 +66,15 @@ export MEDCP_SOURCE=/path/to/MedCP     # run your local core instead of the rele
 
 ### As a local plugin (development)
 
-```bash
-# From a Claude Code session, add this marketplace directory, then install:
+From a Claude Code session, add this marketplace directory, then install the
+plugin:
+
+```text
 /plugin marketplace add /path/to/MedCP/integrations
 /plugin install medcp@medcp-integrations
 ```
 
-> The marketplace manifest is [`../.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json).
+The marketplace manifest is [`../.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json).
 
 ### Quick, without the plugin system
 
@@ -76,9 +86,11 @@ claude mcp add medcp -- uvx --from git+https://github.com/BaranziniLab/MedCP@v0.
 
 ## Use
 
-```
+Run the bundled slash command:
+
+```text
 /medcp-explore
 ```
 
-or just ask, e.g. *"List the clinical tables, then count patients by gender."*
+Or just ask, e.g. *"List the clinical tables, then count patients by gender."*
 Claude will call the read-only MedCP tools.

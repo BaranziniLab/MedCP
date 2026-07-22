@@ -2,8 +2,9 @@
 
 Registers MedCP as an MCP server for [Codex](https://developers.openai.com/codex/cli/),
 exposing the read-only clinical-records and knowledge-graph tools. Codex runs the
-shared `medcp` core with `uvx`, so it's the same engine as the Claude Code plugin
-and the BioRouter extension.
+shared `medcp` core with `uvx`, so it's the same engine as the
+[Claude Code plugin](../claude-code/README.md) and the
+[BioRouter extension](../biorouter/README.md).
 
 ## What's in here
 
@@ -59,5 +60,6 @@ Same variables as every MedCP target — set `CLINICAL_RECORDS_BACKEND` to
 ## Use
 
 Start Codex and ask, e.g. *"Use MedCP to list the clinical tables and count
-patients by gender."* Codex will call the `list_clinical_tables` and
-`query_clinical_records` tools (read-only `SELECT`/`WITH` only).
+patients by gender."* Codex will call the `MedCP-list_clinical_tables` and
+`MedCP-query_clinical_records` tools (read-only `SELECT`/`WITH` only). Tool names
+carry the `MEDCP_NAMESPACE` prefix (default `MedCP`).
