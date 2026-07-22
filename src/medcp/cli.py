@@ -41,7 +41,7 @@ def main() -> None:
         clinical_records_password=os.getenv("CLINICAL_RECORDS_PASSWORD"),
         clinical_records_port=_int_or_none(os.getenv("CLINICAL_RECORDS_PORT")),
         clinical_records_sqlite_path=os.getenv("CLINICAL_RECORDS_SQLITE_PATH"),
-        namespace=os.getenv("MEDCP_NAMESPACE", ""),
+        namespace=os.getenv("MEDCP_NAMESPACE", "MedCP"),
         log_level=log_level,
     )
 
