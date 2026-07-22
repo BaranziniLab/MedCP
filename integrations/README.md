@@ -40,15 +40,21 @@ Change behaviour in exactly one place — `src/medcp/` — then rebuild.
 
 ## Configuration (all targets)
 
-Every target reads the same environment variables. The clinical-records backend
-is selected with `CLINICAL_RECORDS_BACKEND`:
+Every target reads the same environment variables. **Both databases are
+optional** — with no configuration at all, MedCP connects to the bundled SPOKE
+production knowledge graph and exposes only the knowledge-graph tools.
 
-- `sqlite` — set `CLINICAL_RECORDS_SQLITE_PATH` to a local `.sqlite` file
-- `mysql` — set `CLINICAL_RECORDS_SERVER` / `_DATABASE` / `_USERNAME` / `_PASSWORD` (+ optional `_PORT`)
-- `mssql` — same four (SQL Server; default backend)
+**Knowledge graph (`KNOWLEDGE_GRAPH_*`) — optional.** Left unset, MedCP uses the
+bundled SPOKE production graph automatically (no credentials needed). Set
+`KNOWLEDGE_GRAPH_URI` / `_USERNAME` / `_PASSWORD` / `_DATABASE` to use your own
+Neo4j graph instead, or `MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` to turn it off.
 
-The Neo4j knowledge-graph variables (`KNOWLEDGE_GRAPH_*`) are optional; configure
-at least one of {knowledge graph, clinical records}.
+**Clinical records (`CLINICAL_RECORDS_*`) — optional**, selected with
+`CLINICAL_RECORDS_BACKEND`. The credentials are for *your* EHR database:
+
+- `sqlite` — set `CLINICAL_RECORDS_SQLITE_PATH` to a local `.sqlite` file (no credentials)
+- `mysql` — set `CLINICAL_RECORDS_SERVER` / `_DATABASE` / `_USERNAME` / `_PASSWORD` (+ optional `_PORT`) for your MySQL server
+- `mssql` — the same four for your SQL Server
 
 See [`../releases`](../releases) for the built artifacts and per-OS install
 instructions.
