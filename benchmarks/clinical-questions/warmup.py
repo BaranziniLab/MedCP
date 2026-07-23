@@ -23,7 +23,7 @@ import time
 import urllib.request
 
 # The local benchmark models that run via the Ollama provider.
-DEFAULT_MODELS = ["qwen3.6:latest", "gemma4:latest"]
+DEFAULT_MODELS = ["qwen3.6:latest"]
 
 
 def ollama_base():
