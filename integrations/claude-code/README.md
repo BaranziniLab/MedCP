@@ -85,7 +85,7 @@ The marketplace manifest is [`../.claude-plugin/marketplace.json`](../.claude-pl
 You can also register the same server directly:
 
 ```bash
-claude mcp add medcp -- uvx --from git+https://github.com/BaranziniLab/MedCP@v0.8.0 medcp
+claude mcp add medcp -- uvx --from git+https://github.com/BaranziniLab/MedCP@v0.9.0 medcp
 ```
 
 ## Use

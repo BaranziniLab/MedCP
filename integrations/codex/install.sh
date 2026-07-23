@@ -13,7 +13,7 @@
 set -euo pipefail
 
 NAME="medcp"
-SOURCE="${MEDCP_SOURCE:-git+https://github.com/BaranziniLab/MedCP@v0.8.0}"
+SOURCE="${MEDCP_SOURCE:-git+https://github.com/BaranziniLab/MedCP@v0.9.0}"
 
 # Optionally load a .env file.
 if [[ "${1:-}" == "--env-file" && -n "${2:-}" ]]; then

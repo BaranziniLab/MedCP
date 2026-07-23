@@ -27,7 +27,7 @@ time — do not edit it here. That script also generates the `uv.lock`. Both
 
 ```bash
 python3 ../../scripts/build_releases.py --only biorouter
-# → releases/MedCP v0.8/MedCP.brxt
+# → releases/MedCP v0.9/MedCP.brxt
 ```
 
 The script copies the core into `src/`, runs `uv lock` (verifying cross-platform
@@ -41,12 +41,12 @@ Requires [`uv`](https://docs.astral.sh/uv/) — BioRouter runs `uv sync` on inst
 
 ```bash
 # SQLite EHR (e.g. the sham OMOP dataset)
-biorouter extension install "releases/MedCP v0.8/MedCP.brxt" \
+biorouter extension install "releases/MedCP v0.9/MedCP.brxt" \
   --env CLINICAL_RECORDS_BACKEND=sqlite \
   --env CLINICAL_RECORDS_SQLITE_PATH=/absolute/path/to/database.sqlite
 
 # MySQL / SQL Server: pass server/database/username + a secret password
-biorouter extension install "releases/MedCP v0.8/MedCP.brxt" \
+biorouter extension install "releases/MedCP v0.9/MedCP.brxt" \
   --env CLINICAL_RECORDS_BACKEND=mysql \
   --env CLINICAL_RECORDS_SERVER=db.example.org \
   --env CLINICAL_RECORDS_DATABASE=omop \

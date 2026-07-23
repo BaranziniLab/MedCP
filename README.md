@@ -97,8 +97,8 @@ export CLINICAL_RECORDS_PASSWORD="your_password"
 # Option C: Both (for integrated medical analysis)
 # Set all environment variables above
 
-# Run from GitHub (pinned to the v0.8.0 release)
-uvx --from git+https://github.com/BaranziniLab/MedCP@v0.8.0 medcp
+# Run from GitHub (pinned to the v0.9.0 release)
+uvx --from git+https://github.com/BaranziniLab/MedCP@v0.9.0 medcp
 ```
 
 **Important Notes:** tool names are prefixed with the `MEDCP_NAMESPACE` (default `MedCP`).
