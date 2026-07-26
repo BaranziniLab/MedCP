@@ -1,0 +1,1452 @@
+{
+  "messages": [
+    {
+      "id": null,
+      "role": "user",
+      "created": 1784799489,
+      "content": [
+        {
+          "type": "text",
+          "text": "/ext:medcp In COPD, which metabolic or endocrine comorbidities are most prevalent here, and what biology might connect them to airway disease?"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kAVwoRFwyGLx123xwLgk9wuOlTm",
+      "role": "assistant",
+      "created": 1784799494,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_YryZNAGd9QZ7VTOzT6B0yOx3",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__plan_write",
+              "arguments": {
+                "plan": "Use MedCP to identify available clinical/EHR tables and KG schema, query COPD patients for metabolic/endocrine comorbidity prevalence, then query/interpret biological links to airway disease."
+              }
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_sILZZavlk1wFvCciN3EV1Fo5",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_write",
+              "arguments": {
+                "content": "- [ ] Inspect available clinical tables and biomedical graph schema\n- [ ] Query COPD cohort comorbidity prevalence\n- [ ] Query biomedical graph for mechanistic links\n- [ ] Summarize findings with caveats"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_f9c25a74-cecd-4464-a046-81c0ae6b6ce0",
+      "role": "user",
+      "created": 1784799494,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_YryZNAGd9QZ7VTOzT6B0yOx3",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Plan updated"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_01c27701-e343-4986-84b2-372efac9ba00",
+      "role": "user",
+      "created": 1784799494,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_sILZZavlk1wFvCciN3EV1Fo5",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Todo list set: 4 item(s)"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kAajw4Szzo0qG0aaMGFMFh5mwnD",
+      "role": "assistant",
+      "created": 1784799498,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_8vBQQfjwDltm4KEo4wbTaCz3",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-list_clinical_tables",
+              "arguments": {}
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_SF6uzWUTRqNEiaa3RKwgPAGn",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-get_knowledge_graph_schema",
+              "arguments": {}
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_f5ca61dd-d55b-400a-86ec-b0f1745558b7",
+      "role": "user",
+      "created": 1784799498,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_8vBQQfjwDltm4KEo4wbTaCz3",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"care_site\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.care_site\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cdm_source\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cdm_source\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cohort\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cohort\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cohort_definition\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cohort_definition\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_ancestor\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_ancestor\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_class\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_class\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_numeric\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_numeric\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_recommended\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_recommended\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_relationship\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_relationship\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_synonym\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_synonym\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"condition_era\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.condition_era\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"condition_occurrence\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.condition_occurrence\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"condition_occurrence_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.condition_occurrence_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cost\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cost\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"death\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.death\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"device_exposure\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.device_exposure\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"domain\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.domain\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"dose_era\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.dose_era\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_era\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_era\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_exposure\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_exposure\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_exposure_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_exposure_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_strength\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_strength\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"episode\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.episode\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"episode_event\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.episode_event\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"fact_relationship\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.fact_relationship\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"location\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.location\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"measurement\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.measurement\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"measurement_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.measurement_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"metadata\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.metadata\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"note\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.note\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"note_nlp\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.note_nlp\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"observation\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.observation\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"observation_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.observation_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"observation_period\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.observation_period\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"payer_plan_period\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.payer_plan_period\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"person\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.person\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"person_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.person_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"procedure_occurrence\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.procedure_occurrence\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"procedure_occurrence_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.procedure_occurrence_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"provider\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.provider\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"relationship\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.relationship\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"source_to_concept_map\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.source_to_concept_map\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"specimen\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.specimen\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"visit_detail\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.visit_detail\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"visit_occurrence\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.visit_occurrence\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"vocabulary\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.vocabulary\"\n  }\n]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_9a0a1c2b-2677-4cd6-86e1-1b289180aa52",
+      "role": "user",
+      "created": 1784799498,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_SF6uzWUTRqNEiaa3RKwgPAGn",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"PARTOF_LpL\": {\"type\": \"relationship\", \"count\": 114529, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"percent_of_zip_area_in_place\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"percent_of_place_area_in_zip\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ISA_DiD\": {\"type\": \"relationship\", \"count\": 17619, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"EC\": {\"type\": \"node\", \"count\": 8748, \"properties\": {\"reaction\": {\"indexed\": false, \"type\": \"STRING\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"subclass\": {\"indexed\": false, \"type\": \"STRING\"}, \"class\": {\"indexed\": false, \"type\": \"STRING\"}, \"subsubclass\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"aliases\": {\"indexed\": false, \"type\": \"STRING\"}, \"serial\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"ISA_ECiEC\": {\"direction\": \"out\", \"labels\": [\"EC\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"HAS_PhEC\": {\"direction\": \"in\", \"labels\": [\"Protein\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CATALYZES_ECcR\": {\"direction\": \"out\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"CAUSES_OcD\": {\"type\": \"relationship\", \"count\": 739}, \"MARKER_NEG_GmnD\": {\"type\": \"relationship\", \"count\": 10069, \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ASSOCIATES_GaS\": {\"type\": \"relationship\", \"count\": 41461, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"MolecularFunction\": {\"type\": \"node\", \"count\": 4016, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpMF\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"Anatomy\": {\"type\": \"node\", \"count\": 16071, \"properties\": {\"mesh_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"bto\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"LOCALIZES_DlA\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"PARTOF_CTpA\": {\"direction\": \"in\", \"labels\": [\"CellType\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSES_AeG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_AiA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_ApA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"DOWNREGULATES_OGdG\": {\"type\": \"relationship\", \"count\": 63760, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpMF\": {\"type\": \"relationship\", \"count\": 139047, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"CellularComponent\": {\"type\": \"node\", \"count\": 1897, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpCC\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"PARTOF_PDpP\": {\"type\": \"relationship\", \"count\": 54696775, \"properties\": {\"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DatabaseTimestamp\": {\"type\": \"node\", \"count\": 119, \"properties\": {\"updated\": {\"indexed\": false, \"type\": \"LOCAL_DATE_TIME\"}, \"created\": {\"indexed\": false, \"type\": \"LOCAL_DATE_TIME\"}, \"name\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"Pathway\": {\"type\": \"node\", \"count\": 6762, \"properties\": {\"level\": {\"indexed\": false, \"type\": \"STRING\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"reactome_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpPW\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_PWiPW\": {\"direction\": \"out\", \"labels\": [\"Pathway\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTOF_RpPW\": {\"direction\": \"in\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"TARGETS_MtG\": {\"type\": \"relationship\", \"count\": 1600435, \"properties\": {\"prediction_score\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Organism\": {\"type\": \"node\", \"count\": 356647, \"properties\": {\"usa_isolation_country\": {\"indexed\": false, \"type\": \"STRING\"}, \"biovar\": {\"indexed\": false, \"type\": \"STRING\"}, \"strain\": {\"indexed\": false, \"type\": \"STRING\"}, \"isolation_source\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_age\": {\"indexed\": false, \"type\": \"STRING\"}, \"salinity\": {\"indexed\": false, \"type\": \"STRING\"}, \"disease\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_chicken\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"level\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_pig\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"genome_size\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"collection_date\": {\"indexed\": false, \"type\": \"STRING\"}, \"isolation_country\": {\"indexed\": false, \"type\": \"STRING\"}, \"pathovar\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_gender\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_human\": {\"indexed\": false, \"type\": \"STRING\"}, \"temperature_range\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"has_amr_phenotype\": {\"indexed\": false, \"type\": \"STRING\"}, \"sporulation\": {\"indexed\": false, \"type\": \"STRING\"}, \"genbank_accessions\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_health\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_cow\": {\"indexed\": false, \"type\": \"STRING\"}, \"motility\": {\"indexed\": false, \"type\": \"STRING\"}, \"serovar\": {\"indexed\": false, \"type\": \"STRING\"}, \"oxygen_requirement\": {\"indexed\": false, \"type\": \"STRING\"}, \"gram_stain\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"ISA_OiO\": {\"direction\": \"out\", \"labels\": [\"Organism\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ENCODES_OeP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"DietarySupplement\": {\"type\": \"node\", \"count\": 20235, \"properties\": {\"amino_acid_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"vitamin_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"information_source\": {\"indexed\": false, \"type\": \"STRING\"}, \"mineral_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"product_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"botanical_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"supplement_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"other_ingredients_count\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"CONTAINS_DScC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"operator\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"CONTAINS_DScB\": {\"direction\": \"out\", \"labels\": [\"Blend\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"operation\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"Protein\": {\"type\": \"node\", \"count\": 39442384, \"properties\": {\"org_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"gene\": {\"indexed\": false, \"type\": \"LIST\"}, \"org_ncbi_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"EC\": {\"indexed\": false, \"type\": \"LIST\"}, \"refseq\": {\"indexed\": false, \"type\": \"LIST\"}, \"polyprotein\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"reviewed\": {\"indexed\": false, \"type\": \"STRING\"}, \"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"isoform\": {\"indexed\": false, \"type\": \"LIST\"}, \"chembl_id\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"seqids\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"ENCODES_GeP\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"BINDS_CbP\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"bindingdb_k\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"bindingdb_ic50s\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_urls\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kis\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kds\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"HAS_PhEC\": {\"direction\": \"out\", \"labels\": [\"EC\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_PDpP\": {\"direction\": \"in\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ENCODES_OeP\": {\"direction\": \"in\", \"labels\": [\"Organism\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"INTERACTS_PiC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"textmining\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"overall_confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"prediction\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"experimental\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"database\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"DOWNREGULATES_AdG\": {\"type\": \"relationship\", \"count\": 65853}, \"HASROLE_ChC\": {\"type\": \"relationship\", \"count\": 39270, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CAUSES_CcSE\": {\"type\": \"relationship\", \"count\": 155640}, \"DOWNREGULATES_CdG\": {\"type\": \"relationship\", \"count\": 307019, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiP\": {\"type\": \"relationship\", \"count\": 2419547, \"properties\": {\"score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_PGpPG\": {\"type\": \"relationship\", \"count\": 4210, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PRODUCES_RpC\": {\"type\": \"relationship\", \"count\": 54881, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_OiO\": {\"type\": \"relationship\", \"count\": 61437, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ENCODES_GeP\": {\"type\": \"relationship\", \"count\": 157321, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSEDIN_GeiD\": {\"type\": \"relationship\", \"count\": 6227, \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"ptpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiC\": {\"type\": \"relationship\", \"count\": 69200000, \"properties\": {\"textmining\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"overall_confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"prediction\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"experimental\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"database\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PDiPD\": {\"type\": \"relationship\", \"count\": 4758, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_ECiEC\": {\"type\": \"relationship\", \"count\": 8725, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSES_AeG\": {\"type\": \"relationship\", \"count\": 413084, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Food\": {\"type\": \"node\", \"count\": 15057, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"obsolete\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"subset_list\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"CONTAINS_FcC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"content\": {\"indexed\": false, \"type\": \"STRING\"}, \"food_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"orig_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcF\": {\"direction\": \"in\", \"labels\": [\"Blend\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_FiF\": {\"direction\": \"out\", \"labels\": [\"Food\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"REGULATES_PrG\": {\"type\": \"relationship\", \"count\": 16408}, \"CONTRAINDICATES_CcD\": {\"type\": \"relationship\", \"count\": 11715}, \"RESEMBLES_DrD\": {\"type\": \"relationship\", \"count\": 23335, \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"BINDS_CbPD\": {\"type\": \"relationship\", \"count\": 110129, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_CpR\": {\"type\": \"relationship\", \"count\": 2994}, \"HAS_PhEC\": {\"type\": \"relationship\", \"count\": 3768948, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MEMBEROF_PDmPF\": {\"type\": \"relationship\", \"count\": 14197, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_PWiPW\": {\"type\": \"relationship\", \"count\": 3191, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"IN_CLINICAL_TRIALS_FOR_CictD\": {\"type\": \"relationship\", \"count\": 34740}, \"EXPRESSEDIN_GeiCT\": {\"type\": \"relationship\", \"count\": 22498, \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"specific_ncpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"ncpm\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_GpPW\": {\"type\": \"relationship\", \"count\": 94645, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Gene\": {\"type\": \"node\", \"count\": 20825, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"ensembl\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"chembl_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"chromosome\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"INTEGER\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"EXPRESSES_AeG\": {\"direction\": \"in\", \"labels\": [\"Anatomy\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MARKER_NEG_GmnD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ASSOCIATES_GaS\": {\"direction\": \"out\", \"labels\": [\"Symptom\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"DOWNREGULATES_KGdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DOWNREGULATES_OGdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpMF\": {\"direction\": \"out\", \"labels\": [\"MolecularFunction\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"PARTICIPATES_GpR\": {\"direction\": \"out\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"TARGETS_MtG\": {\"direction\": \"in\", \"labels\": [\"MiRNA\"], \"properties\": {\"prediction_score\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_GPuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSEDIN_GeiCT\": {\"direction\": \"out\", \"labels\": [\"CellType\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"specific_ncpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"ncpm\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_GpPW\": {\"direction\": \"out\", \"labels\": [\"Pathway\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpCC\": {\"direction\": \"out\", \"labels\": [\"CellularComponent\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"DOWNREGULATES_CdG\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_CuG\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_GpPG\": {\"direction\": \"out\", \"labels\": [\"PwGroup\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ASSOCIATES_DaG\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"diseases_confidences\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"diseases_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_scores\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_identifiers\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"gwas_pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"ENCODES_GeP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MARKER_POS_GmpD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_KGuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSEDIN_GeiD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"ptpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESPONSE_TO_mGrC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DOWNREGULATES_GPdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpBP\": {\"direction\": \"out\", \"labels\": [\"BiologicalProcess\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"RESISTANT_TO_mGrC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_OGuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_PpCP\": {\"type\": \"relationship\", \"count\": 9566}, \"UPREGULATES_CuG\": {\"type\": \"relationship\", \"count\": 283944, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"TRANSPORTS_PtC\": {\"type\": \"relationship\", \"count\": 6431}, \"CONTAINS_BcC\": {\"type\": \"relationship\", \"count\": 9402, \"properties\": {\"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"TREATS_CtD\": {\"type\": \"relationship\", \"count\": 57098, \"properties\": {\"phase\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"BiologicalProcess\": {\"type\": \"node\", \"count\": 13675, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpBP\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"Reaction\": {\"type\": \"node\", \"count\": 42135, \"properties\": {\"reactome_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"CATALYZES_ECcR\": {\"direction\": \"in\", \"labels\": [\"EC\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpR\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_PGpR\": {\"direction\": \"in\", \"labels\": [\"PwGroup\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PRODUCES_RpC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONSUMES_RcC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_RpPW\": {\"direction\": \"out\", \"labels\": [\"Pathway\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"CONTAINS_BcF\": {\"type\": \"relationship\", \"count\": 6377, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_FiF\": {\"type\": \"relationship\", \"count\": 18469, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"UPREGULATES_KGuG\": {\"type\": \"relationship\", \"count\": 515270, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MARKER_POS_GmpD\": {\"type\": \"relationship\", \"count\": 8153, \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_CTpA\": {\"type\": \"relationship\", \"count\": 899, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"SDoH\": {\"type\": \"node\", \"count\": 320, \"properties\": {\"description\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"name\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_source\": {\"indexed\": false, \"type\": \"STRING\"}, \"mesh_ids\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"ISA_SiS\": {\"direction\": \"out\", \"labels\": [\"SDoH\"]}}}, \"RESISTANT_TO_mGrC\": {\"type\": \"relationship\", \"count\": 70, \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_AuG\": {\"type\": \"relationship\", \"count\": 8082}, \"ISA_CiC\": {\"type\": \"relationship\", \"count\": 264131, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Compound\": {\"type\": \"node\", \"count\": 3177327, \"properties\": {\"max_phase\": {\"indexed\": true, \"type\": \"FLOAT\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"xrefs\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"smiles\": {\"indexed\": false, \"type\": \"STRING\"}, \"standardized_smiles\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"INCLUDES_PCiC\": {\"direction\": \"in\", \"labels\": [\"PharmacologicClass\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"BINDS_CbP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"bindingdb_k\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"bindingdb_ic50s\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_urls\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kis\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kds\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_CiC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"HASROLE_ChC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_DScC\": {\"direction\": \"in\", \"labels\": [\"DietarySupplement\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"operator\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"DOWNREGULATES_CdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_CuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcC\": {\"direction\": \"in\", \"labels\": [\"Blend\"], \"properties\": {\"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"TREATS_CtD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"phase\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PRODUCES_RpC\": {\"direction\": \"in\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_FcC\": {\"direction\": \"in\", \"labels\": [\"Food\"], \"properties\": {\"content\": {\"indexed\": false, \"type\": \"STRING\"}, \"food_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"orig_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"BINDS_CbPD\": {\"direction\": \"out\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESPONSE_TO_mGrC\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_CpC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiC\": {\"direction\": \"in\", \"labels\": [\"Protein\"], \"properties\": {\"textmining\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"overall_confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"prediction\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"experimental\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"database\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESISTANT_TO_mGrC\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONSUMES_RcC\": {\"direction\": \"in\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"Blend\": {\"type\": \"node\", \"count\": 3983, \"properties\": {\"name\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"CONTAINS_DScB\": {\"direction\": \"in\", \"labels\": [\"DietarySupplement\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"operation\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcF\": {\"direction\": \"out\", \"labels\": [\"Food\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_ApA\": {\"type\": \"relationship\", \"count\": 9497, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_FcC\": {\"type\": \"relationship\", \"count\": 24879, \"properties\": {\"content\": {\"indexed\": false, \"type\": \"STRING\"}, \"food_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"orig_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PRESENTS_DpS\": {\"type\": \"relationship\", \"count\": 12707, \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"symptom_frequency_among_postacute_omicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"symptom_frequency_among_overall_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"symptom_frequency_among_acute_omicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"percentage_total_diagnosed_at_time_point3\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"percentage_total_diagnosed_at_time_point2\": {\"indexed\": false, \"type\": \"STRING\"}, \"symptom_frequency_among_postacute_preomicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"percentage_total_diagnosed_at_time_point1\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"FOUNDIN_CfL\": {\"type\": \"relationship\", \"count\": 128447}, \"PARTOF_CpPG\": {\"type\": \"relationship\", \"count\": 568}, \"REDUCES_SEN_mGrsC\": {\"type\": \"relationship\", \"count\": 1}, \"PARTICIPATES_GpR\": {\"type\": \"relationship\", \"count\": 371, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"Version\": {\"type\": \"node\", \"count\": 107, \"properties\": {\"timestamp\": {\"indexed\": false, \"type\": \"LOCAL_DATE_TIME\"}, \"description\": {\"indexed\": false, \"type\": \"STRING\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"BINDS_CbP\": {\"type\": \"relationship\", \"count\": 839834, \"properties\": {\"bindingdb_k\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"bindingdb_ic50s\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_urls\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kis\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kds\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_CiF\": {\"type\": \"relationship\", \"count\": 1003}, \"MENTIONED_CLINICAL_TRIALS_FOR_CmctD\": {\"type\": \"relationship\", \"count\": 34838}, \"LOCALIZES_DlA\": {\"type\": \"relationship\", \"count\": 20844, \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"PARTOF_GpPG\": {\"type\": \"relationship\", \"count\": 191, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ENCODES_OeP\": {\"type\": \"relationship\", \"count\": 38028566, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PREVALENCE_DpL\": {\"type\": \"relationship\", \"count\": 268700, \"properties\": {\"lower\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"data_value_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"location_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"short_question_text\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_value_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"state_desc\": {\"indexed\": false, \"type\": \"STRING\"}, \"upper\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"state_abbr\": {\"indexed\": false, \"type\": \"STRING\"}, \"geolocation\": {\"indexed\": false, \"type\": \"STRING\"}, \"total_population\": {\"indexed\": false, \"type\": \"STRING\"}, \"value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"metric_name\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ASSOCIATES_DaG\": {\"type\": \"relationship\", \"count\": 211155, \"properties\": {\"diseases_confidences\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"diseases_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_scores\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_identifiers\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"gwas_pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"ISA_AiA\": {\"type\": \"relationship\", \"count\": 20447, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ExtracellularParticle\": {\"type\": \"node\", \"count\": 1671, \"properties\": {\"experiment_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"species\": {\"indexed\": false, \"type\": \"STRING\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"identifier\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sample_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"sample\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ISA_CTiCT\": {\"type\": \"relationship\", \"count\": 4212, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INCREASEDIN_PiD\": {\"type\": \"relationship\", \"count\": 11850}, \"RESPONSE_TO_mGrC\": {\"type\": \"relationship\", \"count\": 133, \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"SideEffect\": {\"type\": \"node\", \"count\": 5964, \"properties\": {\"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MiRNA\": {\"type\": \"node\", \"count\": 2656, \"properties\": {\"accession\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"TARGETS_MtG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"prediction_score\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_CpC\": {\"type\": \"relationship\", \"count\": 2574, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_PGpR\": {\"type\": \"relationship\", \"count\": 7794, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"UPREGULATES_OGuG\": {\"type\": \"relationship\", \"count\": 109557, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INCLUDES_PCiC\": {\"type\": \"relationship\", \"count\": 3300, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"CLEAVESTO_PctP\": {\"type\": \"relationship\", \"count\": 41882}, \"ProteinDomain\": {\"type\": \"node\", \"count\": 30231, \"properties\": {\"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"entryName\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"BINDS_CbPD\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MEMBEROF_PDmPF\": {\"direction\": \"out\", \"labels\": [\"ProteinFamily\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_PDpP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PDiPD\": {\"direction\": \"out\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_PpPG\": {\"type\": \"relationship\", \"count\": 5841}, \"PARTICIPATES_PpR\": {\"type\": \"relationship\", \"count\": 2625}, \"DOWNREGULATES_KGdG\": {\"type\": \"relationship\", \"count\": 496023, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Complex\": {\"type\": \"node\", \"count\": 2820, \"properties\": {\"evidence_code\": {\"indexed\": false, \"type\": \"STRING\"}, \"assembly\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"complex_portal\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Symptom\": {\"type\": \"node\", \"count\": 1960, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"obsolete\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PRESENTS_DpS\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"symptom_frequency_among_postacute_omicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"symptom_frequency_among_overall_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"symptom_frequency_among_acute_omicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"percentage_total_diagnosed_at_time_point3\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"percentage_total_diagnosed_at_time_point2\": {\"indexed\": false, \"type\": \"STRING\"}, \"symptom_frequency_among_postacute_preomicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"percentage_total_diagnosed_at_time_point1\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ASSOCIATES_GaS\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"PwGroup\": {\"type\": \"node\", \"count\": 6954, \"properties\": {\"reactome_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTOF_GpPG\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTOF_PGpPG\": {\"direction\": \"out\", \"labels\": [\"PwGroup\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_PGpR\": {\"direction\": \"out\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"ISA_SiS\": {\"type\": \"relationship\", \"count\": 364}, \"CATALYZES_ECcR\": {\"type\": \"relationship\", \"count\": 18723, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_RpPW\": {\"type\": \"relationship\", \"count\": 27093, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"UPREGULATES_GPuG\": {\"type\": \"relationship\", \"count\": 23648, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CellType\": {\"type\": \"node\", \"count\": 2754, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"hybrid_node_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"EXPRESSEDIN_GeiCT\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"specific_ncpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"ncpm\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ISA_CTiCT\": {\"direction\": \"out\", \"labels\": [\"CellType\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_CTpA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"ProteinFamily\": {\"type\": \"node\", \"count\": 900, \"properties\": {\"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"MEMBEROF_PDmPF\": {\"direction\": \"in\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"Disease\": {\"type\": \"node\", \"count\": 12275, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"obsolete\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"mesh_list\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"Linkout\": {\"indexed\": false, \"type\": \"STRING\"}, \"omim_list\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"PRESENTS_DpS\": {\"direction\": \"out\", \"labels\": [\"Symptom\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"symptom_frequency_among_postacute_omicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"symptom_frequency_among_overall_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"symptom_frequency_among_acute_omicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"percentage_total_diagnosed_at_time_point3\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"percentage_total_diagnosed_at_time_point2\": {\"indexed\": false, \"type\": \"STRING\"}, \"symptom_frequency_among_postacute_preomicron_recover_patients\": {\"indexed\": false, \"type\": \"STRING\"}, \"percentage_total_diagnosed_at_time_point1\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"MARKER_POS_GmpD\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"LOCALIZES_DlA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"EXPRESSEDIN_GeiD\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"ptpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_DiD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"MARKER_NEG_GmnD\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PREVALENCE_DpL\": {\"direction\": \"out\", \"labels\": [\"Location\"], \"properties\": {\"lower\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"data_value_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"location_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"short_question_text\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_value_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"state_desc\": {\"indexed\": false, \"type\": \"STRING\"}, \"upper\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"state_abbr\": {\"indexed\": false, \"type\": \"STRING\"}, \"geolocation\": {\"indexed\": false, \"type\": \"STRING\"}, \"total_population\": {\"indexed\": false, \"type\": \"STRING\"}, \"value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"metric_name\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ASSOCIATES_DaG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"diseases_confidences\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"diseases_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_scores\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_identifiers\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"gwas_pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"TREATS_CtD\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"phase\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESEMBLES_DrD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}}}, \"PARTICIPATES_GpCC\": {\"type\": \"relationship\", \"count\": 106934, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"CONTAINS_DScC\": {\"type\": \"relationship\", \"count\": 1486, \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"operator\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"CONTAINS_DScB\": {\"type\": \"relationship\", \"count\": 4981, \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"operation\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DECREASEDIN_PdD\": {\"type\": \"relationship\", \"count\": 1}, \"AFFECTS_CamG\": {\"type\": \"relationship\", \"count\": 13741}, \"Location\": {\"type\": \"node\", \"count\": 108480, \"properties\": {\"state\": {\"indexed\": false, \"type\": \"STRING\"}, \"zipcode_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"code\": {\"indexed\": false, \"type\": \"STRING\"}, \"type\": {\"indexed\": true, \"type\": \"STRING\"}, \"Linkout\": {\"indexed\": false, \"type\": \"STRING\"}, \"state_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"county_fips\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"city_fips\": {\"indexed\": false, \"type\": \"STRING\"}, \"iso3\": {\"indexed\": false, \"type\": \"STRING\"}, \"longitude\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"latitude\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"state_fips\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTOF_LpL\": {\"direction\": \"out\", \"labels\": [\"Location\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"percent_of_zip_area_in_place\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"percent_of_place_area_in_zip\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PREVALENCE_DpL\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"lower\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"data_value_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"location_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"short_question_text\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_value_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"state_desc\": {\"indexed\": false, \"type\": \"STRING\"}, \"upper\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"state_abbr\": {\"indexed\": false, \"type\": \"STRING\"}, \"geolocation\": {\"indexed\": false, \"type\": \"STRING\"}, \"total_population\": {\"indexed\": false, \"type\": \"STRING\"}, \"value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"metric_name\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"EXPRESSEDIN_PeCT\": {\"type\": \"relationship\", \"count\": 795263}, \"DOWNREGULATES_GPdG\": {\"type\": \"relationship\", \"count\": 15935, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpBP\": {\"type\": \"relationship\", \"count\": 720428, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"PharmacologicClass\": {\"type\": \"node\", \"count\": 635, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"class_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"INCLUDES_PCiC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"CONSUMES_RcC\": {\"type\": \"relationship\", \"count\": 49533, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kAqBMax1eYjL26bOQFu2hEQgA0H",
+      "role": "assistant",
+      "created": 1784799516,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_LdsfP4uNShVNQR0m1tHY2eHh",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "#1",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_9238ec35-0126-4a08-95ec-a86731123c7b",
+      "role": "user",
+      "created": 1784799516,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_LdsfP4uNShVNQR0m1tHY2eHh",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[tool_error kind=tool_failure retryable=false] The tool ran and reported a failure. Read the message and address its cause.\nError: No todo item with id ##1"
+                }
+              ],
+              "structuredContent": {
+                "error": {
+                  "kind": "tool_failure",
+                  "retryable": false,
+                  "message": "Error: No todo item with id ##1"
+                }
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kAw582siLTKzewPcQ1WwpTpRZAt",
+      "role": "assistant",
+      "created": 1784799521,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_9jMUb9qB3v6OaXGDSAGryj3w",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "1",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_fb7deaf8-b4cb-487b-b3cc-1bbd16b59ba5",
+      "role": "user",
+      "created": 1784799521,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_9jMUb9qB3v6OaXGDSAGryj3w",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #1"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kB2LQ1AKoGjhU1tHb1CAJ1MDm5Z",
+      "role": "assistant",
+      "created": 1784799529,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_gEaavkHJEa88v1nL8vXrmeJg",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept FROM omop.concept WHERE domain_id = 'Condition' AND lower(concept_name) LIKE '%chronic obstructive pulmonary disease%' ORDER BY standard_concept DESC NULLS LAST, concept_id LIMIT 20"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_Ms22Tnh4BTl9iqoGda51gJe4",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept FROM omop.concept WHERE domain_id = 'Condition' AND (lower(concept_name) LIKE '%type 2 diabetes%' OR lower(concept_name) LIKE '%diabetes mellitus%' OR lower(concept_name) LIKE '%obesity%' OR lower(concept_name) LIKE '%hyperlipidemia%' OR lower(concept_name) LIKE '%hypothyroidism%' OR lower(concept_name) LIKE '%metabolic syndrome%' OR lower(concept_name) LIKE '%disorder of lipid metabolism%') ORDER BY concept_name LIMIT 80"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_rDa56jPb1jQax7jwsbLmgMmS",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT column_name, data_type FROM information_schema.columns WHERE table_schema='omop' AND table_name IN ('condition_occurrence','condition_era','person') ORDER BY table_name, ordinal_position"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_0d9651dd-a661-4fa2-bee7-bd5aa9f2b513",
+      "role": "user",
+      "created": 1784799529,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_Ms22Tnh4BTl9iqoGda51gJe4",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[tool_error kind=tool_failure retryable=false] The tool ran and reported a failure. Read the message and address its cause.\nElectronic health records error: (102, b\"Incorrect syntax near 'LIMIT'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
+                }
+              ],
+              "structuredContent": {
+                "error": {
+                  "kind": "tool_failure",
+                  "retryable": false,
+                  "message": "Electronic health records error: (102, b\"Incorrect syntax near 'LIMIT'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
+                }
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_619ba807-6c65-43aa-b05e-88d279ea6297",
+      "role": "user",
+      "created": 1784799529,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_gEaavkHJEa88v1nL8vXrmeJg",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[tool_error kind=tool_failure retryable=false] The tool ran and reported a failure. Read the message and address its cause.\nElectronic health records error: (102, b\"Incorrect syntax near 'NULLS'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
+                }
+              ],
+              "structuredContent": {
+                "error": {
+                  "kind": "tool_failure",
+                  "retryable": false,
+                  "message": "Electronic health records error: (102, b\"Incorrect syntax near 'NULLS'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
+                }
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_736ba64c-458c-4278-947f-dd8e987c7087",
+      "role": "user",
+      "created": 1784799529,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_rDa56jPb1jQax7jwsbLmgMmS",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "column_name,data_type\ncondition_era_id,int\nperson_id,int\ncondition_concept_id,int\ncondition_era_start_date,datetime\ncondition_era_end_date,datetime\ncondition_occurrence_count,int\ncondition_occurrence_id,int\nperson_id,int\ncondition_concept_id,int\ncondition_start_date,date\ncondition_start_datetime,datetime2\ncondition_end_date,date\ncondition_end_datetime,datetime2\ncondition_type_concept_id,int\nstop_reason,varchar\nprovider_id,int\nvisit_occurrence_id,int\nvisit_detail_id,int\ncondition_source_value,varchar\ncondition_source_concept_id,int\ncondition_status_source_value,varchar\ncondition_status_concept_id,int\nperson_id,int\ngender_concept_id,int\nyear_of_birth,int\nmonth_of_birth,int\nday_of_birth,int\ntime_of_birth,varchar\nrace_concept_id,int\nethnicity_concept_id,int\nlocation_id,int\nprovider_id,int\ncare_site_id,int\nperson_source_value,nvarchar\ngender_source_value,varchar\ngender_source_concept_id,int\nrace_source_value,varchar\nrace_source_concept_id,int\nethnicity_source_value,varchar\nethnicity_source_concept_id,int\nbirth_datetime,datetime2"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kBA2dIUWGS6yJhlCXWXA1146ama",
+      "role": "assistant",
+      "created": 1784799534,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_neUX3ynA0TnzpFRTamlHuRpe",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "2",
+                "status": "in_progress"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_a3291b18-09cd-4023-b712-ce9c8ca975c1",
+      "role": "user",
+      "created": 1784799534,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_neUX3ynA0TnzpFRTamlHuRpe",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #2"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kBEGHk5EJZo0nSfGMkQDYMbtNO5",
+      "role": "assistant",
+      "created": 1784799538,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_xURRK9SEdRd9r1T5tQ29Qlat",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT TOP 30 concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept FROM omop.concept WHERE domain_id = 'Condition' AND lower(concept_name) LIKE '%chronic obstructive pulmonary disease%' ORDER BY concept_name"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_a8b78537-363b-4762-b4f0-ab3564e2d908",
+      "role": "user",
+      "created": 1784799538,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_xURRK9SEdRd9r1T5tQ29Qlat",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,domain_id,vocabulary_id,concept_class_id,standard_concept\n44796286,[X]Other specified chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,\n40396961,[X]Other specified chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,\n257004,Acute exacerbation of chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n43530693,Acute exacerbation of chronic obstructive pulmonary disease with asthma,Condition,SNOMED,Disorder,S\n4115044,Acute infective exacerbation of chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n44807895,Acute non-infective exacerbation of chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n46274062,Asthma-chronic obstructive pulmonary disease overlap syndrome,Condition,SNOMED,Disorder,S\n3547213,Asthma-chronic obstructive pulmonary disease overlap syndrome,Condition,SNOMED,Disorder,\n255573,Chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n35208024,Chronic obstructive pulmonary disease with (acute) exacerbation,Condition,ICD10CM,4-char billing code,\n35208023,Chronic obstructive pulmonary disease with (acute) lower respiratory infection,Condition,ICD10CM,4-char billing code,\n46269701,Chronic obstructive pulmonary disease with acute bronchitis,Condition,SNOMED,Disorder,S\n3538077,Chronic obstructive pulmonary disease with acute exacerbation, unspecified,Condition,SNOMED,Disorder,\n4051464,Chronic obstructive pulmonary disease with acute exacerbation, unspecified,Condition,SNOMED,Disorder,\n40395913,Chronic obstructive pulmonary disease with acute exacerbation, unspecified,Condition,SNOMED,Disorder,\n4110056,Chronic obstructive pulmonary disease with acute lower respiratory infection,Condition,SNOMED,Disorder,S\n35208025,Chronic obstructive pulmonary disease, unspecified,Condition,ICD10CM,4-char billing code,\n4046986,End stage chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n4196712,Mild chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n40316552,Mild chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,\n40395905,Mild chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,\n40316553,Moderate chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,\n4193588,Moderate chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n40395906,Moderate chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,\n44788819,Multiple chronic obstructive pulmonary disease emergency hospital admissions,Condition,SNOMED,Clinical Finding,S\n1569487,Other chronic obstructive pulmonary disease,Condition,ICD10CM,3-char nonbill code,\n786007,Other specified chronic obstructive pulmonary disease,Condition,ICD10CM,5-char billing code,\n786005,Other specified chronic obstructive pulmonary disease,Condition,ICD10CM,4-char nonbill code,\n44782563,Pulmonary hypertension due to chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,S\n40316554,Severe chronic obstructive pulmonary disease,Condition,SNOMED,Disorder,"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kBLDfxvTpBvDanPDZhHR3SBW2lE",
+      "role": "assistant",
+      "created": 1784799548,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_ntdFxdvFqeNc5NEE91NorDLt",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT COUNT(DISTINCT ce.person_id) AS copd_patients FROM omop.condition_era ce JOIN omop.concept_ancestor ca ON ce.condition_concept_id = ca.descendant_concept_id WHERE ca.ancestor_concept_id = 255573"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_K6jA17TIGpZfeS91XoDQMda1",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT TOP 100 concept_id, concept_name, vocabulary_id, concept_class_id, standard_concept FROM omop.concept WHERE domain_id='Condition' AND standard_concept='S' AND (LOWER(concept_name) LIKE '%diabetes mellitus%' OR LOWER(concept_name) LIKE '%obesity%' OR LOWER(concept_name) LIKE '%overweight%' OR LOWER(concept_name) LIKE '%hyperlipidemia%' OR LOWER(concept_name) LIKE '%lipid metabolism%' OR LOWER(concept_name) LIKE '%hypothyroidism%' OR LOWER(concept_name) LIKE '%thyroid%' OR LOWER(concept_name) LIKE '%metabolic syndrome%' OR LOWER(concept_name) LIKE '%malnutrition%' OR LOWER(concept_name) LIKE '%osteoporosis%') ORDER BY concept_name"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_d5e51352-bc3e-4433-a5e6-611e0f374a15",
+      "role": "user",
+      "created": 1784799548,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_ntdFxdvFqeNc5NEE91NorDLt",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "copd_patients\n65365"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_8e178de3-34dd-4d25-bd34-3ddcdc407f15",
+      "role": "user",
+      "created": 1784799548,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_K6jA17TIGpZfeS91XoDQMda1",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,vocabulary_id,concept_class_id,standard_concept\n4007573,Aberrant parathyroid gland,SNOMED,Disorder,S\n4151885,Aberrant thyroid gland,SNOMED,Disorder,S\n4034964,Abnormal metabolic state due to diabetes mellitus,SNOMED,Disorder,S\n37162046,Abnormal thyroid function test caused by substance,SNOMED,Clinical Finding,S\n37162202,Abnormal thyroid function test due to assay interference,SNOMED,Clinical Finding,S\n4036177,Abnormal thyroid hormone,SNOMED,Clinical Finding,S\n4010825,Abscess of thyroid,SNOMED,Disorder,S\n42536400,Absence of lower limb due to diabetes mellitus,SNOMED,Disorder,S\n4170461,Absent parathyroid gland,SNOMED,Disorder,S\n4321756,Acanthosis nigricans due to type 2 diabetes mellitus,SNOMED,Disorder,S\n4274959,Accessory parathyroid gland,SNOMED,Disorder,S\n4278224,Accessory thyroid gland,SNOMED,Disorder,S\n606808,Accidental parathyroid hormone and/or parathyroid hormone derivative poisoning,SNOMED,Disorder,S\n36715571,Acidosis due to type 1 diabetes mellitus,SNOMED,Disorder,S\n36717156,Acidosis due to type 2 diabetes mellitus,SNOMED,Disorder,S\n36558630,Acinar cell carcinoma of thyroid gland,ICDO3,ICDO Condition,S\n36546335,Acinar cell cystadenocarcinoma of thyroid gland,ICDO3,ICDO Condition,S\n36717595,Acquired central hypothyroidism,SNOMED,Disorder,S\n37161453,Acquired central hypothyroidism caused by ionizing radiation,SNOMED,Disorder,S\n37161451,Acquired central hypothyroidism due to pituitary disorder,SNOMED,Disorder,S\n37161450,Acquired central hypothyroidism due to Sheehan syndrome,SNOMED,Disorder,S\n138384,Acquired hypothyroidism,SNOMED,Disorder,S\n37160689,Acute bacterial thyroiditis,SNOMED,Disorder,S\n42538715,Acute complication due to diabetes mellitus,SNOMED,Disorder,S\n763514,Acute disease or injury-related malnutrition,SNOMED,Disorder,S\n37160688,Acute fungal thyroiditis,SNOMED,Disorder,S\n42538723,Acute malnutrition in adolescence,SNOMED,Disorder,S\n42538722,Acute malnutrition in childhood,SNOMED,Disorder,S\n42538721,Acute malnutrition in infancy,SNOMED,Disorder,S\n4095916,Acute non-suppurative thyroiditis,SNOMED,Disorder,S\n4102064,Acute suppurative thyroiditis,SNOMED,Disorder,S\n133737,Acute thyroiditis,SNOMED,Disorder,S\n4129363,Acute viral thyroiditis,SNOMED,Disorder,S\n36555731,Adenocarcinoma in situ in tubulovillous adenoma of thyroid gland,ICDO3,ICDO Condition,S\n36529244,Adenocarcinoma in situ in villous adenoma of thyroid gland,ICDO3,ICDO Condition,S\n36533442,Adenocarcinoma in situ, NOS, of parathyroid gland,ICDO3,ICDO Condition,S\n36557902,Adenocarcinoma in situ, NOS, of thyroid gland,ICDO3,ICDO Condition,S\n36526998,Adenocarcinoma in tubulovillous adenoma of thyroid gland,ICDO3,ICDO Condition,S\n36561704,Adenocarcinoma in villous adenoma of thyroid gland,ICDO3,ICDO Condition,S\n37161444,Adenocarcinoma of parathyroid gland,SNOMED,Disorder,S\n36522417,Adenocarcinoma with mixed subtypes of parathyroid gland,ICDO3,ICDO Condition,S\n44501796,Adenocarcinoma with mixed subtypes of thyroid gland,ICDO3,ICDO Condition,S\n36545132,Adenocarcinoma, NOS, of parathyroid gland,ICDO3,ICDO Condition,S\n44502820,Adenocarcinoma, NOS, of thyroid gland,ICDO3,ICDO Condition,S\n42512526,Adenoid cystic carcinoma of thyroid gland,ICDO3,ICDO Condition,S\n44503033,Adenosquamous carcinoma of thyroid gland,ICDO3,ICDO Condition,S\n4347298,Adult idiopathic generalized osteoporosis,SNOMED,Disorder,S\n4098464,Adult osteomalacia due to malnutrition,SNOMED,Disorder,S\n4171972,Adult-onset obesity,SNOMED,Disorder,S\n4105173,Advanced maculopathy due to diabetes mellitus,SNOMED,Disorder,S\n4209538,Advanced retinal disease due to diabetes mellitus,SNOMED,Disorder,S\n37169796,Agranulocytosis caused by antithyroid agent,SNOMED,Disorder,S\n36547037,ALK positive large B-cell lymphoma of thyroid gland,ICDO3,ICDO Condition,S\n37165209,Alopecia due to thyroid disorder,SNOMED,Disorder,S\n4082365,Alopecia, nail dystrophy, ophthalmic complications, thyroid dysfunction, hypohidrosis, ephelides, enteropathy and respiratory tract infections,SNOMED,Disorder,S\n36529264,Alveolar adenocarcinoma of thyroid gland,ICDO3,ICDO Condition,S\n4184965,Amenorrhea associated with obesity,SNOMED,Clinical Finding,S\n36553588,Anaplastic large cell lymphoma, T-cell and Null-cell type of thyroid gland,ICDO3,ICDO Condition,S\n4112985,Anaplastic thyroid carcinoma,SNOMED,Disorder,S\n4079899,Android obesity,SNOMED,Disorder,S\n4307799,Anemia due to diabetes mellitus,SNOMED,Disorder,S\n4287402,Anemia of parathyroid dysfunction,SNOMED,Disorder,S\n4071444,Anemia of thyroid dysfunction,SNOMED,Disorder,S\n43531588,Angina associated with type 2 diabetes mellitus,SNOMED,Disorder,S\n36558443,Angioimmunoblastic T-cell lymphoma of thyroid gland,ICDO3,ICDO Condition,S\n36715355,Aniridia, ptosis, intellectual disability, familial obesity syndrome,SNOMED,Disorder,S\n45769891,Ankle ulcer due to type 1 diabetes mellitus,SNOMED,Disorder,S\n45769888,Ankle ulcer due to type 2 diabetes mellitus,SNOMED,Disorder,S\n4180661,Antithyroid agent overdose,SNOMED,Disorder,S\n45765631,Aplasia of parathyroid gland,SNOMED,Disorder,S\n37311453,Armanni-Ebstein kidney due to diabetes mellitus,SNOMED,Disorder,S\n435773,Arrested development following protein-calorie malnutrition,SNOMED,Disorder,S\n4196141,Arthropathy due to type 2 diabetes mellitus,SNOMED,Disorder,S\n4044393,Asymmetric polyneuropathy due to diabetes mellitus,SNOMED,Disorder,S\n4194970,Asymmetric proximal motor neuropathy due to diabetes mellitus,SNOMED,Disorder,S\n4101892,Asymptomatic neuropathy due to diabetes mellitus,SNOMED,Disorder,S\n4185526,Athyrotic hypothyroidism sequence,SNOMED,Disorder,S\n1449265,Atrophic Hashimoto thyroiditis,SNOMED,Disorder,S\n4130023,Atrophy of thyroid - acquired,SNOMED,Disorder,S\n36713275,Atypical diabetes mellitus,SNOMED,Disorder,S\n4263629,Atypical subacute thyroiditis,SNOMED,Disorder,S\n4326738,Autoimmune hypoparathyroidism,SNOMED,Disorder,S\n4034815,Autoimmune hypothyroidism,SNOMED,Disorder,S\n4099336,Autoimmune parathyroiditis,SNOMED,Disorder,S\n4281109,Autoimmune thyroiditis,SNOMED,Disorder,S\n4175440,Autonomic neuropathy due to diabetes mellitus,SNOMED,Disorder,S\n602348,Autonomic neuropathy due to drug induced diabetes mellitus,SNOMED,Disorder,S\n37016767,Autonomic neuropathy due to type 1 diabetes mellitus,SNOMED,Disorder,S\n37016768,Autonomic neuropathy due to type 2 diabetes mellitus,SNOMED,Disorder,S\n4030044,Autonomous thyroid function,SNOMED,Disorder,S\n45763615,Autonomously functioning thyroid goiter,SNOMED,Disorder,S\n36535810,B lymphoblastic leukemia/lymphoma with hyperdiploidy of thyroid gland,ICDO3,ICDO Condition,S\n36562493,B lymphoblastic leukemia/lymphoma with hypodiploidy (Hypodiploid ALL) of thyroid gland,ICDO3,ICDO Condition,S\n36558657,B lymphoblastic leukemia/lymphoma with t(1;19)(q23;p13.3); E2A-PBX1 (TCF3-PBX1) of thyroid gland,ICDO3,ICDO Condition,S\n36539010,B lymphoblastic leukemia/lymphoma with t(12;21)(p13;q22); TEL-AML1 (ETV6-RUNX1) of thyroid gland,ICDO3,ICDO Condition,S\n36552324,B lymphoblastic leukemia/lymphoma with t(5;14)(q31;q32); IL3-IGH of thyroid gland,ICDO3,ICDO Condition,S\n36546559,B lymphoblastic leukemia/lymphoma with t(9;22)(q34;q11.2); BCR-ABL1 of thyroid gland,ICDO3,ICDO Condition,S\n36544800,B lymphoblastic leukemia/lymphoma with t(v;11q23); MLL rearranged of thyroid gland,ICDO3,ICDO Condition,S\n36563928,B lymphoblastic leukemia/lymphoma, NOS, of thyroid gland,ICDO3,ICDO Condition,S\n36563723,B-cell chronic lymphocytic leukemia/small lymphocytic lymphoma of parathyroid gland,ICDO3,ICDO Condition,S"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kBZP6kLyBO9oRySvz6Tx81YMAXF",
+      "role": "assistant",
+      "created": 1784799564,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_KvFJYrF0lx2lX07UNBF5MeqY",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT TOP 200 concept_id, concept_name, vocabulary_id, concept_class_id, standard_concept FROM omop.concept WHERE domain_id='Condition' AND standard_concept='S' AND LOWER(concept_name) IN ('diabetes mellitus','type 2 diabetes mellitus','obesity','overweight','hyperlipidemia','disorder of lipid metabolism','dyslipidemia','hypothyroidism','hyperthyroidism','metabolic syndrome x','metabolic syndrome','osteoporosis','malnutrition','protein-calorie malnutrition','vitamin d deficiency','disorder of endocrine system','metabolic disease','endocrine disease') ORDER BY concept_name"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_a1716c38-47ae-43d8-8a19-ebdbd7a26bd2",
+      "role": "user",
+      "created": 1784799564,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_KvFJYrF0lx2lX07UNBF5MeqY",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,vocabulary_id,concept_class_id,standard_concept\n201820,Diabetes mellitus,SNOMED,Disorder,S\n31821,Disorder of endocrine system,SNOMED,Disorder,S\n437530,Disorder of lipid metabolism,SNOMED,Disorder,S\n4159131,Dyslipidemia,SNOMED,Disorder,S\n432867,Hyperlipidemia,SNOMED,Disorder,S\n4142479,Hyperthyroidism,SNOMED,Disorder,S\n140673,Hypothyroidism,SNOMED,Disorder,S\n436670,Metabolic disease,SNOMED,Disorder,S\n436940,Metabolic syndrome X,SNOMED,Disorder,S\n433736,Obesity,SNOMED,Disorder,S\n80502,Osteoporosis,SNOMED,Disorder,S\n201826,Type 2 diabetes mellitus,SNOMED,Disorder,S\n436070,Vitamin D deficiency,SNOMED,Disorder,S"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kBlZ9NsghSgOasFUTW2ZSIjZpyu",
+      "role": "assistant",
+      "created": 1784799576,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_h0j1VqWHi4sujkHSm7I7ZWTy",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "WITH copd AS (\n  SELECT DISTINCT ce.person_id\n  FROM omop.condition_era ce\n  JOIN omop.concept_ancestor ca ON ce.condition_concept_id = ca.descendant_concept_id\n  WHERE ca.ancestor_concept_id = 255573\n), comorbids AS (\n  SELECT * FROM (VALUES\n    ('Diabetes mellitus', 201820),\n    ('Type 2 diabetes mellitus', 201826),\n    ('Disorder of lipid metabolism', 437530),\n    ('Hyperlipidemia', 432867),\n    ('Dyslipidemia', 4159131),\n    ('Obesity', 433736),\n    ('Metabolic syndrome X', 436940),\n    ('Hypothyroidism', 140673),\n    ('Hyperthyroidism', 4142479),\n    ('Disorder of endocrine system', 31821),\n    ('Metabolic disease', 436670),\n    ('Vitamin D deficiency', 436070),\n    ('Osteoporosis', 80502)\n  ) AS v(label, ancestor_id)\n), hits AS (\n  SELECT DISTINCT c.label, c.ancestor_id, copd.person_id\n  FROM copd\n  JOIN omop.condition_era ce ON ce.person_id = copd.person_id\n  JOIN comorbids c ON 1=1\n  JOIN omop.concept_ancestor ca ON ca.ancestor_concept_id = c.ancestor_id AND ca.descendant_concept_id = ce.condition_concept_id\n)\nSELECT c.label, c.ancestor_id, COUNT(h.person_id) AS patients,\n       CAST(100.0 * COUNT(h.person_id) / (SELECT COUNT(*) FROM copd) AS DECIMAL(5,2)) AS prevalence_percent\nFROM comorbids c\nLEFT JOIN hits h ON h.label = c.label AND h.ancestor_id = c.ancestor_id\nGROUP BY c.label, c.ancestor_id\nORDER BY patients DESC;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_34d213da-25d2-4888-8102-dffc109a8e1c",
+      "role": "user",
+      "created": 1784799576,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_h0j1VqWHi4sujkHSm7I7ZWTy",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "label,ancestor_id,patients,prevalence_percent\nMetabolic disease,436670,43344,66.31\nDisorder of endocrine system,31821,31422,48.07\nHyperlipidemia,432867,26809,41.01\nDiabetes mellitus,201820,16910,25.87\nType 2 diabetes mellitus,201826,11340,17.35\nObesity,433736,10957,16.76\nHypothyroidism,140673,9724,14.88\nOsteoporosis,80502,8659,13.25\nVitamin D deficiency,436070,6481,9.92\nDyslipidemia,4159131,2344,3.59\nDisorder of lipid metabolism,437530,1166,1.78\nHyperthyroidism,4142479,837,1.28\nMetabolic syndrome X,436940,485,0.74"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCF1WM8HVVS8Wjnmp6vsHDDUFrM",
+      "role": "assistant",
+      "created": 1784799601,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_4nuILiV2KHKXL1Fzccj3N3PG",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "2",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_c8e7ea6b-85c7-4455-8262-17dd319aad28",
+      "role": "user",
+      "created": 1784799601,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_4nuILiV2KHKXL1Fzccj3N3PG",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #2"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCLrU1803lLFZXPpXBJMYT7ms8p",
+      "role": "assistant",
+      "created": 1784799607,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_FTC6rqwGJZZ0XmAj2PE3lrmb",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "3",
+                "status": "in_progress"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_751ee4f8-7d98-419a-aef4-c3496c5afcd2",
+      "role": "user",
+      "created": 1784799607,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_FTC6rqwGJZZ0XmAj2PE3lrmb",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #3"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCPfQmyFkjbT1V02NOdXau0uaNT",
+      "role": "assistant",
+      "created": 1784799611,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_iVC8snyEa1ZOM5xMXNRjzEgI",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (d:Disease) WHERE toLower(d.name) CONTAINS 'chronic obstructive pulmonary' OR toLower(d.name) CONTAINS 'copd' RETURN d.name AS name, d.identifier AS id LIMIT 20"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_0ed8dc79-8856-4f80-b6c7-6f06103137cd",
+      "role": "user",
+      "created": 1784799611,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_iVC8snyEa1ZOM5xMXNRjzEgI",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"name\": \"chronic obstructive pulmonary disease\", \"id\": \"DOID:3083\"}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCU344SfBFQdHIvBTDuKivqCT3q",
+      "role": "assistant",
+      "created": 1784799617,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_crXJjW5Fl42OAHsnDMJwBHB4",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (d:Disease) WHERE toLower(d.name) IN ['diabetes mellitus','type 2 diabetes mellitus','obesity','hyperlipidemia','hypothyroidism','osteoporosis','vitamin d deficiency','metabolic syndrome x'] RETURN d.name AS name, d.identifier AS id LIMIT 50"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_5WxGpqU9mQrD8P26afGMqluu",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (copd:Disease {identifier:'DOID:3083'})-[r:ASSOCIATES_DaG]->(g:Gene) RETURN g.name AS gene, g.description AS description, r.gwas_pvalue AS pvalue, r.sources AS sources LIMIT 25"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_d94fe48a-c69a-4b87-8241-a197c12e3903",
+      "role": "user",
+      "created": 1784799617,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_5WxGpqU9mQrD8P26afGMqluu",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"gene\": \"CXCL8\", \"description\": \"C-X-C motif chemokine ligand 8\", \"pvalue\": null, \"sources\": [\"DISEASES\"]}, {\"gene\": \"MEGF6\", \"description\": \"multiple EGF like domains 6\", \"pvalue\": 1e-10, \"sources\": [\"GWAS\"]}, {\"gene\": \"RAF1\", \"description\": \"Raf-1 proto-oncogene, serine/threonine kinase\", \"pvalue\": 3e-10, \"sources\": [\"GWAS\"]}, {\"gene\": \"MYPN\", \"description\": \"myopalladin\", \"pvalue\": 3e-09, \"sources\": [\"GWAS\"]}, {\"gene\": \"DGKB\", \"description\": \"diacylglycerol kinase beta\", \"pvalue\": 2e-09, \"sources\": [\"GWAS\"]}, {\"gene\": \"THSD4\", \"description\": \"thrombospondin type 1 domain containing 4\", \"pvalue\": 2e-97, \"sources\": [\"GWAS\"]}, {\"gene\": \"ARHGEF17\", \"description\": \"Rho guanine nucleotide exchange factor 17\", \"pvalue\": 6e-27, \"sources\": [\"GWAS\"]}, {\"gene\": \"RANBP10\", \"description\": \"RAN binding protein 10\", \"pvalue\": 8e-12, \"sources\": [\"GWAS\"]}, {\"gene\": \"HYKK\", \"description\": \"hydroxylysine kinase\", \"pvalue\": 4e-38, \"sources\": [\"GWAS\"]}, {\"gene\": \"LOC124905976\", \"description\": \"uncharacterized LOC124905976\", \"pvalue\": 7e-27, \"sources\": [\"GWAS\"]}, {\"gene\": \"ZSCAN12\", \"description\": \"zinc finger and SCAN domain containing 12\", \"pvalue\": 2e-11, \"sources\": [\"GWAS\"]}, {\"gene\": \"CEP41\", \"description\": \"centrosomal protein 41\", \"pvalue\": 9e-09, \"sources\": [\"GWAS\"]}, {\"gene\": \"MTCL1\", \"description\": \"microtubule crosslinking factor 1\", \"pvalue\": 2e-35, \"sources\": [\"GWAS\"]}, {\"gene\": \"PPP1R18\", \"description\": \"protein phosphatase 1 regulatory subunit 18\", \"pvalue\": 1e-13, \"sources\": [\"GWAS\"]}, {\"gene\": \"ASTN2\", \"description\": \"astrotactin 2\", \"pvalue\": 2e-18, \"sources\": [\"GWAS\"]}, {\"gene\": \"DNM2\", \"description\": \"dynamin 2\", \"pvalue\": 2e-08, \"sources\": [\"GWAS\"]}, {\"gene\": \"LOX\", \"description\": \"lysyl oxidase\", \"pvalue\": 4e-16, \"sources\": [\"GWAS\"]}, {\"gene\": \"MYH9\", \"description\": \"myosin heavy chain 9\", \"pvalue\": 4e-09, \"sources\": [\"GWAS\"]}, {\"gene\": \"CHRM3\", \"description\": \"cholinergic receptor muscarinic 3\", \"pvalue\": 8e-30, \"sources\": [\"GWAS\"]}, {\"gene\": \"SCARF2\", \"description\": \"scavenger receptor class F member 2\", \"pvalue\": 2e-18, \"sources\": [\"GWAS\"]}, {\"gene\": \"APOE\", \"description\": \"apolipoprotein E\", \"pvalue\": 1e-08, \"sources\": [\"GWAS\"]}, {\"gene\": \"TTC23\", \"description\": \"tetratricopeptide repeat domain 23\", \"pvalue\": 2e-18, \"sources\": [\"GWAS\"]}, {\"gene\": \"TEKT5\", \"description\": \"tektin 5\", \"pvalue\": 4e-14, \"sources\": [\"GWAS\"]}, {\"gene\": \"ADCY5\", \"description\": \"adenylate cyclase 5\", \"pvalue\": 4e-10, \"sources\": [\"GWAS\"]}, {\"gene\": \"ERC2\", \"description\": \"ELKS/RAB6-interacting/CAST family member 2\", \"pvalue\": 2e-11, \"sources\": [\"GWAS\"]}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_d0a9c1d0-abee-4455-b737-13ef6ee4ee3d",
+      "role": "user",
+      "created": 1784799617,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_crXJjW5Fl42OAHsnDMJwBHB4",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"name\": \"obesity\", \"id\": \"DOID:9970\"}, {\"name\": \"osteoporosis\", \"id\": \"DOID:11476\"}, {\"name\": \"type 2 diabetes mellitus\", \"id\": \"DOID:9352\"}, {\"name\": \"hypothyroidism\", \"id\": \"DOID:1459\"}, {\"name\": \"diabetes mellitus\", \"id\": \"DOID:9351\"}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCaKV8LgL9GMV43khDRMSSv00al",
+      "role": "assistant",
+      "created": 1784799625,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_ne69saqwAEVJFqWZtvSsPzgL",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (copd:Disease {identifier:'DOID:3083'})-[:ASSOCIATES_DaG]->(g:Gene)<-[:ASSOCIATES_DaG]-(d:Disease)\nWHERE d.identifier IN ['DOID:9351','DOID:9352','DOID:9970','DOID:1459','DOID:11476']\nRETURN d.name AS comorbidity, collect(DISTINCT g.name)[0..20] AS shared_genes, count(DISTINCT g) AS n_shared\nORDER BY n_shared DESC"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_dfb89ff3-17f8-4db3-a261-2edcbbb48c06",
+      "role": "user",
+      "created": 1784799625,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_ne69saqwAEVJFqWZtvSsPzgL",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"comorbidity\": \"type 2 diabetes mellitus\", \"shared_genes\": [\"CXCL8\", \"DGKB\", \"ASTN2\", \"APOE\", \"ADCY5\", \"TNRC6A\", \"FTO\", \"RBMS1\", \"FRMD4A\", \"FRS2\", \"FAM13A\", \"PTCH1\", \"AMZ1\", \"BOC\", \"ITGA1\", \"HLA-DQB1\", \"HSPA4\", \"RREB1\", \"ALDH2\", \"TNS1\"], \"n_shared\": 86}, {\"comorbidity\": \"hypothyroidism\", \"shared_genes\": [\"APOE\", \"ADCY5\", \"ARL17A\", \"SSH2\", \"PTCH1\", \"CAPZB\", \"HLA-DQB1\", \"RREB1\", \"RIN3\", \"TBX1\", \"BMP6\", \"HLA-DQA1\", \"RASGRP3\", \"GLIS3\", \"KANSL1\", \"BCAS3\", \"ARMC2\", \"HDLBP\", \"SHH\", \"ELN\"], \"n_shared\": 52}, {\"comorbidity\": \"obesity\", \"shared_genes\": [\"CXCL8\", \"APOE\", \"TNRC6A\", \"FTO\", \"RBMS1\", \"SMG6\", \"HLA-DQB1\", \"VGLL4\", \"RREB1\", \"RARB\", \"TBX1\", \"AKAP6\", \"ARHGEF28\", \"EHBP1\", \"ADAMTSL3\", \"ADRB2\", \"AFF3\", \"BNC2\", \"DNMT3A\", \"DPYD\"], \"n_shared\": 50}, {\"comorbidity\": \"diabetes mellitus\", \"shared_genes\": [\"CXCL8\", \"APOE\", \"ADCY5\", \"FTO\", \"PTCH1\", \"HLA-DQB1\", \"RREB1\", \"OR5V1\", \"LOC124906010\", \"BMP6\", \"AKAP6\", \"HLA-DQA1\", \"GLIS3\", \"SHH\", \"FLT1\", \"ELN\", \"GJA1\", \"NSMCE2\", \"CC2D2A\", \"AGER\"], \"n_shared\": 43}, {\"comorbidity\": \"osteoporosis\", \"shared_genes\": [\"RUNX2\", \"FAM3C\", \"HOXC6\", \"SMG6\", \"HLA-DQB1\", \"BMP6\", \"HLA-DQA1\", \"ELN\", \"SMAD3\", \"TET2\", \"BMP4\", \"HOXC4\", \"LMX1B\", \"WWOX\", \"TNF\", \"IL6\", \"ALB\", \"IL1B\", \"TGFB1\", \"HMOX1\"], \"n_shared\": 23}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCi46J1X1JauppvBJbRJb48fvVi",
+      "role": "assistant",
+      "created": 1784799633,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_7yGzkQqrUUuJucF3BlpHr9Wv",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (copd:Disease {identifier:'DOID:3083'})-[:ASSOCIATES_DaG]->(g:Gene)<-[:ASSOCIATES_DaG]-(d:Disease)\nWHERE d.identifier IN ['DOID:9352','DOID:9970','DOID:1459','DOID:11476']\nWITH DISTINCT g\nMATCH (g)-[:PARTICIPATES_GpBP]->(bp:BiologicalProcess)\nWHERE toLower(bp.name) CONTAINS 'inflammatory' OR toLower(bp.name) CONTAINS 'immune' OR toLower(bp.name) CONTAINS 'glucose' OR toLower(bp.name) CONTAINS 'lipid' OR toLower(bp.name) CONTAINS 'insulin' OR toLower(bp.name) CONTAINS 'oxidative' OR toLower(bp.name) CONTAINS 'extracellular matrix' OR toLower(bp.name) CONTAINS 'epithelial' OR toLower(bp.name) CONTAINS 'smooth muscle' OR toLower(bp.name) CONTAINS 'cytokine'\nRETURN bp.name AS biological_process, count(DISTINCT g) AS n_genes, collect(DISTINCT g.name)[0..12] AS example_genes\nORDER BY n_genes DESC, biological_process LIMIT 20"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_777d0639-1cd8-484b-847c-f2302220d2c9",
+      "role": "user",
+      "created": 1784799633,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_7yGzkQqrUUuJucF3BlpHr9Wv",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"biological_process\": \"regulation of immune response\", \"n_genes\": 21, \"example_genes\": [\"APOE\", \"HLA-DQB1\", \"HLA-DQA1\", \"SMAD3\", \"GAB2\", \"MFHAS1\", \"FLOT1\", \"TGFB2\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\"]}, {\"biological_process\": \"positive regulation of immune system process\", \"n_genes\": 20, \"example_genes\": [\"CXCL8\", \"HLA-DQB1\", \"HLA-DQA1\", \"SHH\", \"VEGFC\", \"GAB2\", \"MFHAS1\", \"FLOT1\", \"TGFB2\", \"IL10\", \"TNF\", \"IL6\"]}, {\"biological_process\": \"regulation of cytokine production\", \"n_genes\": 19, \"example_genes\": [\"CXCL8\", \"HDAC9\", \"SMAD3\", \"FLOT1\", \"TGFB2\", \"IL10\", \"TNF\", \"ACE2\", \"IL6\", \"IFNG\", \"CRP\", \"IL1B\"]}, {\"biological_process\": \"response to lipid\", \"n_genes\": 19, \"example_genes\": [\"CXCL8\", \"ADCY5\", \"PTCH1\", \"TBX1\", \"BMP6\", \"DNMT3A\", \"BMP4\", \"BCL2L11\", \"TGFB2\", \"IL10\", \"TNF\", \"IL6\"]}, {\"biological_process\": \"regulation of epithelial cell proliferation\", \"n_genes\": 18, \"example_genes\": [\"APOE\", \"RUNX2\", \"FRS2\", \"PTCH1\", \"RREB1\", \"TBX1\", \"BMP6\", \"NRP2\", \"SHH\", \"SMAD3\", \"VEGFC\", \"BMP4\"]}, {\"biological_process\": \"inflammatory response\", \"n_genes\": 17, \"example_genes\": [\"CXCL8\", \"FAM3C\", \"BMP6\", \"CERS6\", \"HDAC9\", \"MFHAS1\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"CRP\", \"IL1B\"]}, {\"biological_process\": \"positive regulation of immune response\", \"n_genes\": 16, \"example_genes\": [\"HLA-DQB1\", \"HLA-DQA1\", \"GAB2\", \"MFHAS1\", \"FLOT1\", \"TGFB2\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\"]}, {\"biological_process\": \"cellular response to lipid\", \"n_genes\": 15, \"example_genes\": [\"CXCL8\", \"ADCY5\", \"PTCH1\", \"TBX1\", \"BMP4\", \"BCL2L11\", \"IL10\", \"TNF\", \"IL6\", \"ACE\", \"IL1B\", \"TGFB1\"]}, {\"biological_process\": \"immune effector process\", \"n_genes\": 14, \"example_genes\": [\"HLA-DQB1\", \"HLA-DQA1\", \"DOCK10\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"CRP\", \"ACE\", \"IL1B\", \"HLA-DPB1\", \"HLA-DPA1\"]}, {\"biological_process\": \"regulation of inflammatory response\", \"n_genes\": 14, \"example_genes\": [\"APOE\", \"SMAD3\", \"MFHAS1\", \"IL10\", \"TNF\", \"ACE2\", \"IL6\", \"IFNG\", \"ACE\", \"IL1B\", \"TGFB1\", \"HMOX1\"]}, {\"biological_process\": \"response to cytokine\", \"n_genes\": 14, \"example_genes\": [\"CXCL8\", \"AKAP6\", \"NRP2\", \"AFF3\", \"VEGFC\", \"FGFR3\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"NFKB1\"]}, {\"biological_process\": \"negative regulation of cytokine production\", \"n_genes\": 13, \"example_genes\": [\"HDAC9\", \"SMAD3\", \"TGFB2\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\", \"HMOX1\", \"NFKB1\", \"PTPN22\"]}, {\"biological_process\": \"positive regulation of epithelial cell proliferation\", \"n_genes\": 13, \"example_genes\": [\"RUNX2\", \"RREB1\", \"TBX1\", \"BMP6\", \"NRP2\", \"SHH\", \"VEGFC\", \"BMP4\", \"TCF7L2\", \"IL10\", \"TNF\", \"TGFB1\"]}, {\"biological_process\": \"cellular response to cytokine stimulus\", \"n_genes\": 12, \"example_genes\": [\"CXCL8\", \"AKAP6\", \"NRP2\", \"VEGFC\", \"FGFR3\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"NFKB1\", \"HLA-DPA1\"]}, {\"biological_process\": \"epithelial cell differentiation\", \"n_genes\": 12, \"example_genes\": [\"FAM3C\", \"FRS2\", \"PTCH1\", \"RARB\", \"TBX1\", \"BMP6\", \"SMAD3\", \"BMP4\", \"THRA\", \"C1GALT1\", \"TGFB2\", \"TGFB1\"]}, {\"biological_process\": \"positive regulation of cytokine production\", \"n_genes\": 12, \"example_genes\": [\"SMAD3\", \"FLOT1\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\", \"HMOX1\", \"PTPN22\", \"HLA-DPB1\", \"HLA-DPA1\"]}, {\"biological_process\": \"regulation of epithelial cell migration\", \"n_genes\": 12, \"example_genes\": [\"APOE\", \"RREB1\", \"BCAS3\", \"NRP2\", \"HDAC9\", \"VEGFC\", \"BMP4\", \"TGFB2\", \"TNF\", \"IFNG\", \"TGFB1\", \"HMOX1\"]}, {\"biological_process\": \"regulation of smooth muscle cell proliferation\", \"n_genes\": 12, \"example_genes\": [\"APOE\", \"FRS2\", \"ELN\", \"BMP4\", \"TCF7L2\", \"IL10\", \"TNF\", \"ACE2\", \"IL6\", \"IFNG\", \"TGFB1\", \"HMOX1\"]}, {\"biological_process\": \"negative regulation of immune system process\", \"n_genes\": 11, \"example_genes\": [\"RIN3\", \"SHH\", \"BMP4\", \"MFHAS1\", \"TGFB2\", \"IL10\", \"TNF\", \"TGFB1\", \"HMOX1\", \"PTPN22\", \"UFD1\"]}, {\"biological_process\": \"regulation of immune effector process\", \"n_genes\": 11, \"example_genes\": [\"GAB2\", \"TGFB2\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\", \"HMOX1\", \"PTPN22\", \"NCF1\"]}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCqh5uHFAyPMxHOsfPH25sP79LK",
+      "role": "assistant",
+      "created": 1784799640,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_l7AtQM0e76QXXFmrRnUqmwPt",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (copd:Disease {identifier:'DOID:3083'})-[r:RESEMBLES_DrD]->(d:Disease)\nWHERE d.identifier IN ['DOID:9351','DOID:9352','DOID:9970','DOID:1459','DOID:11476']\nRETURN d.name AS disease, r.cooccur AS cooccur, r.enrichment AS enrichment, r.odds AS odds, r.fisher AS fisher, r.source AS source\nORDER BY coalesce(r.enrichment,0) DESC, coalesce(r.odds,0) DESC"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_9196245b-f9e9-40bf-9026-8c781e9937cc",
+      "role": "user",
+      "created": 1784799640,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_l7AtQM0e76QXXFmrRnUqmwPt",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kCxBAl5RUiNyKc0V4Q3ilQVMy2A",
+      "role": "assistant",
+      "created": 1784799649,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_LEXHj3lPbNeeYwku0NnBDR44",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (d:Disease) WHERE toLower(d.name) CONTAINS 'lipid' OR toLower(d.name) CONTAINS 'hyperlipidemia' OR toLower(d.name) CONTAINS 'dyslipidemia' OR toLower(d.name) CONTAINS 'metabolic syndrome' RETURN d.name AS name, d.identifier AS id LIMIT 50"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_e3DCYaqpY2PindpAuyGYC8Sv",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (copd:Disease {identifier:'DOID:3083'})-[:ASSOCIATES_DaG]->(g:Gene)<-[:ASSOCIATES_DaG]-(d:Disease)\nWHERE d.identifier IN ['DOID:9352','DOID:9970','DOID:1459','DOID:11476']\nWITH d.name AS comorbidity, g\nMATCH (g)-[:PARTICIPATES_GpPW]->(pw:Pathway)\nWHERE toLower(pw.name) CONTAINS 'immune' OR toLower(pw.name) CONTAINS 'cytokine' OR toLower(pw.name) CONTAINS 'interleukin' OR toLower(pw.name) CONTAINS 'lipid' OR toLower(pw.name) CONTAINS 'insulin' OR toLower(pw.name) CONTAINS 'glucose' OR toLower(pw.name) CONTAINS 'extracellular matrix' OR toLower(pw.name) CONTAINS 'tgf' OR toLower(pw.name) CONTAINS 'smooth muscle'\nRETURN comorbidity, pw.name AS pathway, count(DISTINCT g) AS n_genes, collect(DISTINCT g.name)[0..8] AS genes\nORDER BY n_genes DESC LIMIT 30"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_a9501038-8fee-48b6-9b8d-2985f574eec1",
+      "role": "user",
+      "created": 1784799649,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_LEXHj3lPbNeeYwku0NnBDR44",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"name\": \"abdominal obesity-metabolic syndrome\", \"id\": \"DOID:0060611\"}, {\"name\": \"familial combined hyperlipidemia\", \"id\": \"DOID:13809\"}, {\"name\": \"lipid-cell variant infiltrating bladder urothelial carcinoma\", \"id\": \"DOID:7967\"}, {\"name\": \"sphingolipidosis\", \"id\": \"DOID:1927\"}, {\"name\": \"mucolipidosis\", \"id\": \"DOID:0080488\"}, {\"name\": \"antiphospholipid syndrome\", \"id\": \"DOID:2988\"}, {\"name\": \"cerebral lipidosis\", \"id\": \"DOID:10742\"}, {\"name\": \"lipid-rich carcinoma\", \"id\": \"DOID:5658\"}, {\"name\": \"lipid storage disease\", \"id\": \"DOID:9455\"}, {\"name\": \"mucolipidosis II alpha/beta\", \"id\": \"DOID:0080070\"}, {\"name\": \"mucolipidosis III gamma\", \"id\": \"DOID:0080678\"}, {\"name\": \"abdominal obesity-metabolic syndrome 1\", \"id\": \"DOID:14221\"}, {\"name\": \"abdominal obesity-metabolic syndrome 3\", \"id\": \"DOID:0060612\"}, {\"name\": \"lipid pneumonia\", \"id\": \"DOID:3241\"}, {\"name\": \"retinal dystrophy in systemic or cerebroretinal lipidoses\", \"id\": \"DOID:14253\"}, {\"name\": \"mucolipidosis III alpha/beta\", \"id\": \"DOID:0080071\"}, {\"name\": \"mucolipidosis type IV\", \"id\": \"DOID:0080490\"}, {\"name\": \"familial hyperlipidemia\", \"id\": \"DOID:1168\"}, {\"name\": \"breast lipid-rich carcinoma\", \"id\": \"DOID:7076\"}, {\"name\": \"abdominal obesity-metabolic syndrome 4\", \"id\": \"DOID:0080945\"}, {\"name\": \"lipid metabolism disorder\", \"id\": \"DOID:3146\"}, {\"name\": \"cardiovascular-kidney-metabolic syndrome\", \"id\": \"DOID:0070635\"}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_2267233c-d536-4fc9-a449-b08078583d59",
+      "role": "user",
+      "created": 1784799649,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_e3DCYaqpY2PindpAuyGYC8Sv",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"comorbidity\": \"obesity\", \"pathway\": \"SARS-CoV-2 innate immunity evasion and cell-specific immune response\", \"n_genes\": 7, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"ACE2\", \"IL6\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"Cytokine cytokine receptor interaction\", \"n_genes\": 7, \"genes\": [\"CXCL8\", \"BMP6\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"TGFB1\"]}, {\"comorbidity\": \"obesity\", \"pathway\": \"SARS CoV 2 innate immunity evasion and cell specific immune response\", \"n_genes\": 7, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"ACE2\", \"IL6\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"Immune infiltration in pancreatic cancer\", \"n_genes\": 7, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\"]}, {\"comorbidity\": \"obesity\", \"pathway\": \"Immune infiltration in pancreatic cancer\", \"n_genes\": 7, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"SARS-CoV-2 innate immunity evasion and cell-specific immune response\", \"n_genes\": 6, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"obesity\", \"pathway\": \"Cytokine cytokine receptor interaction\", \"n_genes\": 6, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"TGFB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"Cytokines and inflammatory response\", \"n_genes\": 6, \"genes\": [\"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"SARS CoV 2 innate immunity evasion and cell specific immune response\", \"n_genes\": 6, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"obesity\", \"pathway\": \"Cytokines and inflammatory response\", \"n_genes\": 6, \"genes\": [\"IL10\", \"TNF\", \"IL6\", \"IFNG\", \"IL1B\", \"TGFB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"TGF beta receptor signaling\", \"n_genes\": 5, \"genes\": [\"RUNX2\", \"SMAD3\", \"BMP4\", \"TNF\", \"TGFB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"TGF-beta receptor signaling in skeletal dysplasias\", \"n_genes\": 5, \"genes\": [\"RUNX2\", \"SMAD3\", \"BMP4\", \"TNF\", \"TGFB1\"]}, {\"comorbidity\": \"obesity\", \"pathway\": \"miRNA role in immune response in sepsis\", \"n_genes\": 5, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"NFKB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"miRNAs involvement in the immune response in sepsis\", \"n_genes\": 5, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"NFKB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"TGF beta receptor signaling in skeletal dysplasias\", \"n_genes\": 5, \"genes\": [\"RUNX2\", \"SMAD3\", \"BMP4\", \"TNF\", \"TGFB1\"]}, {\"comorbidity\": \"obesity\", \"pathway\": \"miRNAs involvement in the immune response in sepsis\", \"n_genes\": 5, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"NFKB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"miRNA role in immune response in sepsis\", \"n_genes\": 5, \"genes\": [\"CXCL8\", \"IL10\", \"TNF\", \"IL6\", \"NFKB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"TGF-beta receptor signaling\", \"n_genes\": 5, \"genes\": [\"RUNX2\", \"SMAD3\", \"BMP4\", \"TNF\", \"TGFB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"Cytokine cytokine receptor interaction\", \"n_genes\": 5, \"genes\": [\"BMP6\", \"BMP4\", \"TNF\", \"IL6\", \"TGFB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"TGF beta receptor signaling in skeletal dysplasias\", \"n_genes\": 4, \"genes\": [\"TNF\", \"IFNG\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"TGF-beta receptor signaling\", \"n_genes\": 4, \"genes\": [\"TNF\", \"IFNG\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"SARS CoV 2 innate immunity evasion and cell specific immune response\", \"n_genes\": 4, \"genes\": [\"SMAD3\", \"TNF\", \"IL6\", \"TGFB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"TGF beta receptor signaling\", \"n_genes\": 4, \"genes\": [\"TNF\", \"IFNG\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"TGF-beta receptor signaling in skeletal dysplasias\", \"n_genes\": 4, \"genes\": [\"TNF\", \"IFNG\", \"TGFB1\", \"NFKB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"TGF beta signaling pathway\", \"n_genes\": 4, \"genes\": [\"RUNX2\", \"SMAD3\", \"TGFB1\", \"MMP1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"SARS-CoV-2 innate immunity evasion and cell-specific immune response\", \"n_genes\": 4, \"genes\": [\"SMAD3\", \"TNF\", \"IL6\", \"TGFB1\"]}, {\"comorbidity\": \"osteoporosis\", \"pathway\": \"TGF-beta signaling pathway\", \"n_genes\": 4, \"genes\": [\"RUNX2\", \"SMAD3\", \"TGFB1\", \"MMP1\"]}, {\"comorbidity\": \"type 2 diabetes mellitus\", \"pathway\": \"TGF 1 SMAD2 3 signalling in decidual NK cells at the fetal maternal interface\", \"n_genes\": 4, \"genes\": [\"CXCL8\", \"ITGA1\", \"IFNG\", \"TGFB1\"]}, {\"comorbidity\": \"hypothyroidism\", \"pathway\": \"Cytokine cytokine receptor interaction\", \"n_genes\": 4, \"genes\": [\"BMP6\", \"BMP4\", \"TGFB2\", \"IFNG\"]}, {\"comorbidity\": \"obesity\", \"pathway\": \"TGF beta receptor signaling\", \"n_genes\": 4, \"genes\": [\"TNF\", \"IFNG\", \"TGFB1\", \"NFKB1\"]}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kD5Bf70DBKSACwhqHs9niSenNwJ",
+      "role": "assistant",
+      "created": 1784799656,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_mPC2YBb3TrIukDCt5Qck2P6X",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "3",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_755ee183-176a-466b-a0d9-dd408e36e231",
+      "role": "user",
+      "created": 1784799656,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_mPC2YBb3TrIukDCt5Qck2P6X",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #3"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kDCVoj0ag7sL7HiAJvRXfmsnOYM",
+      "role": "assistant",
+      "created": 1784799660,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_QAIMcbX0b6Wtqnnd6NnNwZSl",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "4",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_7d91fec0-ae05-4f3f-898f-6e8662f113d0",
+      "role": "user",
+      "created": 1784799660,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_QAIMcbX0b6Wtqnnd6NnNwZSl",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #4"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kDHDXybeZE5PpWut3hWY2RQGgU1",
+      "role": "assistant",
+      "created": 1784799664,
+      "content": [
+        {
+          "type": "text",
+          "text": "In the local OMOP cohort, COPD (`SNOMED 255573`) included **65,365 patients**. The most prevalent metabolic/endocrine comorbidity groupings were:\n\n| Comorbidity concept | COPD patients | Prevalence |\n|---|---:|---:|\n| Metabolic disease | 43,344 | **66.31%** |\n| Disorder of endocrine system | 31,422 | **48.07%** |\n| Hyperlipidemia | 26,809 | **41.01%** |\n| Diabetes mellitus | 16,910 | **25.87%** |\n| Type 2 diabetes mellitus | 11,340 | **17.35%** |\n| Obesity | 10,957 | **16.76%** |\n| Hypothyroidism | 9,724 | **14.88%** |\n| Osteoporosis | 8,659 | **13.25%** |\n| Vitamin D deficiency | 6,481 | **9.92%** |\n| Hyperthyroidism | 837 | **1.28%** |\n| Metabolic syndrome X | 485 | **0.74%** |\n\nBiology from the KG points to several plausible bridges between COPD and these comorbidities:\n\n- **Shared inflammatory/immune genes**: COPD shares many disease-associated genes with type 2 diabetes, obesity, hypothyroidism, and osteoporosis. Recurrent examples include `CXCL8`, `IL6`, `TNF`, `IL1B`, `TGFB1`, `NFKB1`, `IL10`, `APOE`, and HLA genes.\n- **Cytokine signaling**: shared genes were enriched in “regulation of cytokine production,” “inflammatory response,” “immune response,” and “cytokine–cytokine receptor interaction.”\n- **Lipid/metabolic signaling**: `APOE`, `FTO`, `ADCY5`, `DGKB`, and lipid-response biological processes connect COPD with hyperlipidemia, obesity, and diabetes.\n- **Airway remodeling pathways**: `TGFB1`, `SMAD3`, `BMP4/BMP6`, `MMP1`, `ELN`, and `RUNX2` link systemic metabolic/endocrine disease to epithelial proliferation, extracellular matrix remodeling, smooth-muscle proliferation, emphysema/remodeling biology, and osteoporosis.\n- **Steroid/inflammation axis**: osteoporosis and vitamin D deficiency are common in COPD and plausibly reflect systemic inflammation, reduced activity, smoking burden, age, and corticosteroid exposure; the KG-supported `TNF/IL6/TGFB1` axis provides a mechanistic overlap.\n\nCaveat: these are **EHR-coded prevalences**, not adjusted epidemiologic risks. Broad parent concepts such as “metabolic disease” and “endocrine disorder” overlap with child diagnoses, so the more clinically interpretable headline comorbidities are **hyperlipidemia, diabetes/T2D, obesity, hypothyroidism, osteoporosis, and vitamin D deficiency**."
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    }
+  ],
+  "metadata": {
+    "total_tokens": 61922,
+    "status": "completed"
+  }
+}

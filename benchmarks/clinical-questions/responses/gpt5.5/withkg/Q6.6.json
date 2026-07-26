@@ -1,0 +1,1374 @@
+{
+  "messages": [
+    {
+      "id": null,
+      "role": "user",
+      "created": 1784801743,
+      "content": [
+        {
+          "type": "text",
+          "text": "/ext:medcp In IBD, which extraintestinal comorbidities are most frequent, and what immune signaling could underlie this?"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kksNbBcxxMHj0854YndUtjEIFN5",
+      "role": "assistant",
+      "created": 1784801749,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_VX8pCyRzcocYPqbce5ykdfnm",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__plan_write",
+              "arguments": {
+                "plan": "Use MedCP to (1) inspect available clinical tables and KG schema, (2) query IBD extraintestinal comorbidity frequencies, (3) query immune-signaling/pathway links that could explain the comorbidity pattern, then synthesize a concise answer with caveats."
+              }
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_iZ8KNI3TZdMkf9yq4RnY8SDr",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_write",
+              "arguments": {
+                "content": "- [ ] Inspect MedCP clinical and KG schemas\n- [ ] Query IBD extraintestinal comorbidity frequencies\n- [ ] Query immune-signaling evidence from KG\n- [ ] Synthesize answer"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_672cb140-0c0d-4efa-9721-9c9df9357672",
+      "role": "user",
+      "created": 1784801749,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_VX8pCyRzcocYPqbce5ykdfnm",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Plan updated"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_8ef1517f-c6d8-43e0-8f88-b07284cf78ab",
+      "role": "user",
+      "created": 1784801749,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_iZ8KNI3TZdMkf9yq4RnY8SDr",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Todo list set: 4 item(s)"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kkxXBRCw4qZoQasQBNMewEmt932",
+      "role": "assistant",
+      "created": 1784801752,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_wRpCeDS2gPVWPC0DUAo6tnot",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-list_clinical_tables",
+              "arguments": {}
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_CeECcEOkY440Nmhoc5AtAFSJ",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-get_knowledge_graph_schema",
+              "arguments": {}
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_b54e8aaf-ee9a-4bc8-b863-9e6d3072c4cc",
+      "role": "user",
+      "created": 1784801752,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_wRpCeDS2gPVWPC0DUAo6tnot",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"care_site\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.care_site\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cdm_source\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cdm_source\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cohort\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cohort\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cohort_definition\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cohort_definition\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_ancestor\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_ancestor\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_class\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_class\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_numeric\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_numeric\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_recommended\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_recommended\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_relationship\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_relationship\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"concept_synonym\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.concept_synonym\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"condition_era\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.condition_era\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"condition_occurrence\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.condition_occurrence\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"condition_occurrence_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.condition_occurrence_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"cost\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.cost\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"death\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.death\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"device_exposure\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.device_exposure\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"domain\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.domain\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"dose_era\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.dose_era\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_era\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_era\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_exposure\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_exposure\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_exposure_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_exposure_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"drug_strength\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.drug_strength\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"episode\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.episode\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"episode_event\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.episode_event\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"fact_relationship\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.fact_relationship\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"location\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.location\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"measurement\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.measurement\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"measurement_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.measurement_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"metadata\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.metadata\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"note\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.note\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"note_nlp\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.note_nlp\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"observation\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.observation\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"observation_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.observation_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"observation_period\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.observation_period\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"payer_plan_period\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.payer_plan_period\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"person\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.person\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"person_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.person_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"procedure_occurrence\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.procedure_occurrence\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"procedure_occurrence_extension\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.procedure_occurrence_extension\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"provider\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.provider\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"relationship\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.relationship\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"source_to_concept_map\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.source_to_concept_map\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"specimen\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.specimen\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"visit_detail\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.visit_detail\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"visit_occurrence\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.visit_occurrence\"\n  },\n  {\n    \"schema\": \"omop\",\n    \"table_name\": \"vocabulary\",\n    \"type\": \"BASE TABLE\",\n    \"full_name\": \"omop.vocabulary\"\n  }\n]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_b0604e43-048b-4def-a019-566c8c42ef62",
+      "role": "user",
+      "created": 1784801752,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_CeECcEOkY440Nmhoc5AtAFSJ",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"PARTOF_LpL\": {\"type\": \"relationship\", \"count\": 114529, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"percent_of_zip_area_in_place\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"percent_of_place_area_in_zip\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ISA_DiD\": {\"type\": \"relationship\", \"count\": 17619, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"EC\": {\"type\": \"node\", \"count\": 8748, \"properties\": {\"reaction\": {\"indexed\": false, \"type\": \"STRING\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"subclass\": {\"indexed\": false, \"type\": \"STRING\"}, \"class\": {\"indexed\": false, \"type\": \"STRING\"}, \"subsubclass\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"aliases\": {\"indexed\": false, \"type\": \"STRING\"}, \"serial\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"ISA_ECiEC\": {\"direction\": \"out\", \"labels\": [\"EC\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"HAS_PhEC\": {\"direction\": \"in\", \"labels\": [\"Protein\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CATALYZES_ECcR\": {\"direction\": \"out\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"CAUSES_OcD\": {\"type\": \"relationship\", \"count\": 739}, \"MARKER_NEG_GmnD\": {\"type\": \"relationship\", \"count\": 10069, \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ASSOCIATES_GaS\": {\"type\": \"relationship\", \"count\": 41461, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"MolecularFunction\": {\"type\": \"node\", \"count\": 4016, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpMF\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"Anatomy\": {\"type\": \"node\", \"count\": 16071, \"properties\": {\"mesh_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"bto\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"LOCALIZES_DlA\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"PARTOF_CTpA\": {\"direction\": \"in\", \"labels\": [\"CellType\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSES_AeG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_AiA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_ApA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"DOWNREGULATES_OGdG\": {\"type\": \"relationship\", \"count\": 63760, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpMF\": {\"type\": \"relationship\", \"count\": 139047, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"CellularComponent\": {\"type\": \"node\", \"count\": 1897, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpCC\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"PARTOF_PDpP\": {\"type\": \"relationship\", \"count\": 54696775, \"properties\": {\"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DatabaseTimestamp\": {\"type\": \"node\", \"count\": 119, \"properties\": {\"updated\": {\"indexed\": false, \"type\": \"LOCAL_DATE_TIME\"}, \"created\": {\"indexed\": false, \"type\": \"LOCAL_DATE_TIME\"}, \"name\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"Pathway\": {\"type\": \"node\", \"count\": 6762, \"properties\": {\"level\": {\"indexed\": false, \"type\": \"STRING\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"reactome_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpPW\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_PWiPW\": {\"direction\": \"out\", \"labels\": [\"Pathway\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTOF_RpPW\": {\"direction\": \"in\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"TARGETS_MtG\": {\"type\": \"relationship\", \"count\": 1600435, \"properties\": {\"prediction_score\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Organism\": {\"type\": \"node\", \"count\": 356647, \"properties\": {\"usa_isolation_country\": {\"indexed\": false, \"type\": \"STRING\"}, \"biovar\": {\"indexed\": false, \"type\": \"STRING\"}, \"strain\": {\"indexed\": false, \"type\": \"STRING\"}, \"isolation_source\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_age\": {\"indexed\": false, \"type\": \"STRING\"}, \"salinity\": {\"indexed\": false, \"type\": \"STRING\"}, \"disease\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_chicken\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"level\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_pig\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"genome_size\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"collection_date\": {\"indexed\": false, \"type\": \"STRING\"}, \"isolation_country\": {\"indexed\": false, \"type\": \"STRING\"}, \"pathovar\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_gender\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_human\": {\"indexed\": false, \"type\": \"STRING\"}, \"temperature_range\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"has_amr_phenotype\": {\"indexed\": false, \"type\": \"STRING\"}, \"sporulation\": {\"indexed\": false, \"type\": \"STRING\"}, \"genbank_accessions\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_health\": {\"indexed\": false, \"type\": \"STRING\"}, \"host_is_cow\": {\"indexed\": false, \"type\": \"STRING\"}, \"motility\": {\"indexed\": false, \"type\": \"STRING\"}, \"serovar\": {\"indexed\": false, \"type\": \"STRING\"}, \"oxygen_requirement\": {\"indexed\": false, \"type\": \"STRING\"}, \"gram_stain\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"ISA_OiO\": {\"direction\": \"out\", \"labels\": [\"Organism\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ENCODES_OeP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"DietarySupplement\": {\"type\": \"node\", \"count\": 20235, \"properties\": {\"amino_acid_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"vitamin_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"information_source\": {\"indexed\": false, \"type\": \"STRING\"}, \"mineral_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"product_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"botanical_count\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"supplement_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"other_ingredients_count\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"CONTAINS_DScC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"operator\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"CONTAINS_DScB\": {\"direction\": \"out\", \"labels\": [\"Blend\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"operation\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"Protein\": {\"type\": \"node\", \"count\": 39442384, \"properties\": {\"org_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"gene\": {\"indexed\": false, \"type\": \"LIST\"}, \"org_ncbi_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"EC\": {\"indexed\": false, \"type\": \"LIST\"}, \"refseq\": {\"indexed\": false, \"type\": \"LIST\"}, \"polyprotein\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"reviewed\": {\"indexed\": false, \"type\": \"STRING\"}, \"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"isoform\": {\"indexed\": false, \"type\": \"LIST\"}, \"chembl_id\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"seqids\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"ENCODES_GeP\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"BINDS_CbP\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"bindingdb_k\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"chembl_action_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"bindingdb_ic50s\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_urls\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kis\": {\"indexed\": false, \"type\": \"LIST\"}, \"drugcentral_relationship\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kds\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"pubmedIDs\": {\"indexed\": false, \"type\": \"LIST\"}, \"methods\": {\"indexed\": false, \"type\": \"LIST\"}, \"roleA\": {\"indexed\": false, \"type\": \"LIST\"}, \"roleB\": {\"indexed\": false, \"type\": \"LIST\"}, \"is_directed\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"miscores\": {\"indexed\": false, \"type\": \"LIST\"}, \"score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"types\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"HAS_PhEC\": {\"direction\": \"out\", \"labels\": [\"EC\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_PDpP\": {\"direction\": \"in\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ENCODES_OeP\": {\"direction\": \"in\", \"labels\": [\"Organism\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"INTERACTS_PiC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"textmining\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"overall_confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"prediction\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"experimental\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"database\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"DOWNREGULATES_AdG\": {\"type\": \"relationship\", \"count\": 65853}, \"HASROLE_ChC\": {\"type\": \"relationship\", \"count\": 39270, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CAUSES_CcSE\": {\"type\": \"relationship\", \"count\": 155640, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DOWNREGULATES_CdG\": {\"type\": \"relationship\", \"count\": 307019, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiP\": {\"type\": \"relationship\", \"count\": 2419547, \"properties\": {\"pubmedIDs\": {\"indexed\": false, \"type\": \"LIST\"}, \"methods\": {\"indexed\": false, \"type\": \"LIST\"}, \"roleA\": {\"indexed\": false, \"type\": \"LIST\"}, \"roleB\": {\"indexed\": false, \"type\": \"LIST\"}, \"is_directed\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"miscores\": {\"indexed\": false, \"type\": \"LIST\"}, \"score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"types\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_PGpPG\": {\"type\": \"relationship\", \"count\": 4210, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PRODUCES_RpC\": {\"type\": \"relationship\", \"count\": 54881, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_OiO\": {\"type\": \"relationship\", \"count\": 61437, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ENCODES_GeP\": {\"type\": \"relationship\", \"count\": 157321, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSEDIN_GeiD\": {\"type\": \"relationship\", \"count\": 6227, \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"ptpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiC\": {\"type\": \"relationship\", \"count\": 69200000, \"properties\": {\"textmining\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"overall_confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"prediction\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"experimental\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"database\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PDiPD\": {\"type\": \"relationship\", \"count\": 4758, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_ECiEC\": {\"type\": \"relationship\", \"count\": 8725, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSES_AeG\": {\"type\": \"relationship\", \"count\": 413084, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Food\": {\"type\": \"node\", \"count\": 15057, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"obsolete\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"subset_list\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"CONTAINS_FcC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"content\": {\"indexed\": false, \"type\": \"STRING\"}, \"food_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"orig_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcF\": {\"direction\": \"in\", \"labels\": [\"Blend\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_FiF\": {\"direction\": \"out\", \"labels\": [\"Food\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"REGULATES_PrG\": {\"type\": \"relationship\", \"count\": 16408}, \"CONTRAINDICATES_CcD\": {\"type\": \"relationship\", \"count\": 11715, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"LIST\"}, \"act_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESEMBLES_DrD\": {\"type\": \"relationship\", \"count\": 23335, \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"BINDS_CbPD\": {\"type\": \"relationship\", \"count\": 110129, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_CpR\": {\"type\": \"relationship\", \"count\": 2994}, \"HAS_PhEC\": {\"type\": \"relationship\", \"count\": 3768948, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MEMBEROF_PDmPF\": {\"type\": \"relationship\", \"count\": 14197, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_PWiPW\": {\"type\": \"relationship\", \"count\": 3191, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"IN_CLINICAL_TRIALS_FOR_CictD\": {\"type\": \"relationship\", \"count\": 34740}, \"EXPRESSEDIN_GeiCT\": {\"type\": \"relationship\", \"count\": 22498, \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"specific_ncpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"ncpm\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_GpPW\": {\"type\": \"relationship\", \"count\": 94645, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Gene\": {\"type\": \"node\", \"count\": 20825, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"ensembl\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"chembl_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"chromosome\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"INTEGER\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"UPREGULATES_GPuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSEDIN_GeiCT\": {\"direction\": \"out\", \"labels\": [\"CellType\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"specific_ncpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"ncpm\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_GpPW\": {\"direction\": \"out\", \"labels\": [\"Pathway\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"database\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpCC\": {\"direction\": \"out\", \"labels\": [\"CellularComponent\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"DOWNREGULATES_CdG\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSES_AeG\": {\"direction\": \"in\", \"labels\": [\"Anatomy\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_CuG\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_GpPG\": {\"direction\": \"out\", \"labels\": [\"PwGroup\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"MARKER_NEG_GmnD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ASSOCIATES_DaG\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"diseases_confidences\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"diseases_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_scores\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_identifiers\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"gwas_pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"ASSOCIATES_GaS\": {\"direction\": \"out\", \"labels\": [\"Symptom\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"DOWNREGULATES_KGdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ENCODES_GeP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DOWNREGULATES_OGdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpMF\": {\"direction\": \"out\", \"labels\": [\"MolecularFunction\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"MARKER_POS_GmpD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_KGuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"EXPRESSEDIN_GeiD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"ptpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESPONSE_TO_mGrC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DOWNREGULATES_GPdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpBP\": {\"direction\": \"out\", \"labels\": [\"BiologicalProcess\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"PARTICIPATES_GpR\": {\"direction\": \"out\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"TARGETS_MtG\": {\"direction\": \"in\", \"labels\": [\"MiRNA\"], \"properties\": {\"prediction_score\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_OGuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_PpCP\": {\"type\": \"relationship\", \"count\": 9566}, \"UPREGULATES_CuG\": {\"type\": \"relationship\", \"count\": 283944, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"TRANSPORTS_PtC\": {\"type\": \"relationship\", \"count\": 6431}, \"CONTAINS_BcC\": {\"type\": \"relationship\", \"count\": 9402, \"properties\": {\"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"TREATS_CtD\": {\"type\": \"relationship\", \"count\": 57098, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"LIST\"}, \"act_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"phase\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"BiologicalProcess\": {\"type\": \"node\", \"count\": 13675, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTICIPATES_GpBP\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"Reaction\": {\"type\": \"node\", \"count\": 42135, \"properties\": {\"reactome_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"CATALYZES_ECcR\": {\"direction\": \"in\", \"labels\": [\"EC\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpR\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_PGpR\": {\"direction\": \"in\", \"labels\": [\"PwGroup\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PRODUCES_RpC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONSUMES_RcC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_RpPW\": {\"direction\": \"out\", \"labels\": [\"Pathway\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"CONTAINS_BcF\": {\"type\": \"relationship\", \"count\": 6377, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_FiF\": {\"type\": \"relationship\", \"count\": 18469, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"UPREGULATES_KGuG\": {\"type\": \"relationship\", \"count\": 515270, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MARKER_POS_GmpD\": {\"type\": \"relationship\", \"count\": 8153, \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_CTpA\": {\"type\": \"relationship\", \"count\": 899, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"SDoH\": {\"type\": \"node\", \"count\": 320, \"properties\": {\"description\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"name\": {\"indexed\": false, \"type\": \"STRING\"}, \"data_source\": {\"indexed\": false, \"type\": \"STRING\"}, \"mesh_ids\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"ISA_SiS\": {\"direction\": \"out\", \"labels\": [\"SDoH\"]}}}, \"RESISTANT_TO_mGrC\": {\"type\": \"relationship\", \"count\": 70}, \"UPREGULATES_AuG\": {\"type\": \"relationship\", \"count\": 8082}, \"ISA_CiC\": {\"type\": \"relationship\", \"count\": 264131, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Compound\": {\"type\": \"node\", \"count\": 3177327, \"properties\": {\"max_phase\": {\"indexed\": true, \"type\": \"FLOAT\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"xrefs\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"smiles\": {\"indexed\": false, \"type\": \"STRING\"}, \"standardized_smiles\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"INCLUDES_PCiC\": {\"direction\": \"in\", \"labels\": [\"PharmacologicClass\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"BINDS_CbP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"bindingdb_k\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"chembl_action_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"bindingdb_ic50s\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_urls\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kis\": {\"indexed\": false, \"type\": \"LIST\"}, \"drugcentral_relationship\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kds\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MENTIONED_CLINICAL_TRIALS_FOR_CmctD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"purpose\": {\"indexed\": false, \"type\": \"LIST\"}, \"phase\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_CiC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CAUSES_CcSE\": {\"direction\": \"out\", \"labels\": [\"SideEffect\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"HASROLE_ChC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_DScC\": {\"direction\": \"in\", \"labels\": [\"DietarySupplement\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"operator\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"DOWNREGULATES_CdG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"UPREGULATES_CuG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTRAINDICATES_CcD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"LIST\"}, \"act_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcC\": {\"direction\": \"in\", \"labels\": [\"Blend\"], \"properties\": {\"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"TREATS_CtD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"LIST\"}, \"act_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"phase\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PRODUCES_RpC\": {\"direction\": \"in\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_FcC\": {\"direction\": \"in\", \"labels\": [\"Food\"], \"properties\": {\"content\": {\"indexed\": false, \"type\": \"STRING\"}, \"food_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"orig_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"BINDS_CbPD\": {\"direction\": \"out\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESPONSE_TO_mGrC\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"FOUNDIN_CfL\": {\"direction\": \"out\", \"labels\": [\"Location\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"LIST\"}, \"metrics\": {\"indexed\": false, \"type\": \"LIST\"}, \"value\": {\"indexed\": false, \"type\": \"LIST\"}, \"year\": {\"indexed\": false, \"type\": \"LIST\"}, \"date\": {\"indexed\": false, \"type\": \"LIST\"}, \"media\": {\"indexed\": false, \"type\": \"LIST\"}, \"date_type\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PiC\": {\"direction\": \"in\", \"labels\": [\"Protein\"], \"properties\": {\"textmining\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"overall_confidence\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"prediction\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"experimental\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"database\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONSUMES_RcC\": {\"direction\": \"in\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"Blend\": {\"type\": \"node\", \"count\": 3983, \"properties\": {\"name\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"CONTAINS_DScB\": {\"direction\": \"in\", \"labels\": [\"DietarySupplement\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"operation\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_BcF\": {\"direction\": \"out\", \"labels\": [\"Food\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_ApA\": {\"type\": \"relationship\", \"count\": 9497, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CONTAINS_FcC\": {\"type\": \"relationship\", \"count\": 24879, \"properties\": {\"content\": {\"indexed\": false, \"type\": \"STRING\"}, \"food_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"orig_unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PRESENTS_DpS\": {\"type\": \"relationship\", \"count\": 12707, \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"FOUNDIN_CfL\": {\"type\": \"relationship\", \"count\": 128447, \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"LIST\"}, \"metrics\": {\"indexed\": false, \"type\": \"LIST\"}, \"value\": {\"indexed\": false, \"type\": \"LIST\"}, \"year\": {\"indexed\": false, \"type\": \"LIST\"}, \"date\": {\"indexed\": false, \"type\": \"LIST\"}, \"media\": {\"indexed\": false, \"type\": \"LIST\"}, \"date_type\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_CpPG\": {\"type\": \"relationship\", \"count\": 568}, \"REDUCES_SEN_mGrsC\": {\"type\": \"relationship\", \"count\": 1}, \"PARTICIPATES_GpR\": {\"type\": \"relationship\", \"count\": 371, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"Version\": {\"type\": \"node\", \"count\": 107, \"properties\": {\"timestamp\": {\"indexed\": false, \"type\": \"LOCAL_DATE_TIME\"}, \"description\": {\"indexed\": false, \"type\": \"STRING\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"BINDS_CbP\": {\"type\": \"relationship\", \"count\": 839834, \"properties\": {\"bindingdb_k\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"chembl_action_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"bindingdb_ic50s\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_urls\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kis\": {\"indexed\": false, \"type\": \"LIST\"}, \"drugcentral_relationship\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_kds\": {\"indexed\": false, \"type\": \"LIST\"}, \"bindingdb_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_CiF\": {\"type\": \"relationship\", \"count\": 1003}, \"MENTIONED_CLINICAL_TRIALS_FOR_CmctD\": {\"type\": \"relationship\", \"count\": 34838, \"properties\": {\"purpose\": {\"indexed\": false, \"type\": \"LIST\"}, \"phase\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"LOCALIZES_DlA\": {\"type\": \"relationship\", \"count\": 20844, \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"PARTOF_GpPG\": {\"type\": \"relationship\", \"count\": 191, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ENCODES_OeP\": {\"type\": \"relationship\", \"count\": 38028566, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PREVALENCE_DpL\": {\"type\": \"relationship\", \"count\": 268700, \"properties\": {\"upper\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"lower\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"metric_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ASSOCIATES_DaG\": {\"type\": \"relationship\", \"count\": 211155, \"properties\": {\"diseases_confidences\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"diseases_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_scores\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_identifiers\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"gwas_pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"ISA_AiA\": {\"type\": \"relationship\", \"count\": 20447, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ExtracellularParticle\": {\"type\": \"node\", \"count\": 1671, \"properties\": {\"experiment_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"species\": {\"indexed\": false, \"type\": \"STRING\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"identifier\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sample_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"sample\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ISA_CTiCT\": {\"type\": \"relationship\", \"count\": 4212, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INCREASEDIN_PiD\": {\"type\": \"relationship\", \"count\": 11850}, \"RESPONSE_TO_mGrC\": {\"type\": \"relationship\", \"count\": 133, \"properties\": {\"clin_sig\": {\"indexed\": false, \"type\": \"STRING\"}, \"pubmed\": {\"indexed\": false, \"type\": \"LIST\"}, \"tier\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease_id\": {\"indexed\": false, \"type\": \"LIST\"}, \"disease\": {\"indexed\": false, \"type\": \"LIST\"}, \"variant\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"SideEffect\": {\"type\": \"node\", \"count\": 5964, \"properties\": {\"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"CAUSES_CcSE\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"MiRNA\": {\"type\": \"node\", \"count\": 2656, \"properties\": {\"accession\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"TARGETS_MtG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"prediction_score\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_CpC\": {\"type\": \"relationship\", \"count\": 2574}, \"PARTICIPATES_PGpR\": {\"type\": \"relationship\", \"count\": 7794, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"UPREGULATES_OGuG\": {\"type\": \"relationship\", \"count\": 109557, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INCLUDES_PCiC\": {\"type\": \"relationship\", \"count\": 3300, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"CLEAVESTO_PctP\": {\"type\": \"relationship\", \"count\": 41882}, \"ProteinDomain\": {\"type\": \"node\", \"count\": 30231, \"properties\": {\"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"entryName\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"BINDS_CbPD\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MEMBEROF_PDmPF\": {\"direction\": \"out\", \"labels\": [\"ProteinFamily\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_PDpP\": {\"direction\": \"out\", \"labels\": [\"Protein\"], \"properties\": {\"start\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"end\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"INTERACTS_PDiPD\": {\"direction\": \"out\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"PARTOF_PpPG\": {\"type\": \"relationship\", \"count\": 5841}, \"PARTICIPATES_PpR\": {\"type\": \"relationship\", \"count\": 2625}, \"DOWNREGULATES_KGdG\": {\"type\": \"relationship\", \"count\": 496023, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Complex\": {\"type\": \"node\", \"count\": 2820, \"properties\": {\"evidence_code\": {\"indexed\": false, \"type\": \"STRING\"}, \"assembly\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"complex_portal\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"Symptom\": {\"type\": \"node\", \"count\": 1960, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"obsolete\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PRESENTS_DpS\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ASSOCIATES_GaS\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"PwGroup\": {\"type\": \"node\", \"count\": 6954, \"properties\": {\"reactome_id\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTOF_GpPG\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTOF_PGpPG\": {\"direction\": \"out\", \"labels\": [\"PwGroup\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"PARTICIPATES_PGpR\": {\"direction\": \"out\", \"labels\": [\"Reaction\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}}}, \"ISA_SiS\": {\"type\": \"relationship\", \"count\": 364}, \"CATALYZES_ECcR\": {\"type\": \"relationship\", \"count\": 18723, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_RpPW\": {\"type\": \"relationship\", \"count\": 27093, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"version\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"UPREGULATES_GPuG\": {\"type\": \"relationship\", \"count\": 23648, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"CellType\": {\"type\": \"node\", \"count\": 2754, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"description\": {\"indexed\": true, \"type\": \"STRING\"}, \"hybrid_node_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"synonyms\": {\"indexed\": true, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}}, \"relationships\": {\"EXPRESSEDIN_GeiCT\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"specific_ncpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"ncpm\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"ISA_CTiCT\": {\"direction\": \"out\", \"labels\": [\"CellType\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTOF_CTpA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"ProteinFamily\": {\"type\": \"node\", \"count\": 900, \"properties\": {\"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"MEMBEROF_PDmPF\": {\"direction\": \"in\", \"labels\": [\"ProteinDomain\"], \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"Disease\": {\"type\": \"node\", \"count\": 12275, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"obsolete\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"mesh_list\": {\"indexed\": false, \"type\": \"LIST\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"Linkout\": {\"indexed\": false, \"type\": \"STRING\"}, \"omim_list\": {\"indexed\": false, \"type\": \"LIST\"}}, \"relationships\": {\"PRESENTS_DpS\": {\"direction\": \"out\", \"labels\": [\"Symptom\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MENTIONED_CLINICAL_TRIALS_FOR_CmctD\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"purpose\": {\"indexed\": false, \"type\": \"LIST\"}, \"phase\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MARKER_POS_GmpD\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"LOCALIZES_DlA\": {\"direction\": \"out\", \"labels\": [\"Anatomy\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"EXPRESSEDIN_GeiD\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"specificity_score\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"ptpm\": {\"indexed\": false, \"type\": \"STRING\"}, \"group\": {\"indexed\": false, \"type\": \"STRING\"}, \"distribution\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ISA_DiD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"CONTRAINDICATES_CcD\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"LIST\"}, \"act_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"MARKER_NEG_GmnD\": {\"direction\": \"in\", \"labels\": [\"Gene\"], \"properties\": {\"p_value\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PREVALENCE_DpL\": {\"direction\": \"out\", \"labels\": [\"Location\"], \"properties\": {\"upper\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"lower\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"metric_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"ASSOCIATES_DaG\": {\"direction\": \"out\", \"labels\": [\"Gene\"], \"properties\": {\"diseases_confidences\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"diseases_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_scores\": {\"indexed\": false, \"type\": \"LIST\"}, \"diseases_identifiers\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"gwas_pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}}}, \"TREATS_CtD\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"LIST\"}, \"act_sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"phase\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"RESEMBLES_DrD\": {\"direction\": \"out\", \"labels\": [\"Disease\"], \"properties\": {\"cooccur\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"enrichment\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"fisher\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"odds\": {\"indexed\": false, \"type\": \"FLOAT\"}}}}}, \"PARTICIPATES_GpCC\": {\"type\": \"relationship\", \"count\": 106934, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"CONTAINS_DScC\": {\"type\": \"relationship\", \"count\": 1486, \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"category\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"operator\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"CONTAINS_DScB\": {\"type\": \"relationship\", \"count\": 4981, \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"STRING\"}, \"operation\": {\"indexed\": false, \"type\": \"STRING\"}, \"quantity\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"DECREASEDIN_PdD\": {\"type\": \"relationship\", \"count\": 1}, \"AFFECTS_CamG\": {\"type\": \"relationship\", \"count\": 13741}, \"Location\": {\"type\": \"node\", \"count\": 108480, \"properties\": {\"state\": {\"indexed\": false, \"type\": \"STRING\"}, \"zipcode_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"code\": {\"indexed\": false, \"type\": \"STRING\"}, \"type\": {\"indexed\": true, \"type\": \"STRING\"}, \"Linkout\": {\"indexed\": false, \"type\": \"STRING\"}, \"state_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"county_fips\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"city_fips\": {\"indexed\": false, \"type\": \"STRING\"}, \"iso3\": {\"indexed\": false, \"type\": \"STRING\"}, \"longitude\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"latitude\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"state_fips\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"PARTOF_LpL\": {\"direction\": \"out\", \"labels\": [\"Location\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"percent_of_zip_area_in_place\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}, \"percent_of_place_area_in_zip\": {\"indexed\": false, \"type\": \"STRING\"}}}, \"FOUNDIN_CfL\": {\"direction\": \"in\", \"labels\": [\"Compound\"], \"properties\": {\"unit\": {\"indexed\": false, \"type\": \"LIST\"}, \"metrics\": {\"indexed\": false, \"type\": \"LIST\"}, \"value\": {\"indexed\": false, \"type\": \"LIST\"}, \"year\": {\"indexed\": false, \"type\": \"LIST\"}, \"date\": {\"indexed\": false, \"type\": \"LIST\"}, \"media\": {\"indexed\": false, \"type\": \"LIST\"}, \"date_type\": {\"indexed\": false, \"type\": \"LIST\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PREVALENCE_DpL\": {\"direction\": \"in\", \"labels\": [\"Disease\"], \"properties\": {\"upper\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"lower\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"value\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"year\": {\"indexed\": false, \"type\": \"INTEGER\"}, \"metric_name\": {\"indexed\": false, \"type\": \"STRING\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}}, \"EXPRESSEDIN_PeCT\": {\"type\": \"relationship\", \"count\": 795263}, \"DOWNREGULATES_GPdG\": {\"type\": \"relationship\", \"count\": 15935, \"properties\": {\"pvalue\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"zscore\": {\"indexed\": false, \"type\": \"FLOAT\"}, \"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}, \"PARTICIPATES_GpBP\": {\"type\": \"relationship\", \"count\": 720428, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"evidence\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}, \"PharmacologicClass\": {\"type\": \"node\", \"count\": 635, \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"name\": {\"indexed\": true, \"type\": \"STRING\"}, \"class_type\": {\"indexed\": false, \"type\": \"STRING\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"identifier\": {\"indexed\": true, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"url\": {\"indexed\": false, \"type\": \"STRING\"}}, \"relationships\": {\"INCLUDES_PCiC\": {\"direction\": \"out\", \"labels\": [\"Compound\"], \"properties\": {\"source\": {\"indexed\": false, \"type\": \"STRING\"}, \"unbiased\": {\"indexed\": false, \"type\": \"BOOLEAN\"}, \"license\": {\"indexed\": false, \"type\": \"STRING\"}, \"vestige\": {\"indexed\": false, \"type\": \"BOOLEAN\"}}}}}, \"CONSUMES_RcC\": {\"type\": \"relationship\", \"count\": 49533, \"properties\": {\"sources\": {\"indexed\": false, \"type\": \"LIST\"}}}}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4klFLgAdWL9taU6HoykbqWYOGdUn",
+      "role": "assistant",
+      "created": 1784801773,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_4RgKL6EXL20Qd2R2SGvgiaXn",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "#1",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_63c0da4f-20e8-478e-b271-b89e91c42d50",
+      "role": "user",
+      "created": 1784801773,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_4RgKL6EXL20Qd2R2SGvgiaXn",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[tool_error kind=tool_failure retryable=false] The tool ran and reported a failure. Read the message and address its cause.\nError: No todo item with id ##1"
+                }
+              ],
+              "structuredContent": {
+                "error": {
+                  "kind": "tool_failure",
+                  "retryable": false,
+                  "message": "Error: No todo item with id ##1"
+                }
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4klLbhth35TZ170osjjZ4MqQksp7",
+      "role": "assistant",
+      "created": 1784801780,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_IgGJ0xSZiTJ00PQG3skTt8Tr",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "1",
+                "status": "completed"
+              }
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_V0AdoFSgqZeGtgKd7Y3n2r7Q",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT concept_id, concept_name, vocabulary_id, concept_class_id, standard_concept FROM omop.concept WHERE domain_id = 'Condition' AND standard_concept = 'S' AND (LOWER(concept_name) LIKE '%crohn%' OR LOWER(concept_name) LIKE '%ulcerative colitis%' OR LOWER(concept_name) LIKE '%inflammatory bowel disease%') ORDER BY concept_name LIMIT 50;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_4f029dda-2e99-42f5-8ad2-c965b065e843",
+      "role": "user",
+      "created": 1784801780,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_IgGJ0xSZiTJ00PQG3skTt8Tr",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #1"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_a9b5e156-9da2-48b0-85bb-ea2b9daaa8de",
+      "role": "user",
+      "created": 1784801780,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_V0AdoFSgqZeGtgKd7Y3n2r7Q",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[tool_error kind=tool_failure retryable=false] The tool ran and reported a failure. Read the message and address its cause.\nElectronic health records error: (102, b\"Incorrect syntax near 'LIMIT'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
+                }
+              ],
+              "structuredContent": {
+                "error": {
+                  "kind": "tool_failure",
+                  "retryable": false,
+                  "message": "Electronic health records error: (102, b\"Incorrect syntax near 'LIMIT'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
+                }
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4klUuZb4zcJB7MFEx2mBC6pcnvsl",
+      "role": "assistant",
+      "created": 1784801788,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_jrg2FkX0Lilw8XhoPr4yVZ8w",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT TOP 50 concept_id, concept_name, vocabulary_id, concept_class_id, standard_concept FROM omop.concept WHERE domain_id = 'Condition' AND standard_concept = 'S' AND (LOWER(concept_name) LIKE '%crohn%' OR LOWER(concept_name) LIKE '%ulcerative colitis%' OR LOWER(concept_name) LIKE '%inflammatory bowel disease%') ORDER BY concept_name;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_2e5fbeaf-7a0f-4144-a642-8deaa2241812",
+      "role": "user",
+      "created": 1784801788,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_jrg2FkX0Lilw8XhoPr4yVZ8w",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,vocabulary_id,concept_class_id,standard_concept\n46269888,Abscess of intestine co-occurrent and due to Crohn's disease,SNOMED,Disorder,S\n46274073,Abscess of intestine co-occurrent and due to Crohn's disease of large intestine,SNOMED,Disorder,S\n46269878,Abscess of intestine co-occurrent and due to Crohn's disease of small and large intestine,SNOMED,Disorder,S\n46269883,Abscess of intestine co-occurrent and due to Crohn's disease of small intestine,SNOMED,Disorder,S\n46269951,Abscess of intestine co-occurrent and due to ulcerative colitis,SNOMED,Disorder,S\n602594,Acute left-sided ulcerative colitis,SNOMED,Disorder,S\n4029372,Acute ulcerative colitis,SNOMED,Disorder,S\n1245349,ALPI-related inflammatory bowel disease,SNOMED,Disorder,S\n36716986,Arthritis co-occurrent and due to Crohn's disease,SNOMED,Disorder,S\n37170948,Arthritis of joint of spine due to inflammatory bowel disease,SNOMED,Disorder,S\n1075206,Arthritis temporally related to inflammatory bowel disease,SNOMED,Disorder,S\n4116142,Arthropathy in ulcerative colitis,SNOMED,Disorder,S\n40481367,Chronic left-sided ulcerative colitis,SNOMED,Disorder,S\n40479837,Chronic ulcerative colitis,SNOMED,Disorder,S\n37162889,Colorectal Crohn disease,SNOMED,Disorder,S\n46269889,Complication due to Crohn's disease,SNOMED,Disorder,S\n46269874,Complication due to Crohn's disease of large intestine,SNOMED,Disorder,S\n46269879,Complication due to Crohn's disease of small and large intestines,SNOMED,Disorder,S\n46269884,Complication due to Crohn's disease of small intestine,SNOMED,Disorder,S\n46273477,Complication due to ulcerative colitis,SNOMED,Disorder,S\n36715915,Crohn disease of anal canal,SNOMED,Disorder,S\n37116446,Crohn disease of appendix,SNOMED,Disorder,S\n37172426,Crohn disease of colon in remission,SNOMED,Disorder,S\n37170088,Crohn disease of rectum in remission,SNOMED,Disorder,S\n37172546,Crohn disease of small intestine and large intestine in remission,SNOMED,Disorder,S\n37170274,Crohn disease of small intestine in remission,SNOMED,Disorder,S\n42537666,Crohn disease of upper gastrointestinal tract,SNOMED,Disorder,S\n201606,Crohn's disease,SNOMED,Disorder,S\n4142544,Crohn's disease in remission,SNOMED,Disorder,S\n4177488,Crohn's disease of colon,SNOMED,Disorder,S\n4210469,Crohn's disease of duodenum,SNOMED,Disorder,S\n4340114,Crohn's disease of esophagus,SNOMED,Disorder,S\n36716695,Crohn's disease of gastrointestinal anastomosis,SNOMED,Disorder,S\n4122617,Crohn's disease of gingivae,SNOMED,Disorder,S\n4244235,Crohn's disease of ileum,SNOMED,Disorder,S\n4246693,Crohn's disease of intestine,SNOMED,Disorder,S\n4239382,Crohn's disease of jejunum,SNOMED,Disorder,S\n194684,Crohn's disease of large bowel,SNOMED,Disorder,S\n4055884,Crohn's disease of oral soft tissues,SNOMED,Disorder,S\n37162884,Crohn's disease of parastomal skin,SNOMED,Disorder,S\n4299294,Crohn's disease of penis,SNOMED,Disorder,S\n4323289,Crohn's disease of pyloric antrum,SNOMED,Disorder,S\n4266370,Crohn's disease of pylorus,SNOMED,Disorder,S\n4242392,Crohn's disease of rectum,SNOMED,Disorder,S\n4292361,Crohn's disease of scrotum,SNOMED,Disorder,S\n4290835,Crohn's disease of skin,SNOMED,Disorder,S\n195575,Crohn's disease of small and large intestines,SNOMED,Disorder,S\n195585,Crohn's disease of small intestine,SNOMED,Disorder,S\n36686095,Crohn's disease of small intestine with stenosis,SNOMED,Disorder,S\n4342643,Crohn's disease of stomach,SNOMED,Disorder,S"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kld47SlqYyGCW5RtlfUK7EkPr9j",
+      "role": "assistant",
+      "created": 1784801798,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_lOY0Ahs41ZbE6lLW5XNRvFDA",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT TOP 100 concept_id, concept_name FROM omop.concept WHERE domain_id='Condition' AND standard_concept='S' AND (concept_name IN ('Crohn''s disease','Ulcerative colitis') OR LOWER(concept_name) LIKE '%ulcerative colitis%') ORDER BY CASE WHEN concept_name IN ('Crohn''s disease','Ulcerative colitis') THEN 0 ELSE 1 END, concept_name;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_4728b281-0695-4f9b-a3b6-639c65cb1c2c",
+      "role": "user",
+      "created": 1784801798,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_lOY0Ahs41ZbE6lLW5XNRvFDA",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name\n201606,Crohn's disease\n81893,Ulcerative colitis\n46269951,Abscess of intestine co-occurrent and due to ulcerative colitis\n602594,Acute left-sided ulcerative colitis\n4029372,Acute ulcerative colitis\n4116142,Arthropathy in ulcerative colitis\n40481367,Chronic left-sided ulcerative colitis\n40479837,Chronic ulcerative colitis\n46273477,Complication due to ulcerative colitis\n4086978,Eosinophilic ulcerative colitis\n4187900,Exacerbation of ulcerative colitis\n1340490,Exacerbation of ulcerative colitis\n46269952,Fistula of intestine due to ulcerative colitis\n37162650,Gingival disease due to ulcerative colitis\n46274082,Intestinal obstruction due to ulcerative colitis\n4259504,Iritis with ulcerative colitis\n4114447,Juvenile arthritis in ulcerative colitis\n40482865,Left sided ulcerative colitis\n37170100,Left sided ulcerative colitis in remission\n4301738,Mild chronic ulcerative colitis\n4302002,Moderate chronic ulcerative colitis\n46273478,Rectal hemorrhage due to ulcerative colitis\n37116301,Secondary autoimmune hemolytic anemia co-occurrent and due to ulcerative colitis\n4031048,Severe chronic ulcerative colitis\n4225691,Toxic megacolon due to ulcerative colitis\n44783784,Ulcerative colitis in remission"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4klnkXKegxJMYaVp43vVuF22oOoU",
+      "role": "assistant",
+      "created": 1784801813,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_Lw5Cw4Bn3ruxWrZUr2w3sYue",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "2",
+                "status": "in_progress"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_340dcca5-83bf-49f5-946b-679ffaa6adb4",
+      "role": "user",
+      "created": 1784801813,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_Lw5Cw4Bn3ruxWrZUr2w3sYue",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #2"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4km0tNR5sPDOfE26aMdfhJt6RoDn",
+      "role": "assistant",
+      "created": 1784801823,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_GDrugTXPynFRX21ENSCbooFe",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "WITH ibd AS (\n  SELECT DISTINCT co.person_id\n  FROM omop.condition_occurrence co\n  JOIN omop.concept_ancestor ca ON co.condition_concept_id = ca.descendant_concept_id\n  WHERE ca.ancestor_concept_id IN (201606, 81893)\n)\nSELECT COUNT(*) AS ibd_patient_count FROM ibd;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_2a1f7867-02e1-4de3-901c-97aae66feac1",
+      "role": "user",
+      "created": 1784801823,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_GDrugTXPynFRX21ENSCbooFe",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "ibd_patient_count\n25587"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kmgfftzDRtt8mrwfWTHPhdevEFK",
+      "role": "assistant",
+      "created": 1784801864,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_RAuAhj2drRYXZwYvdWrJyAZY",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT TOP 200 concept_id, concept_name, vocabulary_id, concept_class_id, standard_concept\nFROM omop.concept\nWHERE domain_id='Condition' AND standard_concept='S' AND (\n  LOWER(concept_name) LIKE '%arthritis%' OR\n  LOWER(concept_name) LIKE '%arthropathy%' OR\n  LOWER(concept_name) LIKE '%spondylitis%' OR\n  LOWER(concept_name) LIKE '%uveitis%' OR\n  LOWER(concept_name) LIKE '%iritis%' OR\n  LOWER(concept_name) LIKE '%episcleritis%' OR\n  LOWER(concept_name) LIKE '%erythema nodosum%' OR\n  LOWER(concept_name) LIKE '%pyoderma gangrenosum%' OR\n  LOWER(concept_name) LIKE '%primary sclerosing cholangitis%' OR\n  LOWER(concept_name) LIKE '%psoriasis%' OR\n  LOWER(concept_name) LIKE '%hidradenitis%' OR\n  LOWER(concept_name) LIKE '%venous thromboembolism%' OR\n  LOWER(concept_name) LIKE '%deep vein thrombosis%' OR\n  LOWER(concept_name) LIKE '%pulmonary embolism%'\n)\nORDER BY concept_name;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_74d4fc59-d484-4b3a-8843-ede66f3a4f32",
+      "role": "user",
+      "created": 1784801864,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_RAuAhj2drRYXZwYvdWrJyAZY",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,vocabulary_id,concept_class_id,standard_concept\n4296354,Acne fulminans with erythema nodosum,SNOMED,Disorder,S\n4270746,Actively extending plaque psoriasis,SNOMED,Disorder,S\n1245256,Acute angle closure of left eye due to uveitis,SNOMED,Disorder,S\n1245255,Acute angle closure of right eye due to uveitis,SNOMED,Disorder,S\n4176864,Acute anterior uveitis,SNOMED,Disorder,S\n36713148,Acute anterior uveitis of bilateral eyes,SNOMED,Disorder,S\n36713131,Acute anterior uveitis of left eye,SNOMED,Disorder,S\n36713119,Acute anterior uveitis of right eye,SNOMED,Disorder,S\n4000634,Acute arthritis,SNOMED,Disorder,S\n4106283,Acute arthropathy,SNOMED,Disorder,S\n4077425,Acute bacterial arthritis,SNOMED,Disorder,S\n4002683,Acute calcific periarthritis,SNOMED,Disorder,S\n608954,Acute cor pulmonale due to septic pulmonary embolism,SNOMED,Disorder,S\n1246043,Acute deep vein thrombosis during pregnancy,SNOMED,Disorder,S\n762148,Acute deep vein thrombosis of bilateral iliac veins,SNOMED,Disorder,S\n761444,Acute deep vein thrombosis of bilateral lower limbs following coronary artery bypass graft,SNOMED,Disorder,S\n37169261,Acute deep vein thrombosis of bilateral lower limbs following procedure,SNOMED,Disorder,S\n37169260,Acute deep vein thrombosis of bilateral upper limbs following coronary artery bypass graft,SNOMED,Disorder,S\n37169249,Acute deep vein thrombosis of bilateral upper limbs following procedure,SNOMED,Disorder,S\n35616028,Acute deep vein thrombosis of left iliac vein,SNOMED,Disorder,S\n608832,Acute deep vein thrombosis of left lower limb following coronary artery bypass graft,SNOMED,Disorder,S\n35615035,Acute deep vein thrombosis of left lower limb following procedure,SNOMED,Disorder,S\n761416,Acute deep vein thrombosis of left upper limb following coronary artery bypass graft,SNOMED,Disorder,S\n35615031,Acute deep vein thrombosis of left upper limb following procedure,SNOMED,Disorder,S\n43531681,Acute deep vein thrombosis of lower limb,SNOMED,Disorder,S\n35616027,Acute deep vein thrombosis of right iliac vein,SNOMED,Disorder,S\n608831,Acute deep vein thrombosis of right lower limb following coronary artery bypass graft,SNOMED,Disorder,S\n35615034,Acute deep vein thrombosis of right lower limb following procedure,SNOMED,Disorder,S\n761415,Acute deep vein thrombosis of right upper limb following coronary artery bypass graft,SNOMED,Disorder,S\n35615030,Acute deep vein thrombosis of right upper limb following procedure,SNOMED,Disorder,S\n4318267,Acute erythema nodosum,SNOMED,Disorder,S\n4299285,Acute generalized pustular flare of preexisting plaque psoriasis,SNOMED,Disorder,S\n4297497,Acute generalized pustular psoriasis de novo,SNOMED,Disorder,S\n4299281,Acute guttate psoriasis,SNOMED,Disorder,S\n4094226,Acute infective arthritis,SNOMED,Disorder,S\n4034672,Acute infective polyarthritis,SNOMED,Disorder,S\n4104039,Acute iritis,SNOMED,Disorder,S\n36713130,Acute iritis of left eye,SNOMED,Disorder,S\n36717362,Acute iritis of right eye,SNOMED,Disorder,S\n4120091,Acute massive pulmonary embolism,SNOMED,Disorder,S\n4201372,Acute osteoarthritis of shoulder region,SNOMED,Disorder,S\n4179092,Acute polyarthritis,SNOMED,Disorder,S\n42535150,Acute polyarticular juvenile idiopathic arthritis,SNOMED,Disorder,S\n45768439,Acute pulmonary embolism,SNOMED,Disorder,S\n44811608,Acute pyrophosphate crystal arthropathy,SNOMED,Disorder,S\n4216531,Acute rheumatic arthritis,SNOMED,Disorder,S\n4158412,Acute suppurative arthritis,SNOMED,Disorder,S\n4160643,Acute suppurative arthritis caused by bacteria,SNOMED,Disorder,S\n37399301,Advanced collapse of scapholunate joint due to osteoarthritis,SNOMED,Disorder,S\n72992,Allergic arthritis,SNOMED,Disorder,S\n80804,Allergic arthritis of multiple sites,SNOMED,Disorder,S\n4323203,Allergic arthritis of spine,SNOMED,Disorder,S\n74129,Allergic arthritis of the ankle and/or foot,SNOMED,Disorder,S\n77070,Allergic arthritis of the hand,SNOMED,Disorder,S\n73557,Allergic arthritis of the pelvic region and thigh,SNOMED,Disorder,S\n75042,Allergic arthritis of the shoulder region,SNOMED,Disorder,S\n37165995,Amniotic fluid pulmonary embolism,SNOMED,Disorder,S\n37203942,Aneurysm osteoarthritis syndrome,SNOMED,Disorder,S\n1245216,Angle closure of left eye due to uveitis,SNOMED,Disorder,S\n1245215,Angle closure of right eye due to uveitis,SNOMED,Disorder,S\n437082,Ankylosing spondylitis,SNOMED,Disorder,S\n37203959,Ankylosing spondylitis co-occurrent with anterior uveitis,SNOMED,Disorder,S\n4035741,Ankylosing spondylitis with multisystem involvement,SNOMED,Disorder,S\n4035614,Ankylosing spondylitis with organ / system involvement,SNOMED,Disorder,S\n4298741,Anogenital hidradenitis suppurativa,SNOMED,Disorder,S\n435887,Antepartum deep vein thrombosis,SNOMED,Disorder,S\n4132792,Anterior uveitis,SNOMED,Disorder,S\n4211939,Anterior uveitis due to juvenile idiopathic arthritis,SNOMED,Disorder,S\n606435,Anterior uveitis due to sarcoidosis,SNOMED,Disorder,S\n37160399,Anti-citrullinated protein antibody positive erosive rheumatoid arthritis,SNOMED,Disorder,S\n4083686,Apatite-associated destructive arthritis,SNOMED,Disorder,S\n44783938,Apatite-associated destructive arthritis of shoulder,SNOMED,Disorder,S\n4291025,Arthritis,SNOMED,Disorder,S\n4070038,Arthritis caused by Escherichia coli,SNOMED,Disorder,S\n3654667,Arthritis caused by Mycobacterium leprae,SNOMED,Disorder,S\n4008978,Arthritis caused by Pseudomonas,SNOMED,Disorder,S\n4343917,Arthritis caused by Spirochaetales,SNOMED,Disorder,S\n40480709,Arthritis caused by Streptococcus suis,SNOMED,Disorder,S\n36716986,Arthritis co-occurrent and due to Crohn's disease,SNOMED,Disorder,S\n762720,Arthritis due to alkaptonuria,SNOMED,Disorder,S\n4084265,Arthritis due to bleeding disorder,SNOMED,Disorder,S\n80184,Arthritis due to parasitic infection,SNOMED,Disorder,S\n4035426,Arthritis following intestinal bypass,SNOMED,Disorder,S\n4025831,Arthritis mutilans,SNOMED,Disorder,S\n4323882,Arthritis of acromioclavicular joint,SNOMED,Disorder,S\n1244517,Arthritis of ankle caused by Streptococcus pneumoniae,SNOMED,Disorder,S\n759885,Arthritis of bilateral acromioclavicular joints,SNOMED,Disorder,S\n1245536,Arthritis of bilateral ankles caused by Streptococcus pneumoniae,SNOMED,Disorder,S\n37117138,Arthritis of bilateral first carpometacarpal joints,SNOMED,Disorder,S\n37209324,Arthritis of bilateral hips caused by bacteria,SNOMED,Disorder,S\n37209325,Arthritis of bilateral knee joints caused by bacteria,SNOMED,Disorder,S\n1076696,Arthritis of bilateral knee joints due to and following immunization,SNOMED,Disorder,S\n1075215,Arthritis of bilateral radiocarpal joints,SNOMED,Disorder,S\n37209327,Arthritis of bilateral sacroiliac joints caused by bacteria,SNOMED,Disorder,S\n37209326,Arthritis of bilateral shoulders caused by bacteria,SNOMED,Disorder,S\n4205509,Arthritis of elbow,SNOMED,Disorder,S\n37109064,Arthritis of facet joint of cervical spine,SNOMED,Disorder,S\n37109063,Arthritis of facet joint of lumbar spine,SNOMED,Disorder,S\n37309677,Arthritis of facet joint of thoracic spine,SNOMED,Disorder,S\n37108750,Arthritis of finger of left hand,SNOMED,Disorder,S\n42539199,Arthritis of finger of left hand due to trauma,SNOMED,Disorder,S\n37108751,Arthritis of finger of right hand,SNOMED,Disorder,S\n42535125,Arthritis of finger of right hand due to trauma,SNOMED,Disorder,S\n37108610,Arthritis of first carpometacarpal joint of left hand,SNOMED,Disorder,S\n37108611,Arthritis of first carpometacarpal joint of right hand,SNOMED,Disorder,S\n764311,Arthritis of first metatarsophalangeal joint of left foot,SNOMED,Disorder,S\n761361,Arthritis of first metatarsophalangeal joint of right foot,SNOMED,Disorder,S\n4286642,Arthritis of hip,SNOMED,Disorder,S\n1076699,Arthritis of intervertebral joint due to and following immunization,SNOMED,Disorder,S\n1245539,Arthritis of joint of bilateral ankles caused by bacteria,SNOMED,Disorder,S\n1075214,Arthritis of joint of bilateral wrist regions,SNOMED,Disorder,S\n1076697,Arthritis of joint of bilateral wrist regions due to and following immunization,SNOMED,Disorder,S\n1244992,Arthritis of joint of elbow caused by Streptococcus,SNOMED,Disorder,S\n37108609,Arthritis of joint of finger of bilateral hands,SNOMED,Disorder,S\n1075350,Arthritis of joint of foot,SNOMED,Disorder,S\n1075348,Arthritis of joint of hand,SNOMED,Disorder,S\n1244129,Arthritis of joint of left elbow caused by Streptococcus,SNOMED,Disorder,S\n1244127,Arthritis of joint of left foot caused by Staphylococcus,SNOMED,Disorder,S\n37173819,Arthritis of joint of left hand,SNOMED,Disorder,S\n1244133,Arthritis of joint of left hand caused by Streptococcus,SNOMED,Disorder,S\n37173822,Arthritis of joint of left shoulder region,SNOMED,Disorder,S\n1244131,Arthritis of joint of left wrist region caused by Streptococcus,SNOMED,Disorder,S\n1076700,Arthritis of joint of left wrist region due to and following immunization,SNOMED,Disorder,S\n1244128,Arthritis of joint of right elbow caused by Streptococcus,SNOMED,Disorder,S\n1244126,Arthritis of joint of right foot caused by Staphylococcus,SNOMED,Disorder,S\n37173695,Arthritis of joint of right hand,SNOMED,Disorder,S\n1244132,Arthritis of joint of right hand caused by Streptococcus,SNOMED,Disorder,S\n37173825,Arthritis of joint of right shoulder region,SNOMED,Disorder,S\n1244130,Arthritis of joint of right wrist region caused by Streptococcus,SNOMED,Disorder,S\n1076698,Arthritis of joint of right wrist region due to and following immunization,SNOMED,Disorder,S\n37170948,Arthritis of joint of spine due to inflammatory bowel disease,SNOMED,Disorder,S\n4176008,Arthritis of joint of toe,SNOMED,Disorder,S\n1244931,Arthritis of joint of wrist region caused by Streptococcus,SNOMED,Disorder,S\n1076458,Arthritis of joint of wrist region due to and following immunization,SNOMED,Disorder,S\n1246675,Arthritis of joint structure of spine caused by Streptococcus,SNOMED,Disorder,S\n4159739,Arthritis of knee,SNOMED,Disorder,S\n1076459,Arthritis of knee joint due to and following immunization,SNOMED,Disorder,S\n765073,Arthritis of left acromioclavicular joint,SNOMED,Disorder,S\n37108612,Arthritis of left ankle,SNOMED,Disorder,S\n42534826,Arthritis of left ankle caused by bacteria,SNOMED,Disorder,S\n37207828,Arthritis of left ankle caused by Staphylococcus,SNOMED,Disorder,S\n605412,Arthritis of left ankle caused by Streptococcus,SNOMED,Disorder,S\n1246155,Arthritis of left ankle caused by Streptococcus pneumoniae,SNOMED,Disorder,S\n37117422,Arthritis of left ankle due to trauma,SNOMED,Disorder,S\n37108605,Arthritis of left elbow,SNOMED,Disorder,S\n42534821,Arthritis of left elbow caused by bacteria,SNOMED,Disorder,S\n37310649,Arthritis of left elbow caused by Staphylococcus,SNOMED,Disorder,S\n37108613,Arthritis of left foot,SNOMED,Disorder,S\n36685016,Arthritis of left foot caused by bacteria,SNOMED,Disorder,S\n42534854,Arthritis of left foot due to trauma,SNOMED,Disorder,S\n37108602,Arthritis of left glenohumeral joint,SNOMED,Disorder,S\n42534824,Arthritis of left hand caused by bacteria,SNOMED,Disorder,S\n759889,Arthritis of left hip,SNOMED,Disorder,S\n37108586,Arthritis of left hip caused by bacteria,SNOMED,Disorder,S\n605410,Arthritis of left hip caused by Streptococcus,SNOMED,Disorder,S\n759891,Arthritis of left knee,SNOMED,Disorder,S\n37108588,Arthritis of left knee caused by bacteria,SNOMED,Disorder,S\n37310648,Arthritis of left knee caused by Staphylococcus,SNOMED,Disorder,S\n37208262,Arthritis of left knee caused by Streptococcus,SNOMED,Disorder,S\n37310673,Arthritis of left knee caused by Streptococcus pneumoniae,SNOMED,Disorder,S\n1076701,Arthritis of left knee joint due to and following immunization,SNOMED,Disorder,S\n42539289,Arthritis of left midtarsal joint,SNOMED,Disorder,S\n1075216,Arthritis of left radiocarpal joint,SNOMED,Disorder,S\n37108617,Arthritis of left sacroiliac joint,SNOMED,Disorder,S\n37208263,Arthritis of left sacroiliac joint caused by bacteria,SNOMED,Disorder,S\n37108584,Arthritis of left shoulder caused by bacteria,SNOMED,Disorder,S\n37310647,Arthritis of left shoulder caused by Staphylococcus,SNOMED,Disorder,S\n37310489,Arthritis of left shoulder caused by Streptococcus,SNOMED,Disorder,S\n42534862,Arthritis of left sternoclavicular joint,SNOMED,Disorder,S\n37108996,Arthritis of left subtalar joint,SNOMED,Disorder,S\n36687162,Arthritis of left temporomandibular joint,SNOMED,Disorder,S\n37108606,Arthritis of left wrist,SNOMED,Disorder,S\n42534823,Arthritis of left wrist caused by bacteria,SNOMED,Disorder,S\n37207830,Arthritis of left wrist caused by Staphylococcus,SNOMED,Disorder,S\n46273991,Arthritis of lower limb due to parasitic infection,SNOMED,Disorder,S\n36714940,Arthritis of lumbosacral spine,SNOMED,Disorder,S\n4322886,Arthritis of midtarsal joint,SNOMED,Disorder,S\n44783158,Arthritis of pelvis,SNOMED,Disorder,S\n765074,Arthritis of right acromioclavicular joint,SNOMED,Disorder,S\n37108614,Arthritis of right ankle,SNOMED,Disorder,S\n42534825,Arthritis of right ankle caused by bacteria,SNOMED,Disorder,S\n37207831,Arthritis of right ankle caused by Staphylococcus,SNOMED,Disorder,S\n605411,Arthritis of right ankle caused by Streptococcus,SNOMED,Disorder,S\n1246156,Arthritis of right ankle caused by Streptococcus pneumoniae,SNOMED,Disorder,S\n37109098,Arthritis of right ankle due to trauma,SNOMED,Disorder,S\n37119224,Arthritis of right elbow,SNOMED,Disorder,S\n42539396,Arthritis of right elbow caused by bacteria,SNOMED,Disorder,S\n37310646,Arthritis of right elbow caused by Staphylococcus,SNOMED,Disorder,S\n37117139,Arthritis of right foot,SNOMED,Disorder,S\n36685015,Arthritis of right foot caused by bacteria,SNOMED,Disorder,S\n42534853,Arthritis of right foot due to trauma,SNOMED,Disorder,S\n37108603,Arthritis of right glenohumeral joint,SNOMED,Disorder,S\n42539287,Arthritis of right hand caused by bacteria,SNOMED,Disorder,S\n759890,Arthritis of right hip,SNOMED,Disorder,S\n37108585,Arthritis of right hip caused by bacteria,SNOMED,Disorder,S\n605409,Arthritis of right hip caused by Streptococcus,SNOMED,Disorder,S\n765259,Arthritis of right knee,SNOMED,Disorder,S\n37108587,Arthritis of right knee caused by bacteria,SNOMED,Disorder,S\n37310645,Arthritis of right knee caused by Staphylococcus,SNOMED,Disorder,S\n37208261,Arthritis of right knee caused by Streptococcus,SNOMED,Disorder,S"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kmsBEvYO4ETomfF8gDILzQG5fHB",
+      "role": "assistant",
+      "created": 1784801875,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_KzTshR4piotyC1Tdq4haYMT2",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT concept_id, concept_name, vocabulary_id, concept_class_id FROM omop.concept WHERE domain_id='Condition' AND standard_concept='S' AND LOWER(concept_name) IN ('arthritis','arthropathy','spondyloarthritis','ankylosing spondylitis','uveitis','iritis','episcleritis','erythema nodosum','pyoderma gangrenosum','primary sclerosing cholangitis','psoriasis','hidradenitis suppurativa','deep venous thrombosis','deep vein thrombosis','pulmonary embolism','venous thromboembolism') ORDER BY concept_name;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_fa414e06-08e0-4b1a-94ae-5aaa63ac78f1",
+      "role": "user",
+      "created": 1784801875,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_KzTshR4piotyC1Tdq4haYMT2",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,vocabulary_id,concept_class_id\n437082,Ankylosing spondylitis,SNOMED,Disorder\n4291025,Arthritis,SNOMED,Disorder\n73553,Arthropathy,SNOMED,Disorder\n4133004,Deep venous thrombosis,SNOMED,Disorder\n4218083,Episcleritis,SNOMED,Disorder\n140176,Erythema nodosum,SNOMED,Disorder\n4241223,Hidradenitis suppurativa,SNOMED,Disorder\n4274964,Iritis,SNOMED,Disorder\n4058821,Primary sclerosing cholangitis,SNOMED,Disorder\n140168,Psoriasis,SNOMED,Disorder\n440417,Pulmonary embolism,SNOMED,Disorder\n133283,Pyoderma gangrenosum,SNOMED,Disorder\n37205058,Spondyloarthritis,SNOMED,Disorder\n4028363,Uveitis,SNOMED,Disorder"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kn1aZh0KoJleoJqgNhleP91Kvmc",
+      "role": "assistant",
+      "created": 1784801888,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_O5m4TsPmBl79oVMWMyEse0Jn",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "WITH ibd AS (\n  SELECT DISTINCT co.person_id\n  FROM omop.condition_occurrence co\n  JOIN omop.concept_ancestor ca ON co.condition_concept_id = ca.descendant_concept_id\n  WHERE ca.ancestor_concept_id IN (201606, 81893)\n), categories AS (\n  SELECT 'Arthritis / arthropathy / spondyloarthritis' AS category, 4291025 AS ancestor_concept_id UNION ALL\n  SELECT 'Arthritis / arthropathy / spondyloarthritis', 73553 UNION ALL\n  SELECT 'Arthritis / arthropathy / spondyloarthritis', 37205058 UNION ALL\n  SELECT 'Arthritis / arthropathy / spondyloarthritis', 437082 UNION ALL\n  SELECT 'Skin: psoriasis / hidradenitis', 140168 UNION ALL\n  SELECT 'Skin: psoriasis / hidradenitis', 4241223 UNION ALL\n  SELECT 'Ocular inflammation: uveitis / iritis / episcleritis', 4028363 UNION ALL\n  SELECT 'Ocular inflammation: uveitis / iritis / episcleritis', 4274964 UNION ALL\n  SELECT 'Ocular inflammation: uveitis / iritis / episcleritis', 4218083 UNION ALL\n  SELECT 'Thromboembolism: DVT / PE', 4133004 UNION ALL\n  SELECT 'Thromboembolism: DVT / PE', 440417 UNION ALL\n  SELECT 'Hepatobiliary: primary sclerosing cholangitis', 4058821 UNION ALL\n  SELECT 'Skin: erythema nodosum', 140176 UNION ALL\n  SELECT 'Skin: pyoderma gangrenosum', 133283\n), hits AS (\n  SELECT DISTINCT c.category, co.person_id\n  FROM categories c\n  JOIN omop.concept_ancestor ca ON ca.ancestor_concept_id = c.ancestor_concept_id\n  JOIN omop.condition_occurrence co ON co.condition_concept_id = ca.descendant_concept_id\n  JOIN ibd ON ibd.person_id = co.person_id\n)\nSELECT h.category, COUNT(DISTINCT h.person_id) AS ibd_patients_with_condition,\n       CAST(100.0 * COUNT(DISTINCT h.person_id) / (SELECT COUNT(*) FROM ibd) AS DECIMAL(6,2)) AS pct_of_ibd_cohort\nFROM hits h\nGROUP BY h.category\nORDER BY ibd_patients_with_condition DESC;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_4e3e4db6-f885-4b4a-bd5a-b60bf501fa86",
+      "role": "user",
+      "created": 1784801888,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_O5m4TsPmBl79oVMWMyEse0Jn",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "category,ibd_patients_with_condition,pct_of_ibd_cohort\nArthritis / arthropathy / spondyloarthritis,7573,29.60\nThromboembolism: DVT / PE,1311,5.12\nSkin: psoriasis / hidradenitis,1057,4.13\nHepatobiliary: primary sclerosing cholangitis,462,1.81\nOcular inflammation: uveitis / iritis / episcleritis,457,1.79\nSkin: pyoderma gangrenosum,222,0.87\nSkin: erythema nodosum,198,0.77"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kokm1RpuFCRzlnOESSFsblCHtL1",
+      "role": "assistant",
+      "created": 1784801993,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_myVpLCB5SVDtv6380KpEuHTO",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "WITH ibd AS (\n  SELECT DISTINCT co.person_id\n  FROM omop.condition_occurrence co\n  JOIN omop.concept_ancestor ca ON co.condition_concept_id = ca.descendant_concept_id\n  WHERE ca.ancestor_concept_id IN (201606, 81893)\n), targets AS (\n  SELECT 'Ankylosing spondylitis' AS condition, 437082 AS ancestor_concept_id UNION ALL\n  SELECT 'Arthritis', 4291025 UNION ALL\n  SELECT 'Arthropathy', 73553 UNION ALL\n  SELECT 'Spondyloarthritis', 37205058 UNION ALL\n  SELECT 'Psoriasis', 140168 UNION ALL\n  SELECT 'Hidradenitis suppurativa', 4241223 UNION ALL\n  SELECT 'Uveitis', 4028363 UNION ALL\n  SELECT 'Iritis', 4274964 UNION ALL\n  SELECT 'Episcleritis', 4218083 UNION ALL\n  SELECT 'Deep venous thrombosis', 4133004 UNION ALL\n  SELECT 'Pulmonary embolism', 440417 UNION ALL\n  SELECT 'Primary sclerosing cholangitis', 4058821 UNION ALL\n  SELECT 'Erythema nodosum', 140176 UNION ALL\n  SELECT 'Pyoderma gangrenosum', 133283\n), hits AS (\n  SELECT DISTINCT t.condition, co.person_id\n  FROM targets t\n  JOIN omop.concept_ancestor ca ON ca.ancestor_concept_id = t.ancestor_concept_id\n  JOIN omop.condition_occurrence co ON co.condition_concept_id = ca.descendant_concept_id\n  JOIN ibd ON ibd.person_id = co.person_id\n)\nSELECT condition, COUNT(DISTINCT person_id) AS n,\n       CAST(100.0 * COUNT(DISTINCT person_id) / (SELECT COUNT(*) FROM ibd) AS DECIMAL(6,2)) AS pct\nFROM hits\nGROUP BY condition\nORDER BY n DESC;"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_rCrJ08UbSOPkMR83cbAlgXOp",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (d:Disease)\nWHERE toLower(d.name) CONTAINS 'inflammatory bowel'\n   OR toLower(d.name) CONTAINS 'crohn'\n   OR toLower(d.name) CONTAINS 'ulcerative colitis'\n   OR toLower(d.name) CONTAINS 'psoriasis'\n   OR toLower(d.name) CONTAINS 'spondylitis'\n   OR toLower(d.name) CONTAINS 'uveitis'\n   OR toLower(d.name) CONTAINS 'primary sclerosing cholangitis'\nRETURN d.name AS disease, d.identifier AS id\nORDER BY disease\nLIMIT 80",
+                "parameters": {}
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_e17bb571-0153-45e5-98c3-4757e06ab3d0",
+      "role": "user",
+      "created": 1784801993,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_rCrJ08UbSOPkMR83cbAlgXOp",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"disease\": \"Crohn's colitis\", \"id\": \"DOID:0060192\"}, {\"disease\": \"Crohn's disease\", \"id\": \"DOID:8778\"}, {\"disease\": \"Fuchs' heterochromic uveitis\", \"id\": \"DOID:9375\"}, {\"disease\": \"ankylosing spondylitis\", \"id\": \"DOID:7147\"}, {\"disease\": \"ankylosing spondylitis 1\", \"id\": \"DOID:0080603\"}, {\"disease\": \"ankylosing spondylitis 2\", \"id\": \"DOID:0080604\"}, {\"disease\": \"ankylosing spondylitis 3\", \"id\": \"DOID:0080605\"}, {\"disease\": \"anterior uveitis\", \"id\": \"DOID:1407\"}, {\"disease\": \"autoimmune uveitis\", \"id\": \"DOID:0040088\"}, {\"disease\": \"gastroduodenal Crohn's disease\", \"id\": \"DOID:0060191\"}, {\"disease\": \"gonococcal spondylitis\", \"id\": \"DOID:13127\"}, {\"disease\": \"infectious anterior uveitis\", \"id\": \"DOID:9389\"}, {\"disease\": \"inflammatory bowel disease\", \"id\": \"DOID:0050589\"}, {\"disease\": \"inflammatory bowel disease 1\", \"id\": \"DOID:0110892\"}, {\"disease\": \"inflammatory bowel disease 10\", \"id\": \"DOID:0110885\"}, {\"disease\": \"inflammatory bowel disease 11\", \"id\": \"DOID:0110894\"}, {\"disease\": \"inflammatory bowel disease 12\", \"id\": \"DOID:0110887\"}, {\"disease\": \"inflammatory bowel disease 13\", \"id\": \"DOID:0110893\"}, {\"disease\": \"inflammatory bowel disease 14\", \"id\": \"DOID:0110895\"}, {\"disease\": \"inflammatory bowel disease 15\", \"id\": \"DOID:0110897\"}, {\"disease\": \"inflammatory bowel disease 16\", \"id\": \"DOID:0110896\"}, {\"disease\": \"inflammatory bowel disease 17\", \"id\": \"DOID:0110883\"}, {\"disease\": \"inflammatory bowel disease 18\", \"id\": \"DOID:0110888\"}, {\"disease\": \"inflammatory bowel disease 19\", \"id\": \"DOID:0110890\"}, {\"disease\": \"inflammatory bowel disease 2\", \"id\": \"DOID:0110900\"}, {\"disease\": \"inflammatory bowel disease 20\", \"id\": \"DOID:0110898\"}, {\"disease\": \"inflammatory bowel disease 21\", \"id\": \"DOID:0110906\"}, {\"disease\": \"inflammatory bowel disease 22\", \"id\": \"DOID:0110905\"}, {\"disease\": \"inflammatory bowel disease 23\", \"id\": \"DOID:0110884\"}, {\"disease\": \"inflammatory bowel disease 24\", \"id\": \"DOID:0110908\"}, {\"disease\": \"inflammatory bowel disease 25\", \"id\": \"DOID:0110909\"}, {\"disease\": \"inflammatory bowel disease 26\", \"id\": \"DOID:0110901\"}, {\"disease\": \"inflammatory bowel disease 27\", \"id\": \"DOID:0110902\"}, {\"disease\": \"inflammatory bowel disease 28\", \"id\": \"DOID:0110899\"}, {\"disease\": \"inflammatory bowel disease 29\", \"id\": \"DOID:0112155\"}, {\"disease\": \"inflammatory bowel disease 3\", \"id\": \"DOID:0110891\"}, {\"disease\": \"inflammatory bowel disease 30\", \"id\": \"DOID:0112154\"}, {\"disease\": \"inflammatory bowel disease 4\", \"id\": \"DOID:0110903\"}, {\"disease\": \"inflammatory bowel disease 5\", \"id\": \"DOID:0110889\"}, {\"disease\": \"inflammatory bowel disease 6\", \"id\": \"DOID:0110907\"}, {\"disease\": \"inflammatory bowel disease 7\", \"id\": \"DOID:0110882\"}, {\"disease\": \"inflammatory bowel disease 8\", \"id\": \"DOID:0110904\"}, {\"disease\": \"inflammatory bowel disease 9\", \"id\": \"DOID:0110886\"}, {\"disease\": \"intermediate uveitis\", \"id\": \"DOID:12732\"}, {\"disease\": \"juvenile ankylosing spondylitis\", \"id\": \"DOID:0040092\"}, {\"disease\": \"panuveitis\", \"id\": \"DOID:12030\"}, {\"disease\": \"parapsoriasis\", \"id\": \"DOID:9088\"}, {\"disease\": \"posterior uveitis\", \"id\": \"DOID:12574\"}, {\"disease\": \"primary sclerosing cholangitis\", \"id\": \"DOID:0060643\"}, {\"disease\": \"psoriasis\", \"id\": \"DOID:8893\"}, {\"disease\": \"psoriasis 1\", \"id\": \"DOID:0111286\"}, {\"disease\": \"psoriasis 10\", \"id\": \"DOID:0111289\"}, {\"disease\": \"psoriasis 11\", \"id\": \"DOID:0111285\"}, {\"disease\": \"psoriasis 12\", \"id\": \"DOID:0111291\"}, {\"disease\": \"psoriasis 13\", \"id\": \"DOID:0111287\"}, {\"disease\": \"psoriasis 15\", \"id\": \"DOID:0111281\"}, {\"disease\": \"psoriasis 2\", \"id\": \"DOID:0080475\"}, {\"disease\": \"psoriasis 3\", \"id\": \"DOID:0111283\"}, {\"disease\": \"psoriasis 4\", \"id\": \"DOID:0111280\"}, {\"disease\": \"psoriasis 5\", \"id\": \"DOID:0111282\"}, {\"disease\": \"psoriasis 6\", \"id\": \"DOID:0111290\"}, {\"disease\": \"psoriasis 7\", \"id\": \"DOID:0111279\"}, {\"disease\": \"psoriasis 8\", \"id\": \"DOID:0111288\"}, {\"disease\": \"psoriasis 9\", \"id\": \"DOID:0111284\"}, {\"disease\": \"pustular psoriasis 14\", \"id\": \"DOID:0080474\"}, {\"disease\": \"spondylitis\", \"id\": \"DOID:6590\"}, {\"disease\": \"suppurative uveitis\", \"id\": \"DOID:13140\"}, {\"disease\": \"ulcerative colitis\", \"id\": \"DOID:8577\"}, {\"disease\": \"uveitis\", \"id\": \"DOID:13141\"}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_e46aa56d-0de2-405f-9679-c30bf58636fb",
+      "role": "user",
+      "created": 1784801993,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_myVpLCB5SVDtv6380KpEuHTO",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "condition,n,pct\nArthropathy,7573,29.60\nArthritis,5072,19.82\nDeep venous thrombosis,986,3.85\nPsoriasis,925,3.62\nSpondyloarthritis,865,3.38\nPulmonary embolism,616,2.41\nPrimary sclerosing cholangitis,462,1.81\nUveitis,407,1.59\nAnkylosing spondylitis,381,1.49\nIritis,333,1.30\nPyoderma gangrenosum,222,0.87\nErythema nodosum,198,0.77\nHidradenitis suppurativa,162,0.63\nEpiscleritis,64,0.25"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kpsn6DSCX0hqHhk9bEtwVyX3lGR",
+      "role": "assistant",
+      "created": 1784802058,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_KlBLm7vepOGMxOLAu0A9iNR3",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "2",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_ef061ba5-685e-4b59-b36c-c17182bd12e6",
+      "role": "user",
+      "created": 1784802058,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_KlBLm7vepOGMxOLAu0A9iNR3",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #2"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kpxf6zuZREOmwtpYpcIN5yRL6EO",
+      "role": "assistant",
+      "created": 1784802062,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_l2nv2fRUrpEGlsmAXtLKAB8b",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "3",
+                "status": "in_progress"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_d4e1577d-7317-4212-aef3-129af1d9e4f4",
+      "role": "user",
+      "created": 1784802062,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_l2nv2fRUrpEGlsmAXtLKAB8b",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #3"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kq1AjXOEjyiwl83jpIpLC8i352c",
+      "role": "assistant",
+      "created": 1784802071,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_yyh0mIFwVcW1DEOdb2IkVgM5",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (ibd:Disease)-[:ASSOCIATES_DaG]->(g:Gene)<-[:ASSOCIATES_DaG]-(d:Disease)\nWHERE ibd.identifier IN ['DOID:0050589','DOID:8778','DOID:8577']\n  AND d.identifier IN ['DOID:7147','DOID:6590','DOID:8893','DOID:13141','DOID:1407','DOID:0060643']\nOPTIONAL MATCH (g)-[:PARTICIPATES_GpPW]->(pw:Pathway)\nWHERE toLower(pw.name) CONTAINS 'interleukin'\n   OR toLower(pw.name) CONTAINS 'cytokine'\n   OR toLower(pw.name) CONTAINS 'tnf'\n   OR toLower(pw.name) CONTAINS 'jak'\n   OR toLower(pw.name) CONTAINS 'stat'\n   OR toLower(pw.name) CONTAINS 'nf-kb'\n   OR toLower(pw.name) CONTAINS 'immune'\n   OR toLower(pw.name) CONTAINS 't cell'\nWITH d.name AS comorbidity, g.name AS gene, collect(DISTINCT pw.name)[0..5] AS immune_pathways\nRETURN comorbidity, collect(DISTINCT {gene: gene, pathways: immune_pathways})[0..20] AS shared_genes\nORDER BY comorbidity",
+                "parameters": {}
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_eaa77421-deda-4f39-8bd9-411572a101e1",
+      "role": "user",
+      "created": 1784802071,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_yyh0mIFwVcW1DEOdb2IkVgM5",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"comorbidity\": \"ankylosing spondylitis\", \"shared_genes\": [{\"gene\": \"IL27\", \"pathways\": [\"Cytokine cytokine receptor interaction\"]}, {\"gene\": \"FCGR2A\", \"pathways\": []}, {\"gene\": \"ZMIZ1\", \"pathways\": []}, {\"gene\": \"GPR35\", \"pathways\": []}, {\"gene\": \"MEFV\", \"pathways\": []}, {\"gene\": \"KIF21B\", \"pathways\": []}, {\"gene\": \"SH2B3\", \"pathways\": [\"T cell receptor signaling\", \"Modulators of TCR signaling and T cell activation\"]}, {\"gene\": \"INAVA\", \"pathways\": []}, {\"gene\": \"GATD3\", \"pathways\": []}, {\"gene\": \"GPSM1\", \"pathways\": []}, {\"gene\": \"BACH2\", \"pathways\": []}, {\"gene\": \"CDC37\", \"pathways\": [\"TNF alpha signaling\", \"TNF-alpha signaling pathway\"]}, {\"gene\": \"IL1A\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"Interleukin 1 IL 1 structural pathway\", \"miRNA role in immune response in sepsis\", \"Interleukin 1 induced activation of NF kB\", \"Cytokines and inflammatory response\"]}, {\"gene\": \"IL12B\", \"pathways\": [\"Cytokines and inflammatory response\", \"Selective expression of chemokine receptors during T cell polarization\", \"Immune infiltration in pancreatic cancer\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"CARD9\", \"pathways\": []}, {\"gene\": \"STAT3\", \"pathways\": [\"JAK STAT signaling and ARTD family members\", \"ncRNAs involved in STAT3 signaling in hepatocellular carcinoma\", \"Regulatory circuits of STAT3 signaling\", \"Neural crest cell migration in cancer\", \"JAK STAT signaling in the regulation of beta cells\"]}, {\"gene\": \"TYK2\", \"pathways\": [\"Regulatory circuits of STAT3 signaling\", \"T cell activation SARS CoV 2\", \"Oncostatin M signaling\", \"Oncostatin M signaling pathway\", \"Interleukin-11 signaling pathway\"]}, {\"gene\": \"HLA-B\", \"pathways\": []}, {\"gene\": \"SAA1\", \"pathways\": []}, {\"gene\": \"IL17A\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"Immune infiltration in pancreatic cancer\", \"T cell activation SARS CoV 2\"]}]}, {\"comorbidity\": \"anterior uveitis\", \"shared_genes\": [{\"gene\": \"HLA-B\", \"pathways\": []}, {\"gene\": \"IL23R\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell activation SARS CoV 2\"]}]}, {\"comorbidity\": \"psoriasis\", \"shared_genes\": [{\"gene\": \"IL2RA\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"Regulatory circuits of STAT3 signaling\", \"Interactions between immune cells and microRNAs in tumor microenvironment\", \"Regulatory circuits of the STAT3 signaling pathway\"]}, {\"gene\": \"SP140\", \"pathways\": []}, {\"gene\": \"ATXN2\", \"pathways\": []}, {\"gene\": \"LPP\", \"pathways\": []}, {\"gene\": \"RGS14\", \"pathways\": []}, {\"gene\": \"UBAC2\", \"pathways\": []}, {\"gene\": \"RMI2\", \"pathways\": []}, {\"gene\": \"TAP2\", \"pathways\": []}, {\"gene\": \"IFNGR2\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"Selective expression of chemokine receptors during T cell polarization\", \"Regulatory circuits of STAT3 signaling\", \"JAK STAT signaling in the regulation of beta cells\", \"JAK-STAT signaling in the regulation of Beta-cells\"]}, {\"gene\": \"LOC124902436\", \"pathways\": []}, {\"gene\": \"IFIH1\", \"pathways\": [\"Mitochondrial immune response to SARS CoV 2\", \"Pathways of nucleic acid metabolism and innate immune sensing\", \"Mitochondrial immune response to SARS-CoV-2\"]}, {\"gene\": \"TNXB\", \"pathways\": []}, {\"gene\": \"IL12B\", \"pathways\": [\"Cytokines and inflammatory response\", \"Selective expression of chemokine receptors during T cell polarization\", \"Immune infiltration in pancreatic cancer\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"CDKAL1\", \"pathways\": []}, {\"gene\": \"GPR183\", \"pathways\": []}, {\"gene\": \"TNFAIP3\", \"pathways\": [\"TNF alpha signaling\", \"Modulators of TCR signaling and T cell activation\", \"TNF-alpha signaling pathway\"]}, {\"gene\": \"YDJC\", \"pathways\": []}, {\"gene\": \"IL21\", \"pathways\": [\"Cytokine cytokine receptor interaction\"]}, {\"gene\": \"HLA-DQA1\", \"pathways\": []}, {\"gene\": \"PRR5L\", \"pathways\": []}]}, {\"comorbidity\": \"spondylitis\", \"shared_genes\": [{\"gene\": \"CRP\", \"pathways\": []}]}, {\"comorbidity\": \"uveitis\", \"shared_genes\": [{\"gene\": \"NLRP3\", \"pathways\": []}, {\"gene\": \"TNRC18\", \"pathways\": []}, {\"gene\": \"IL23R\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"MEFV\", \"pathways\": []}, {\"gene\": \"UBAC2\", \"pathways\": []}, {\"gene\": \"IL10\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"Cytokines and inflammatory response\", \"T cell modulation and desmoplasia in pancreatic cancer\", \"SARS CoV 2 innate immunity evasion and cell specific immune response\"]}, {\"gene\": \"XIAP\", \"pathways\": []}, {\"gene\": \"TLR4\", \"pathways\": [\"Interactions between immune cells and microRNAs in tumor microenvironment\", \"miRNA role in immune response in sepsis\", \"miRNAs involvement in the immune response in sepsis\"]}, {\"gene\": \"IL6\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"GLP 1 in pancreatic islet cells\", \"Immune infiltration in pancreatic cancer\", \"T cell modulation and desmoplasia in pancreatic cancer\", \"SARS CoV 2 innate immunity evasion and cell specific immune response\"]}, {\"gene\": \"CD4\", \"pathways\": [\"Calcium mediated T cell apoptosis involved in inclusion body myositis\", \"Selective expression of chemokine receptors during T cell polarization\", \"T cell receptor signaling\", \"T cell activation SARS CoV 2\", \"Cytokines and inflammatory response\"]}, {\"gene\": \"IFNG\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"Control of immune tolerance by vasoactive intestinal peptide\", \"Immune infiltration in pancreatic cancer\", \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"Cytokines and inflammatory response\"]}, {\"gene\": \"TNF\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"T cell activation SARS CoV 2\", \"Immune infiltration in pancreatic cancer\", \"miRNA role in immune response in sepsis\"]}, {\"gene\": \"IL17A\", \"pathways\": [\"Cytokine cytokine receptor interaction\", \"Immune infiltration in pancreatic cancer\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"CRP\", \"pathways\": []}, {\"gene\": \"CASP10\", \"pathways\": []}, {\"gene\": \"PTPN22\", \"pathways\": []}, {\"gene\": \"NOD2\", \"pathways\": []}, {\"gene\": \"IKBKG\", \"pathways\": [\"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"miRNA role in immune response in sepsis\", \"miRNA regulation of prostate cancer signaling\", \"Modulators of TCR signaling and T cell activation\", \"TNF alpha signaling\"]}, {\"gene\": \"TCF4\", \"pathways\": []}, {\"gene\": \"FOXP1\", \"pathways\": []}]}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kqAc6870fOWZBIhFHaDGv9X2MaM",
+      "role": "assistant",
+      "created": 1784802078,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_QCEpiQC8TXFruLRBQ4AOW05q",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (ibd:Disease)-[:ASSOCIATES_DaG]->(g:Gene)\nWHERE ibd.identifier IN ['DOID:0050589','DOID:8778','DOID:8577']\nMATCH (g)-[:PARTICIPATES_GpPW]->(pw:Pathway)\nWHERE toLower(pw.name) CONTAINS 'interleukin'\n   OR toLower(pw.name) CONTAINS 'cytokine'\n   OR toLower(pw.name) CONTAINS 'tnf'\n   OR toLower(pw.name) CONTAINS 'jak'\n   OR toLower(pw.name) CONTAINS 'stat'\n   OR toLower(pw.name) CONTAINS 't cell'\n   OR toLower(pw.name) CONTAINS 'nf k'\nWITH pw.name AS pathway, collect(DISTINCT g.name)[0..12] AS genes, count(DISTINCT g) AS n_genes\nRETURN pathway, n_genes, genes\nORDER BY n_genes DESC, pathway\nLIMIT 15",
+                "parameters": {}
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_f6bcf236-0a6b-41be-9285-a748bd2b4517",
+      "role": "user",
+      "created": 1784802078,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_QCEpiQC8TXFruLRBQ4AOW05q",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"pathway\": \"Cytokine cytokine receptor interaction\", \"n_genes\": 42, \"genes\": [\"IL10RB\", \"IL10RA\", \"IL18R1\", \"IL12RB2\", \"CXCR5\", \"IL27\", \"IL2RA\", \"IFNGR2\", \"IL18RAP\", \"TGFBR2\", \"TNFSF15\", \"TNFRSF14\"]}, {\"pathway\": \"T cell activation SARS CoV 2\", \"n_genes\": 31, \"genes\": [\"IL18R1\", \"IL12RB2\", \"STAT4\", \"NFATC1\", \"FOS\", \"IL12B\", \"HLA-DRB1\", \"CD28\", \"PTPRC\", \"NFKBIA\", \"CTLA4\", \"JAK2\"]}, {\"pathway\": \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"n_genes\": 23, \"genes\": [\"MAP3K8\", \"FOS\", \"CD28\", \"PTPRC\", \"NFKBIA\", \"CTLA4\", \"IKBKG\", \"CARD11\", \"CD8A\", \"IFNG\", \"CSF2\", \"IL5\"]}, {\"pathway\": \"T cell receptor signaling\", \"n_genes\": 22, \"genes\": [\"REL\", \"MAP3K8\", \"SHC1\", \"NFATC1\", \"SH2B3\", \"FOS\", \"SKAP1\", \"CD28\", \"NFKBIA\", \"IKBKG\", \"CARD11\", \"CD8A\"]}, {\"pathway\": \"Cytokines and inflammatory response\", \"n_genes\": 17, \"genes\": [\"IL12B\", \"HLA-DRB1\", \"IFNG\", \"IL1A\", \"IL13\", \"IL1B\", \"CXCL1\", \"CSF2\", \"IL5\", \"TNF\", \"CD4\", \"IL2\"]}, {\"pathway\": \"TNF-alpha signaling pathway\", \"n_genes\": 17, \"genes\": [\"REL\", \"MAP3K8\", \"CDC37\", \"KSR1\", \"CUL1\", \"NFKBIA\", \"IKBKG\", \"CCL2\", \"AKT1\", \"NFKB1\", \"TNF\", \"RIPK1\"]}, {\"pathway\": \"Modulators of TCR signaling and T cell activation\", \"n_genes\": 15, \"genes\": [\"REL\", \"MAP3K8\", \"UBASH3A\", \"SH2B3\", \"CD28\", \"NFKBIA\", \"IKBKG\", \"CARD11\", \"CD8A\", \"AKT1\", \"NFKB1\", \"TNFAIP3\"]}, {\"pathway\": \"Oncostatin M signaling pathway\", \"n_genes\": 15, \"genes\": [\"PRKCB\", \"OSMR\", \"SHC1\", \"FOS\", \"NFKBIA\", \"STAT1\", \"JAK2\", \"CCL2\", \"AKT1\", \"NFKB1\", \"JAK1\", \"PRKCD\"]}, {\"pathway\": \"TNF alpha signaling\", \"n_genes\": 15, \"genes\": [\"REL\", \"MAP3K8\", \"CDC37\", \"KSR1\", \"CUL1\", \"NFKBIA\", \"IKBKG\", \"AKT1\", \"NFKB1\", \"TNF\", \"RIPK1\", \"TNFAIP3\"]}, {\"pathway\": \"Oncostatin M signaling\", \"n_genes\": 14, \"genes\": [\"PRKCB\", \"OSMR\", \"SHC1\", \"FOS\", \"NFKBIA\", \"STAT1\", \"JAK2\", \"AKT1\", \"NFKB1\", \"JAK1\", \"PRKCD\", \"STAT3\"]}, {\"pathway\": \"Regulatory circuits of STAT3 signaling\", \"n_genes\": 13, \"genes\": [\"IL10RB\", \"IL10RA\", \"IL12RB2\", \"PRKCB\", \"OSMR\", \"IL2RA\", \"IFNGR2\", \"PTPRC\", \"JAK2\", \"JAK1\", \"STAT3\", \"TYK2\"]}, {\"pathway\": \"Regulatory circuits of the STAT3 signaling pathway\", \"n_genes\": 13, \"genes\": [\"IL10RB\", \"IL10RA\", \"IL12RB2\", \"PRKCB\", \"OSMR\", \"IL2RA\", \"IFNGR2\", \"PTPRC\", \"JAK2\", \"JAK1\", \"STAT3\", \"TYK2\"]}, {\"pathway\": \"T cell modulation and desmoplasia in pancreatic cancer\", \"n_genes\": 13, \"genes\": [\"CD226\", \"CD28\", \"CD40\", \"CTLA4\", \"IL13\", \"CD86\", \"CD274\", \"IL4\", \"FAS\", \"TGFB1\", \"IL6\", \"FASLG\"]}, {\"pathway\": \"Selective expression of chemokine receptors during T cell polarization\", \"n_genes\": 12, \"genes\": [\"IL18R1\", \"IL12RB2\", \"IFNGR2\", \"IL12B\", \"CD28\", \"IFNG\", \"CSF2\", \"IL5\", \"CD4\", \"IL2\", \"IL4\", \"TGFB1\"]}, {\"pathway\": \"Photodynamic therapy induced NF kB survival signaling\", \"n_genes\": 11, \"genes\": [\"REL\", \"IL1A\", \"IL1B\", \"PTGS2\", \"ICAM1\", \"CSF2\", \"NFKB1\", \"TNF\", \"CXCL8\", \"IL2\", \"IL6\"]}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kqHcpdIuPhPbFhkXzWVQTs73clf",
+      "role": "assistant",
+      "created": 1784802087,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_6IQ1RvmneUDucIlpGc7gXw6a",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (ibd:Disease)-[:ASSOCIATES_DaG]->(g:Gene)<-[:ASSOCIATES_DaG]-(d:Disease)\nWHERE ibd.identifier IN ['DOID:0050589','DOID:8778','DOID:8577']\n  AND d.identifier IN ['DOID:7147','DOID:8893','DOID:13141','DOID:1407','DOID:0060643']\nWITH g, collect(DISTINCT d.name) AS comorbidities, count(DISTINCT d) AS n_comorbidities\nWHERE n_comorbidities >= 2\nOPTIONAL MATCH (g)-[:PARTICIPATES_GpPW]->(pw:Pathway)\nWHERE toLower(pw.name) CONTAINS 'cytokine'\n   OR toLower(pw.name) CONTAINS 'interleukin'\n   OR toLower(pw.name) CONTAINS 'tnf'\n   OR toLower(pw.name) CONTAINS 'jak'\n   OR toLower(pw.name) CONTAINS 'stat'\n   OR toLower(pw.name) CONTAINS 't cell'\nRETURN g.name AS gene, comorbidities, collect(DISTINCT pw.name)[0..6] AS immune_pathways\nORDER BY n_comorbidities DESC, gene\nLIMIT 20",
+                "parameters": {}
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_24a97cf7-dbbc-451a-8c40-967eb5a2edbb",
+      "role": "user",
+      "created": 1784802087,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_6IQ1RvmneUDucIlpGc7gXw6a",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[tool_error kind=tool_failure retryable=false] The tool ran and reported a failure. Read the message and address its cause.\nBiomedical knowledge graph error: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: In a WITH/RETURN with DISTINCT or an aggregation, it is not possible to access variables declared before the WITH/RETURN: n_comorbidities (line 14, column 10 (offset: 744))\n\"ORDER BY n_comorbidities DESC, gene\"\n          ^} {gql_status: 42001} {gql_status_description: error: syntax error or access rule violation - invalid syntax}"
+                }
+              ],
+              "structuredContent": {
+                "error": {
+                  "kind": "tool_failure",
+                  "retryable": false,
+                  "message": "Biomedical knowledge graph error: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: In a WITH/RETURN with DISTINCT or an aggregation, it is not possible to access variables declared before the WITH/RETURN: n_comorbidities (line 14, column 10 (offset: 744))\n\"ORDER BY n_comorbidities DESC, gene\"\n          ^} {gql_status: 42001} {gql_status_description: error: syntax error or access rule violation - invalid syntax}"
+                }
+              },
+              "isError": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kqP57KY7Vt1OWKizlKB2i1yILwR",
+      "role": "assistant",
+      "created": 1784802093,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_lq53WiWctEXICBscAJc0QMMc",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_knowledge_graph",
+              "arguments": {
+                "cypher_query": "MATCH (ibd:Disease)-[:ASSOCIATES_DaG]->(g:Gene)<-[:ASSOCIATES_DaG]-(d:Disease)\nWHERE ibd.identifier IN ['DOID:0050589','DOID:8778','DOID:8577']\n  AND d.identifier IN ['DOID:7147','DOID:8893','DOID:13141','DOID:1407','DOID:0060643']\nWITH g, collect(DISTINCT d.name) AS comorbidities, count(DISTINCT d) AS n_comorbidities\nWHERE n_comorbidities >= 2\nOPTIONAL MATCH (g)-[:PARTICIPATES_GpPW]->(pw:Pathway)\nWHERE toLower(pw.name) CONTAINS 'cytokine'\n   OR toLower(pw.name) CONTAINS 'interleukin'\n   OR toLower(pw.name) CONTAINS 'tnf'\n   OR toLower(pw.name) CONTAINS 'jak'\n   OR toLower(pw.name) CONTAINS 'stat'\n   OR toLower(pw.name) CONTAINS 't cell'\nWITH g.name AS gene, comorbidities, n_comorbidities, collect(DISTINCT pw.name)[0..6] AS immune_pathways\nRETURN gene, comorbidities, immune_pathways\nORDER BY n_comorbidities DESC, gene\nLIMIT 20",
+                "parameters": {}
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_788406b7-28d8-4cda-a010-a1268a6bc1c3",
+      "role": "user",
+      "created": 1784802093,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_lq53WiWctEXICBscAJc0QMMc",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "[{\"gene\": \"HLA-B\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\", \"anterior uveitis\", \"uveitis\"], \"immune_pathways\": []}, {\"gene\": \"IL23R\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\", \"anterior uveitis\", \"uveitis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"CRP\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\", \"uveitis\"], \"immune_pathways\": []}, {\"gene\": \"IL17A\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"TNF\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"T cell activation SARS CoV 2\", \"TNF related weak inducer of apoptosis TWEAK signaling\", \"TNF alpha signaling\", \"Cytokines and inflammatory response\"]}, {\"gene\": \"CD4\", \"comorbidities\": [\"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Calcium mediated T cell apoptosis involved in inclusion body myositis\", \"Selective expression of chemokine receptors during T cell polarization\", \"T cell receptor signaling\", \"T cell activation SARS CoV 2\", \"Cytokines and inflammatory response\", \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\"]}, {\"gene\": \"ERAP2\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\"], \"immune_pathways\": []}, {\"gene\": \"FCGR2A\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\"], \"immune_pathways\": []}, {\"gene\": \"GPR35\", \"comorbidities\": [\"ankylosing spondylitis\", \"uveitis\"], \"immune_pathways\": []}, {\"gene\": \"HLA-DRB1\", \"comorbidities\": [\"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Cytokines and inflammatory response\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"IFNG\", \"comorbidities\": [\"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"Cytokines and inflammatory response\", \"T cell activation SARS CoV 2\", \"JAK STAT signaling in the regulation of beta cells\", \"Selective expression of chemokine receptors during T cell polarization\"]}, {\"gene\": \"IL10\", \"comorbidities\": [\"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"T cell antigen receptor TCR pathway during Staphylococcus aureus infection\", \"Cytokines and inflammatory response\", \"T cell modulation and desmoplasia in pancreatic cancer\", \"T cell modulation in pancreatic cancer\"]}, {\"gene\": \"IL12B\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\"], \"immune_pathways\": [\"Cytokines and inflammatory response\", \"Selective expression of chemokine receptors during T cell polarization\", \"T cell activation SARS CoV 2\"]}, {\"gene\": \"IL1A\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"Interleukin 1 IL 1 structural pathway\", \"Interleukin 1 induced activation of NF kB\", \"Cytokines and inflammatory response\", \"Interleukin-1 induced activation of NF-kB\", \"Interleukin-1 (IL-1) structural pathway\"]}, {\"gene\": \"IL2RA\", \"comorbidities\": [\"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"Regulatory circuits of STAT3 signaling\", \"Regulatory circuits of the STAT3 signaling pathway\"]}, {\"gene\": \"IL6\", \"comorbidities\": [\"psoriasis\", \"uveitis\"], \"immune_pathways\": [\"Cytokine cytokine receptor interaction\", \"GLP 1 in pancreatic islet cells\", \"T cell modulation and desmoplasia in pancreatic cancer\", \"Cytokines and inflammatory response\", \"JAK STAT signaling in the regulation of beta cells\", \"ncRNAs involved in STAT3 signaling in hepatocellular carcinoma\"]}, {\"gene\": \"MEFV\", \"comorbidities\": [\"ankylosing spondylitis\", \"uveitis\"], \"immune_pathways\": []}, {\"gene\": \"PTPN2\", \"comorbidities\": [\"psoriasis\", \"uveitis\"], \"immune_pathways\": []}, {\"gene\": \"SH2B3\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\"], \"immune_pathways\": [\"T cell receptor signaling\", \"Modulators of TCR signaling and T cell activation\"]}, {\"gene\": \"STAT3\", \"comorbidities\": [\"ankylosing spondylitis\", \"psoriasis\"], \"immune_pathways\": [\"JAK STAT signaling and ARTD family members\", \"ncRNAs involved in STAT3 signaling in hepatocellular carcinoma\", \"Regulatory circuits of STAT3 signaling\", \"Neural crest cell migration in cancer\", \"JAK STAT signaling in the regulation of beta cells\", \"Androgen receptor network in prostate cancer\"]}]"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kqWp9RdRApOStV7ktY4tehy8LXw",
+      "role": "assistant",
+      "created": 1784802101,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_V2ZDTZwoBQ5ZO80qtwNelDbv",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "3",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_f7864430-8caf-418d-8504-62ded28759cf",
+      "role": "user",
+      "created": 1784802101,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_V2ZDTZwoBQ5ZO80qtwNelDbv",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #3"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kqefxqvdwU4NpRXfedmH8soayGE",
+      "role": "assistant",
+      "created": 1784802106,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_gTyWaRF8Ll3bhHf8c5Zr5PYv",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "4",
+                "status": "in_progress"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_7a7f9aa2-4f98-4055-b8fc-4e0bae1c403c",
+      "role": "user",
+      "created": 1784802106,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_gTyWaRF8Ll3bhHf8c5Zr5PYv",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #4"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kqjb9yV4i30Z6FAksmAg7vuvvTR",
+      "role": "assistant",
+      "created": 1784802110,
+      "content": [
+        {
+          "type": "toolRequest",
+          "id": "call_d2YuPwpV7TkEeaNYUNvblvO8",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "todo__todo_update",
+              "arguments": {
+                "id": "4",
+                "status": "completed"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_f44c48b0-dbbb-4ca1-a920-231727c3806c",
+      "role": "user",
+      "created": 1784802110,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_d2YuPwpV7TkEeaNYUNvblvO8",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Updated item #4"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "chatcmpl-E4kqn2qO5W1Hd49cT2Sd0NZkVad1q",
+      "role": "assistant",
+      "created": 1784802114,
+      "content": [
+        {
+          "type": "text",
+          "text": "Using MedCP’s OMOP cohort (`n=25,587` IBD patients; Crohn’s or ulcerative colitis descendants), the most frequent extraintestinal comorbidities were:\n\n| Extraintestinal category | IBD patients | % of IBD cohort |\n|---|---:|---:|\n| Arthritis / arthropathy / spondyloarthritis | 7,573 | 29.6% |\n| Thromboembolism: DVT / PE | 1,311 | 5.1% |\n| Skin: psoriasis / hidradenitis | 1,057 | 4.1% |\n| Primary sclerosing cholangitis | 462 | 1.8% |\n| Ocular inflammation: uveitis / iritis / episcleritis | 457 | 1.8% |\n| Pyoderma gangrenosum | 222 | 0.9% |\n| Erythema nodosum | 198 | 0.8% |\n\nThe leading signal is musculoskeletal disease, especially broad arthropathy/arthritis codes.\n\nThe MedCP knowledge graph supports a shared immune-axis explanation: IBD and common inflammatory comorbidities share genes/pathways involving cytokine–cytokine receptor signaling, T-cell receptor/activation programs, TNF/NF-κB signaling, JAK/STAT/STAT3 signaling, and the IL-23/IL-17 axis. Shared genes included `IL23R`, `IL17A`, `TNF`, `IL12B`, `IL1A`, `IL6`, `IFNG`, `STAT3`, `TYK2`, `SH2B3`, and `HLA-B`.\n\nInterpretation: the frequent arthritis/spondyloarthritis, psoriasis, and uveitis pattern is consistent with systemic mucosal–barrier immune dysregulation, Th17/IL-23 signaling, TNF-driven inflammation, antigen presentation via HLA loci, and JAK/STAT cytokine propagation. PSC likely reflects gut–liver immune trafficking and shared epithelial/innate immune mechanisms; thromboembolism may reflect systemic inflammation–driven hypercoagulability rather than a single shared autoimmune pathway."
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    }
+  ],
+  "metadata": {
+    "total_tokens": 65550,
+    "status": "completed"
+  }
+}
