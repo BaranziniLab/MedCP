@@ -82,6 +82,17 @@ and keep the read-only validator raising as it does today.
 After the change, rebuild/reinstall the medcp extension so `biorouter` picks it
 up (the installed copy lives at `~/.config/biorouter/extensions/medcp`).
 
+**A ready-to-apply patch is saved next to this file** (verified to apply cleanly
+against the committed `src/medcp/server.py`; the source itself is left unmodified
+so the change is yours to make):
+
+```bash
+cd /Users/wgu/Desktop/MedCP
+git apply benchmarks/clinical-questions/run_logs/opus_fix.patch
+python3 -m py_compile src/medcp/server.py     # sanity check
+# then reinstall the extension so biorouter picks it up
+```
+
 ## Re-running opus afterwards
 
 Purge + re-run only opus (runners skip completed questions, hold a singleton

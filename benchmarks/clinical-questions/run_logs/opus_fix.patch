@@ -1,0 +1,22 @@
+diff --git a/src/medcp/server.py b/src/medcp/server.py
+index 2899260..bb478ed 100644
+--- a/src/medcp/server.py
++++ b/src/medcp/server.py
+@@ -431,7 +431,16 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
+                 raise
+             except Exception as e:
+                 logger.error(f"Clinical records query error: {e}")
+-                raise ToolError(f"Electronic health records error: {e}")
++                # Return query errors (malformed SQL, wrong dialect, etc.) as a
++                # NORMAL tool result instead of a protocol-level tool error. The
++                # model still sees the identical message and can correct its
++                # query, but the client does not enter a tool-error recovery
++                # path -- in biorouter that path duplicates msg_uid and kills the
++                # whole run (BaranziniLab/biorouter#41).
++                # Connection/config failures still raise ToolError (see
++                # get_clinical_records_connection), as does the read-only validator.
++                return ToolResult(content=[TextContent(
++                    type="text", text=f"Electronic health records error: {e}")])
+             finally:
+                 if conn is not None:
+                     try:
