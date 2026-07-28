@@ -1,0 +1,13 @@
+# Study F — Polypharmacy and QT-prolonging drug burden
+
+*Original observational study · synthetic MIMIC-IV/OMOP demo · MedCP (EHR) + SPOKE (KG)*
+
+**Launching prompt** — paste as-is; the agent follows `../MedCP_Clinical_study_skill.md`.
+
+---
+
+Run an original observational study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, on polypharmacy and QT-prolonging drug burden in a critical-care cohort. Follow the MedCP clinical study framework skill for the analysis and above all the report, as an original study on a synthetic dataset rather than a replication: wherever the skill expects a source citation, an "Original Paper" result, a replication status, or a paper-versus-replication overlay, record "original study on Synthetic Dataset", and state that the data are synthetic and date-shifted.
+
+With MedCP's clinical-record tools, build the cohort of patients exposed to at least five distinct named medications, using the NDC-resolved drug names in drug_exposure (join drug_source_concept_id to the concept dictionary), and describe the distribution of the per-patient medication count. For each patient's regimen, use the SPOKE knowledge graph through MedCP to identify which of their drugs are associated with QT prolongation and which pairs carry clinically relevant interactions — deciding the traversals yourself rather than following a fixed node map — and from this derive a per-patient QT-drug-burden count. Then relate that burden to the cardiac-rhythm annotations in condition_occurrence (for example atrial fibrillation and sinus tachycardia), comparing arrhythmia frequency across burden strata with χ² or a test for trend and reporting counts with a 95% confidence interval. Because many drug records carry only a raw NDC code with no resolvable name, restrict the analysis to NDC-resolved drugs and carry that coverage limitation — together with the fact that the QT flags come from the knowledge graph rather than from a measured QT interval — into the limitations.
+
+Attribute every SPOKE-derived flag and statement so the report makes visible exactly which drugs the knowledge graph classified as QT-prolonging or interacting, kept clearly separate from the EHR-measured exposures and rhythms. Include this launching prompt verbatim in the report.

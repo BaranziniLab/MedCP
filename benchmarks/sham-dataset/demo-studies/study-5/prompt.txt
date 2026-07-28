@@ -1,0 +1,13 @@
+# Study M — Comorbidity resolved into a disease network (SPOKE)
+
+*Original descriptive study · synthetic MIMIC-IV/OMOP demo · MedCP (EHR) + SPOKE (KG)*
+
+**Launching prompt** — paste as-is; the agent follows `../MedCP_Clinical_study_skill.md`.
+
+---
+
+Run an original, exploratory descriptive study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, that turns the cohort's coded diagnoses into a disease network using the SPOKE knowledge graph. Follow the MedCP clinical study framework skill for the workflow and especially the report; note in the report that this is a descriptive comorbidity-network study rather than an effect-estimation study, that STROBE + RECORD is the closest applicable standard (recorded as a deliberate deviation), and that it is an original study on a synthetic dataset — so wherever the skill expects a source citation, an "Original Paper" result, a replication status, or a paper-versus-replication overlay, record "original study on Synthetic Dataset", and state that the data are synthetic and date-shifted.
+
+With MedCP's clinical-record tools, extract each patient's set of ICD-coded diagnoses from condition_occurrence — the condition_source_value entries that are ICD codes (for example 4019 for hypertension, E785 for hyperlipidemia, E039 for hypothyroidism), as distinct from the free-text rhythm-monitor labels — and describe the comorbidity burden across the cohort. Because these codes carry no human-readable name in the dataset, use the SPOKE knowledge graph through MedCP to resolve them to diseases and to connect those diseases into a network via shared genes and pathways, then describe the most connected diseases and any comorbidity clusters that emerge; decide the traversals yourself rather than following a fixed node map. Report how many codes SPOKE could and could not resolve, and treat unresolved codes as a data-availability limitation.
+
+Because resolving the diagnoses and revealing their shared biology is done entirely by the knowledge graph, this study is the clearest demonstration of SPOKE's contribution: attribute every resolved name, edge and cluster to SPOKE and keep it visibly separate from the EHR-supplied codes and counts. Include this launching prompt verbatim in the report.

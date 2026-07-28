@@ -1,0 +1,13 @@
+# Study C — Lactate and in-hospital mortality
+
+*Original observational study · synthetic MIMIC-IV/OMOP demo · MedCP (EHR) + SPOKE (KG)*
+
+**Launching prompt** — paste as-is; the agent follows `../MedCP_Clinical_study_skill.md`.
+
+---
+
+Run an original observational study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, on the association between blood lactate and in-hospital mortality in a critical-care cohort. Follow the MedCP clinical study framework skill for the analysis and especially the report, treating this as an original study on a synthetic dataset rather than a replication: wherever the skill expects a source citation, an "Original Paper" column, a replication status, or a paper-versus-replication overlay, record "original study on Synthetic Dataset", and make the synthetic, date-shifted nature of the data explicit.
+
+Using MedCP's clinical-record tools, assemble every patient with at least one lactate measurement (measurement concept 'Lactate|Blood|Blood Gas', value_as_number in mmol/L) and, for each patient, derive peak lactate, last lactate and lactate clearance. Take in-hospital death from the death table as the outcome. Treat this as an association study, not a prediction model: compare peak lactate between survivors and non-survivors with Mann–Whitney, estimate Kaplan–Meier survival by lactate tertiles with a log-rank test, and report the discrimination of peak lactate for death as a descriptive ROC/AUC. Report the number of deaths and the person-time, and the minimum detectable effect at 80% power given the event count; do not fit any multivariate outcome model, because with only about fifteen deaths such a model would be overfit — say so.
+
+Then use MedCP's SPOKE knowledge graph to supply the pathophysiological and therapeutic context for elevated lactate in shock and sepsis, deciding the traversals yourself and attributing every knowledge-graph-derived claim so the report separates EHR-measured physiology from SPOKE-supplied biology. Include this launching prompt verbatim in the report.

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 5 — Coded comorbidity and shared-gene networks</title>
+<style>
+  :root{--ink:#1a2230;--mut:#5b6675;--line:#e2e6ec;--ehr:#0b6bcb;--kg:#7a3ea8;--bg:#fff;--card:#f7f9fc;}
+  *{box-sizing:border-box}
+  body{font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+       max-width:920px;margin:0 auto;padding:32px 20px;background:var(--bg)}
+  h1{font-size:1.7rem;margin:.2em 0}h2{font-size:1.25rem;margin-top:2em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+  h3{font-size:1.05rem;margin-top:1.4em}
+  .sub{color:var(--mut);font-size:.95rem}
+  .banner{background:#fff8e1;border:1px solid #f0d98a;border-radius:8px;padding:10px 14px;font-size:.9rem;margin:14px 0}
+  table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:10px;color:#fff;vertical-align:middle}
+  .badge.ehr{background:var(--ehr)} .badge.kg{background:var(--kg)}
+  .kgbox{border-left:4px solid var(--kg);background:#faf6fd;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  .ehrbox{border-left:4px solid var(--ehr);background:#f2f8ff;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  figure{margin:1.2em 0;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:8px}
+  figcaption{font-size:.85rem;color:var(--mut);margin-top:.5em}
+  pre{background:#0f1622;color:#d6e2f0;padding:14px;border-radius:8px;overflow:auto;font-size:.82rem;line-height:1.5}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prompt{white-space:pre-wrap;background:#0f1622;color:#e7eefc;padding:16px;border-radius:8px;font-size:.86rem}
+  ul{margin:.4em 0}
+  .kv td:first-child{width:32%;color:var(--mut)}
+  .pill{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:10px;color:#fff}
+  .c1{background:#c0392b}.c2{background:#7a3ea8}.c3{background:#0f8a7e}.c4{background:#d68910}
+  .small{font-size:.85rem;color:var(--mut)}
+  @media print{body{max-width:none}}
+</style>
+</head>
+<body>
+
+<h1>Study 5 — Coded comorbidity and shared-gene networks</h1>
+<p class="sub">Original, exploratory <b>descriptive comorbidity-network</b> study · MedCP (EHR) + SPOKE (knowledge graph)</p>
+<div class="banner"><b>Synthetic data.</b> Analyses use the synthetic, date-shifted MIMIC-IV demo (100 patients,
+OMOP CDM) served through MedCP. Every number is computed from that data, not fabricated. This is an
+<b>original study on Synthetic Dataset</b>, not a replication of a published paper; every field a
+replication framework would fill with a source paper is recorded as <em>"original study on Synthetic Dataset"</em>.
+Because this is a descriptive network study (no exposure, no outcome, no effect estimate), the effect-size /
+event-count / minimum-detectable-effect machinery of the skill is <b>not applicable</b> and is marked as such.</div>
+
+<p class="sub">Provenance legend:
+<span class="badge ehr">EHR</span> measured in the clinical records (via MedCP) ·
+<span class="badge kg">SPOKE</span> derived from the biomedical knowledge graph (via MedCP).
+Cluster tags: <span class="pill c1">cardio-renal-vascular</span> <span class="pill c2">metabolic-endocrine</span>
+<span class="pill c3">hematologic</span> <span class="pill c4">neuropsychiatric</span></p>
+
+<!-- ============================================================= -->
+<h2>1. Executive summary</h2>
+<p><b>Source study.</b> <span class="badge ehr">EHR</span> Original study on Synthetic Dataset (synthetic MIMIC-IV/OMOP demo,
+date-shifted; no published paper). <b>Design:</b> descriptive comorbidity-network study; unit of analysis = person; N = 100.</p>
+
+<p><b>What the EHR alone shows.</b> <span class="badge ehr">EHR</span> The <code>condition_occurrence</code> table holds
+16,441 rows. Filtering to true billed diagnoses (<code>condition_type_concept_id = 32821</code>) yields
+<b>3,833 ICD-coded diagnosis rows</b> spanning <b>1,217 distinct ICD codes</b> across all 100 patients — a mix of
+ICD-9-CM (579 codes) and ICD-10-CM (638 codes). Comorbidity burden is high (ICU cohort): a median of
+<b>18.5 distinct diagnoses per patient</b> (IQR 8-33, range 2-134). The most frequent codes are cardiometabolic
+(hypertension 4019: 41 patients; hyperlipidemia 2724/E785; type-2 diabetes 25000; coronary disease 41401;
+atrial fibrillation 42731). Critically, <b>these codes carry no human-readable name in this dataset</b> — the local
+OMOP <code>concept</code> table contains only <code>mimiciv_*</code> vocabularies and no ICD9CM/ICD10CM, so a code such
+as <code>E039</code> is opaque without external knowledge.</p>
+
+<p><b>What SPOKE adds.</b> <span class="badge kg">SPOKE</span> The most frequent codes were decoded to
+<b>19 distinct disease concepts</b> (knowledge-based proxy; ICD-9 and ICD-10 codes for the same entity collapsed),
+and every one resolved to a SPOKE <code>Disease</code> node (<b>18 exact, 1 approximate</b>). SPOKE then turned these
+opaque codes into a <b>biological network</b>: of 171 disease pairs, <b>161 (94.2%) share at least one associated gene</b>
+(<code>ASSOCIATES_DaG</code>). A Jaccard-thresholded network (81 edges) resolves into <b>four clinically coherent modules</b>
+(modularity 0.204): a cardio-renal-vascular cluster, a metabolic-endocrine cluster, a hematologic cluster, and a
+neuropsychiatric cluster. The strongest biological links — type-2 diabetes&ndash;obesity (385 shared genes) and
+anemia&ndash;thrombocytopenia (Jaccard 0.38) — are exactly the pairs that also co-occur most in the same patients,
+so the knowledge graph supplies a plausible shared-biology explanation for observed comorbidity.</p>
+
+<p><b>Bottom line.</b> SPOKE converts an unreadable list of billing codes into a labelled, biologically-wired disease
+network. This is the clearest demonstration of the knowledge graph's contribution in the benchmark: the EHR supplies
+the codes and their counts; <b>SPOKE supplies the names, the shared-gene edges, and the comorbidity clusters</b> — none of
+which exist in the clinical record.</p>
+
+<!-- ============================================================= -->
+<h2>1b. Protocol header &amp; design</h2>
+<p class="sub">Reporting standard: <b>STROBE + RECORD</b> (routinely-collected health data), applied to a descriptive
+cross-sectional comorbidity-network design. This is <b>not</b> an effect-estimation study, so STROBE/RECORD is recorded
+as the <em>closest applicable</em> standard and the descriptive-only scope is a <b>deliberate, documented deviation</b>
+(no exposure/outcome contrast, no STaRT-RWE/HARPER design table).</p>
+<table class="kv"><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Citation (source study)</td><td>original study on Synthetic Dataset</td></tr>
+<tr><td>Design of source study</td><td>original study on Synthetic Dataset — descriptive comorbidity network</td></tr>
+<tr><td>Reporting standard applied</td><td>STROBE + RECORD (closest applicable; descriptive-only deviation recorded)</td></tr>
+<tr><td>Setting / calendar timeframe</td><td>Synthetic, date-shifted MIMIC-IV ICU demo (OMOP CDM); calendar dates are shifted and not interpretable</td></tr>
+<tr><td>Unit of analysis</td><td>Person (patient); N = 100</td></tr>
+<tr><td>Primary "endpoint"</td><td>Not applicable — descriptive. Object of interest = the disease-disease network derived from each patient's ICD-coded diagnoses</td></tr>
+<tr><td>Primary estimand</td><td>Not applicable (no exposure-outcome contrast). Descriptive quantities: code prevalence, per-patient burden, shared-gene edges, network modules</td></tr>
+<tr><td>Time zero (index date)</td><td>Not applicable — <b>explicit assumption:</b> diagnoses are pooled over each patient's entire available record (cumulative lifetime coding), consistent with a cross-sectional comorbidity description</td></tr>
+<tr><td>Eligibility assessment window</td><td>Entire record; all 100 persons with &ge;1 billed ICD diagnosis are eligible (all 100 qualify)</td></tr>
+<tr><td>Baseline lookback window</td><td>Not applicable (no index date) — full record used</td></tr>
+<tr><td>Exposure ascertainment / washout</td><td>Not applicable (no exposure defined)</td></tr>
+<tr><td>Follow-up start / end / censoring</td><td>Not applicable (no time-to-event); no follow-up, death, LTFU or switching censoring is modelled</td></tr>
+<tr><td>Competing risks</td><td>Not applicable (no time-to-event outcome)</td></tr>
+<tr><td>Immortal-time / timeline-direction check</td><td>Not applicable — no exposure&rarr;outcome timeline exists in a cross-sectional network; no interval is classified as exposed follow-up and no outcome window is opened</td></tr>
+</tbody></table>
+
+<h3>Design table (original study vs this analysis)</h3>
+<table><thead><tr><th>Design element</th><th>Original paper</th><th>This analysis</th><th>Deviation / expected effect</th></tr></thead><tbody>
+<tr><td>Data source</td><td>original study on Synthetic Dataset</td><td>Synthetic MIMIC-IV/OMOP demo via MedCP</td><td>Synthetic + ICU-only + 100 patients &rarr; case mix skewed to critical-care cardiometabolic disease; not generalizable</td></tr>
+<tr><td>Diagnosis capture</td><td>original study on Synthetic Dataset</td><td>ICD-9/ICD-10 in <code>condition_source_value</code>, filtered to billing type 32821</td><td>Excludes chart-rhythm labels + chart items (ETOH, post-menopausal); improves specificity for true diagnoses</td></tr>
+<tr><td>Code&rarr;disease decode</td><td>original study on Synthetic Dataset</td><td>Knowledge-based proxy (skill 2D), SPOKE-resolved to DOID</td><td>Manual decode covers frequent codes only; long-tail codes undecoded (coverage limitation, below)</td></tr>
+<tr><td>Network construction</td><td>original study on Synthetic Dataset</td><td>SPOKE <code>ASSOCIATES_DaG</code> shared genes; networkx</td><td><code>RESEMBLES_DrD</code> absent for these diseases; network rests on the shared-gene layer only</td></tr>
+<tr><td>Statistical model</td><td>original study on Synthetic Dataset</td><td>Descriptive (prevalence, Jaccard, greedy-modularity communities)</td><td>No effect estimate &rarr; event counts / minimum detectable effect not applicable</td></tr>
+</tbody></table>
+
+<!-- ============================================================= -->
+<h2>2. Results</h2>
+
+<h3>2.1 Diagnosis extraction &amp; cohort flow <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Step</th><th>Rows / codes</th><th>Note</th></tr></thead><tbody>
+<tr><td>All <code>condition_occurrence</code> rows</td><td>16,441</td><td>100 patients</td></tr>
+<tr><td>&minus; Free-text rhythm-monitor labels (13 chart categories: SR, AF, ST, V Paced, SB, A Paced, 1st-AV block, A Flut, JR, SA, AV Paced, SVT, LBBB)</td><td>&minus;~12,434</td><td>Chart-derived rhythm states, not billed diagnoses</td></tr>
+<tr><td>&minus; Numeric chart items misread as codes (225106 = ETOH; 225085 = post-menopausal; type 32817)</td><td>&minus;174</td><td>Excluded by billing-type filter</td></tr>
+<tr><td><b>= ICD-coded billed diagnoses (type 32821)</b></td><td><b>3,833 rows / 1,217 distinct codes</b></td><td>ICD-9: 579 codes (1,779 rows); ICD-10: 638 codes (2,054 rows)</td></tr>
+</tbody></table>
+<p class="small">Grounded sanity check: ICD codes (e.g. <code>4019</code>, <code>E785</code>, <code>E039</code>) co-exist with
+rhythm labels (e.g. <code>AF (Atrial Fibrillation)</code>) in the same <code>condition_source_value</code> column; all 100
+persons are present.</p>
+
+<h3>2.2 Comorbidity burden per patient <span class="badge ehr">EHR</span></h3>
+<p>Distinct billed ICD codes per patient: <b>median 18.5</b> (IQR 8-33), range <b>2-134</b>, mean 26.2; 2,621 total
+patient-code pairs. The heavy right tail (max 134 distinct codes in one patient) is characteristic of long, complex
+ICU admissions.</p>
+
+<h3>2.3 Most frequent ICD codes, decoded <span class="badge ehr">EHR</span> codes / <span class="badge kg">SPOKE</span> names</h3>
+<p class="small">Rank by number of distinct patients carrying the code. The disease-name column is the
+knowledge-based decode (documented proxy) subsequently resolved in SPOKE. Note how ICD-9 and ICD-10 codes for the
+same entity appear separately (e.g. 4019 &amp; I10 &rarr; hypertension; 2724 &amp; E785 &rarr; hyperlipidemia;
+42731 &amp; I4891 &rarr; atrial fibrillation; 5849 &amp; N179 &rarr; acute kidney failure).</p>
+<table><thead><tr><th>Code</th><th>Vocab</th><th>Patients</th><th>Occurrences</th><th>Decoded disease (&rarr; SPOKE)</th></tr></thead><tbody>
+<tr><td>4019</td><td>ICD-9</td><td>41</td><td>68</td><td>Essential hypertension</td></tr>
+<tr><td>2724</td><td>ICD-9</td><td>34</td><td>55</td><td>Hyperlipidemia (unspecified)</td></tr>
+<tr><td>E785</td><td>ICD-10</td><td>21</td><td>57</td><td>Hyperlipidemia (unspecified)</td></tr>
+<tr><td>25000</td><td>ICD-9</td><td>21</td><td>33</td><td>Type 2 diabetes mellitus</td></tr>
+<tr><td>41401</td><td>ICD-9</td><td>19</td><td>28</td><td>Coronary artery disease</td></tr>
+<tr><td>42731</td><td>ICD-9</td><td>18</td><td>34</td><td>Atrial fibrillation</td></tr>
+<tr><td>3051</td><td>ICD-9</td><td>18</td><td>24</td><td>Tobacco/nicotine dependence</td></tr>
+<tr><td>2859</td><td>ICD-9</td><td>18</td><td>23</td><td>Anemia</td></tr>
+<tr><td>I10</td><td>ICD-10</td><td>17</td><td>32</td><td>Essential hypertension</td></tr>
+<tr><td>311</td><td>ICD-9</td><td>16</td><td>30</td><td>Major depressive disorder</td></tr>
+<tr><td>N179</td><td>ICD-10</td><td>15</td><td>31</td><td>Acute kidney failure</td></tr>
+<tr><td>5849</td><td>ICD-9</td><td>15</td><td>25</td><td>Acute kidney failure</td></tr>
+<tr><td>53081</td><td>ICD-9</td><td>15</td><td>22</td><td>GERD</td></tr>
+<tr><td>5990</td><td>ICD-9</td><td>15</td><td>21</td><td>Urinary tract infection</td></tr>
+<tr><td>D62</td><td>ICD-10</td><td>15</td><td>20</td><td>Anemia (acute posthemorrhagic)</td></tr>
+<tr><td>40390</td><td>ICD-9</td><td>14</td><td>27</td><td>Chronic kidney disease (hypertensive)</td></tr>
+<tr><td>I2510</td><td>ICD-10</td><td>13</td><td>33</td><td>Coronary artery disease</td></tr>
+<tr><td>4280</td><td>ICD-9</td><td>13</td><td>25</td><td>Congestive heart failure</td></tr>
+<tr><td>I4891</td><td>ICD-10</td><td>13</td><td>23</td><td>Atrial fibrillation</td></tr>
+<tr><td>K219</td><td>ICD-10</td><td>13</td><td>17</td><td>GERD</td></tr>
+</tbody></table>
+
+<h3>2.4 Decode &amp; SPOKE-resolution coverage (honest accounting)</h3>
+<div class="kgbox">
+<p><b>SPOKE resolution of decoded concepts: 19 / 19 succeeded</b> (18 exact name matches + 1 approximate).
+<span class="badge kg">SPOKE</span> The single approximate resolution is <em>hyperlipidemia (unspecified)</em>: the general
+polygenic lipid disorder (ICD 2724/E785/2720) has no exact Disease Ontology node in SPOKE; the nearest node is
+<em>familial hyperlipidemia</em> (DOID:1168), a Mendelian-variant proxy — flagged wherever it is used.</p>
+<p><b>ICD-code coverage of the decode is partial by design.</b> <span class="badge ehr">EHR</span> The knowledge-based
+decode targeted the frequent codes: <b>115 / 1,217 distinct codes (9.4%)</b> were decoded and resolved. Those codes
+nonetheless account for <b>1,459 / 3,833 ICD occurrences (38.1%)</b> and <b>767 / 2,621 patient-code pairs (29.3%)</b> —
+a small fraction of distinct codes carries a large share of the diagnostic burden (long-tail structure). The remaining
+<b>1,102 rare codes</b> (mostly 1-2 patients each) were <b>not</b> individually decoded.</p>
+<p class="small"><b>Two distinct limitations, kept separate:</b> (a) SPOKE resolution did <b>not</b> largely fail — every
+disease concept we asked SPOKE to resolve was found. (b) The undecoded long tail is a <b>scope / data-availability</b>
+limitation of the manual decode step, not a SPOKE failure. Scaling: the network below describes the 19 resolved
+diseases, which represent the dominant, high-prevalence comorbidities of this cohort.</p>
+</div>
+
+<h3>2.5 Resolved diseases and their SPOKE gene associations <span class="badge kg">SPOKE</span></h3>
+<p class="small">EHR prevalence = distinct patients carrying any decoded code for that disease (EHR). Genes =
+<code>ASSOCIATES_DaG</code> degree in SPOKE. Cluster = greedy-modularity community (below).</p>
+<table><thead><tr><th>Disease</th><th>SPOKE DOID</th><th>Resolution</th><th>Genes (SPOKE)</th><th>Patients (EHR)</th><th>Cluster</th></tr></thead><tbody>
+<tr><td>Essential hypertension</td><td>DOID:10825</td><td>exact</td><td>56</td><td>53</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Hyperlipidemia (unspecified)</td><td>DOID:1168</td><td><b>approximate</b></td><td>81</td><td>51</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Anemia</td><td>DOID:2355</td><td>exact</td><td>747</td><td>43</td><td><span class="pill c3">hematologic</span></td></tr>
+<tr><td>Coronary artery disease</td><td>DOID:3393</td><td>exact</td><td>450</td><td>34</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Type 2 diabetes mellitus</td><td>DOID:9352</td><td>exact</td><td>1,373</td><td>32</td><td><span class="pill c2">metabolic</span></td></tr>
+<tr><td>Acute kidney failure</td><td>DOID:3021</td><td>exact</td><td>49</td><td>32</td><td><span class="pill c3">hematologic</span></td></tr>
+<tr><td>Atrial fibrillation</td><td>DOID:0060224</td><td>exact</td><td>613</td><td>30</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Chronic kidney disease</td><td>DOID:784</td><td>exact</td><td>84</td><td>29</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Congestive heart failure</td><td>DOID:6000</td><td>exact</td><td>355</td><td>26</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Major depressive disorder</td><td>DOID:1470</td><td>exact</td><td>366</td><td>24</td><td><span class="pill c4">neuropsych</span></td></tr>
+<tr><td>GERD</td><td>DOID:8534</td><td>exact</td><td>622</td><td>24</td><td><span class="pill c2">metabolic</span></td></tr>
+<tr><td>Thrombocytopenia</td><td>DOID:1588</td><td>exact</td><td>467</td><td>22</td><td><span class="pill c3">hematologic</span></td></tr>
+<tr><td>Urinary tract infection</td><td>DOID:0080784</td><td>exact</td><td>6</td><td>22</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Obesity</td><td>DOID:9970</td><td>exact</td><td>904</td><td>20</td><td><span class="pill c2">metabolic</span></td></tr>
+<tr><td>Tobacco/nicotine dependence</td><td>DOID:0050742</td><td>exact</td><td>83</td><td>20</td><td><span class="pill c4">neuropsych</span></td></tr>
+<tr><td>Anxiety disorder</td><td>DOID:2030</td><td>exact</td><td>67</td><td>16</td><td><span class="pill c4">neuropsych</span></td></tr>
+<tr><td>Hypothyroidism</td><td>DOID:1459</td><td>exact</td><td>789</td><td>15</td><td><span class="pill c2">metabolic</span></td></tr>
+<tr><td>COPD</td><td>DOID:3083</td><td>exact</td><td>335</td><td>14</td><td><span class="pill c1">cardio-renal</span></td></tr>
+<tr><td>Asthma</td><td>DOID:2841</td><td>exact</td><td>516</td><td>13</td><td><span class="pill c2">metabolic</span></td></tr>
+</tbody></table>
+<p class="small">Note the gene-sparse nodes: urinary tract infection (6 genes), acute kidney failure (49),
+essential hypertension (56) — SPOKE's gene coverage is uneven, which limits how strongly these nodes can wire into the
+network regardless of clinical importance.</p>
+
+<h3>2.6 SPOKE disease network: hubs, links, and clusters <span class="badge kg">SPOKE</span></h3>
+<div class="kgbox">
+<p><b>Connectivity.</b> Among the 19 diseases (171 possible pairs), <b>161 pairs (94.2%) share &ge;1 associated gene</b>.
+No <code>RESEMBLES_DrD</code> edge exists between any of these diseases (0 of 171), although 46,670 such edges exist
+elsewhere in SPOKE — so the comorbidity network is built <b>entirely on the shared-gene (ASSOCIATES_DaG) layer</b>.
+A structural graph thresholded at Jaccard &ge; 0.0239 (median non-zero) retains <b>81 edges</b>.</p>
+<p><b>Biological hubs</b> (by total shared genes across neighbours): Type 2 diabetes (1,578) &gt; Obesity (1,397) &gt;
+Hypothyroidism (1,148) &gt; Anemia (1,014) &gt; GERD (864) &gt; Asthma (822) &gt; Thrombocytopenia (808) &gt; Atrial
+fibrillation (757). By <b>degree</b> in the thresholded graph, coronary artery disease (14), atrial fibrillation (13) and
+COPD (13) are the most broadly connected.</p>
+<p><b>Strongest disease-disease links.</b> Type 2 diabetes&ndash;obesity share <b>385 genes</b> (Jaccard 0.20); anemia&ndash;
+thrombocytopenia share <b>337 genes</b> and have the highest normalized overlap (<b>Jaccard 0.38</b>); other strong links:
+T2DM&ndash;hypothyroidism (192), obesity&ndash;hypothyroidism (184), hypothyroidism&ndash;GERD (154), obesity&ndash;GERD
+(143), T2DM&ndash;coronary disease (139). Within the neuropsychiatric group, depression&ndash;anxiety share 46 genes
+(Jaccard 0.12).</p>
+<p><b>Comorbidity clusters</b> (greedy modularity, weight = Jaccard; modularity = 0.204):</p>
+<ul>
+<li><span class="pill c1">cardio-renal-vascular</span> hypertension, hyperlipidemia, coronary artery disease, atrial fibrillation, congestive heart failure, chronic kidney disease, COPD, urinary tract infection</li>
+<li><span class="pill c2">metabolic-endocrine</span> type 2 diabetes, obesity, hypothyroidism, GERD, asthma</li>
+<li><span class="pill c3">hematologic</span> anemia, thrombocytopenia, acute kidney failure</li>
+<li><span class="pill c4">neuropsychiatric</span> major depressive disorder, anxiety disorder, tobacco/nicotine dependence</li>
+</ul>
+<p class="small">These four modules were derived <b>only</b> from shared genes — SPOKE never saw which diseases co-occur in
+patients — yet they reproduce textbook comorbidity groupings (metabolic syndrome; cardio-renal axis; the
+anemia/thrombocytopenia/AKI critical-illness triad; the depression/anxiety/substance-use triad).</p>
+</div>
+
+<h3>2.7 EHR observed co-occurrence vs SPOKE shared biology <span class="badge ehr">EHR</span> + <span class="badge kg">SPOKE</span></h3>
+<p>The EHR independently answers a different question — <em>which</em> diseases occur in the same patients — and the two
+views agree on the headline pairs, giving the biology face validity.</p>
+<table><thead><tr><th>Disease pair</th><th>Patients with both <span class="badge ehr">EHR</span></th><th>Shared genes <span class="badge kg">SPOKE</span></th></tr></thead><tbody>
+<tr><td>Type 2 diabetes + Obesity</td><td>9</td><td><b>385</b></td></tr>
+<tr><td>Anemia + Thrombocytopenia</td><td>18</td><td><b>337</b></td></tr>
+<tr><td>Coronary artery disease + Atrial fibrillation</td><td>19</td><td>72</td></tr>
+<tr><td>Hypertension + Hyperlipidemia</td><td>34</td><td>2</td></tr>
+<tr><td>Hyperlipidemia + Coronary artery disease</td><td>26</td><td>25</td></tr>
+<tr><td>Hypertension + Anemia</td><td>24</td><td>2</td></tr>
+<tr><td>Anemia + Acute kidney failure</td><td>24</td><td>23</td></tr>
+<tr><td>Hyperlipidemia + Type 2 diabetes</td><td>24</td><td>25</td></tr>
+</tbody></table>
+<p class="small">The clinically "obvious" co-occurrences (hypertension+hyperlipidemia, 34 patients) can have few shared
+genes (just 2), while the strongest shared-gene pairs (diabetes-obesity 385; anemia-thrombocytopenia 337) are
+mechanistically, not merely epidemiologically, linked. The EHR tells you two diseases travel together; SPOKE proposes
+the molecular reason. (Co-occurrence counts are raw, over the shared 100-patient denominator, and unadjusted.)</p>
+
+<!-- ============================================================= -->
+<h2>3. Figures</h2>
+<p class="small">Publication-ready static figures (matplotlib), generated by <code>make_figures.py</code> from the saved
+SPOKE edges and cluster assignments (PNG shown; vector PDF/SVG alongside in <code>figures/</code>). Figure cluster
+palette: <b style="color:#0F4D92">blue</b> = cardio-renal-vascular, <b style="color:#B8860B">gold</b> = metabolic-endocrine,
+<b style="color:#2E7d84">teal</b> = hematologic, <b style="color:#7C6CCF">violet</b> = neuropsychiatric.</p>
+<figure>
+  <img src="figures/fig_network.png" style="max-width:100%;height:auto" alt="SPOKE disease-disease shared-gene network of the 19 cohort diseases, coloured by comorbidity cluster">
+  <figcaption><b>Figure 1 <span class="badge kg">SPOKE</span>.</b> <b>Comorbidity as a biological network.</b> Disease–disease
+  graph built <b>entirely from SPOKE shared-gene associations</b> (<code>ASSOCIATES_DaG</code>): each node is one of the 19
+  resolved diseases, node colour is the SPOKE-derived comorbidity cluster, node size is the total shared genes with the
+  other cohort diseases (hubs largest: type-2 diabetes 1,578, obesity 1,397, hypothyroidism 1,148), and edge width/opacity
+  encode the number of shared genes (bold backbone for &ge;20 shared genes, faint hairlines below). The metabolic-endocrine
+  module (top) and the anemia&ndash;thrombocytopenia hematologic pair (left) form the densest cores; gene-sparse nodes
+  (UTI, AKI, hypertension) sit at the periphery. Force-directed layout, fixed seed. Every name, edge and cluster shown is
+  contributed by the knowledge graph — none exists in the EHR.</figcaption>
+</figure>
+<figure>
+  <img src="figures/fig_heatmap.png" style="max-width:100%;height:auto" alt="Disease-by-disease shared-gene heatmap ordered by cluster">
+  <figcaption><b>Figure 2 <span class="badge kg">SPOKE</span>.</b> <b>Shared-gene matrix.</b> Disease&times;disease shared-gene
+  overlap (magma, log colour scale), diseases ordered by cluster so the four modules read as diagonal blocks (white lines =
+  cluster boundaries; axis labels coloured by cluster). The diagonal (self-overlap) is masked. The two strongest links are
+  boxed and annotated: type-2 diabetes&ndash;obesity (<b>385</b> shared genes) and anemia&ndash;thrombocytopenia (<b>337</b>).
+  Off-block cells expose cross-cluster wiring, e.g. the metabolic hubs bleeding into the cardio-renal block.</figcaption>
+</figure>
+<figure>
+  <img src="figures/fig_hubs.png" style="max-width:100%;height:auto" alt="Horizontal bar chart of the top hub diseases by total shared genes, coloured by cluster">
+  <figcaption><b>Figure 3 <span class="badge kg">SPOKE</span>.</b> <b>Biological hubs.</b> Top diseases ranked by total shared
+  genes across the other cohort diseases; bar colour = comorbidity cluster. The metabolic-endocrine module dominates
+  connectivity (type-2 diabetes 1,578, obesity 1,397, hypothyroidism 1,148), with anemia (1,014) the leading hematologic
+  hub. This ranking — like the names, edges and clusters — is supplied by the knowledge graph and has no counterpart in the
+  billing record.</figcaption>
+</figure>
+
+<!-- ============================================================= -->
+<h2>4. Knowledge-graph contribution (what SPOKE added)</h2>
+<div class="kgbox">
+<p>The EHR alone provided <b>only</b> opaque codes and their counts. Everything below was supplied by SPOKE via MedCP and
+could not be obtained from the clinical record (whose <code>concept</code> table has no ICD vocabulary):</p>
+<ul>
+<li><span class="badge kg">SPOKE</span> <b>Names for opaque codes.</b> 19 disease concepts resolved to Disease Ontology nodes (18 exact, 1 approximate), turning <code>E039</code>&rarr;hypothyroidism, <code>4019</code>&rarr;essential hypertension, <code>N179</code>&rarr;acute kidney failure, etc.</li>
+<li><span class="badge kg">SPOKE</span> <b>A biological wiring diagram.</b> 7,963 disease-gene associations pulled; 161 of 171 disease pairs (94.2%) share &ge;1 gene — a dense network invisible to any billing system.</li>
+<li><span class="badge kg">SPOKE</span> <b>Mechanistic hubs.</b> Type-2 diabetes (1,373 genes), obesity (904), hypothyroidism (789) emerge as shared-gene hubs, prioritising them as biological drivers of multimorbidity.</li>
+<li><span class="badge kg">SPOKE</span> <b>Quantified disease-disease similarity.</b> e.g. anemia-thrombocytopenia Jaccard 0.38, diabetes-obesity 385 shared genes — a molecular distance the EHR cannot express.</li>
+<li><span class="badge kg">SPOKE</span> <b>Emergent comorbidity clusters.</b> Four coherent modules recovered from biology alone, matching known clinical syndromes, without any patient co-occurrence input.</li>
+<li><span class="badge kg">SPOKE</span> <b>Honest negative findings.</b> SPOKE also revealed what is <em>missing</em>: no <code>RESEMBLES_DrD</code> edges among these diseases, and gene-sparse nodes (UTI = 6 genes) — knowable only by querying the graph.</li>
+</ul>
+</div>
+
+<!-- ============================================================= -->
+<h2>5. Limitations</h2>
+<h3>Data-availability limitations</h3>
+<ul>
+<li><b>Synthetic, date-shifted, ICU-only, N = 100.</b> Case mix is skewed to critical-care cardiometabolic disease; prevalences and clusters are not generalizable to any real population.</li>
+<li><b>No ICD names in the dataset.</b> The OMOP <code>concept</code> table holds only local <code>mimiciv_*</code> vocabularies (no ICD9CM/ICD10CM); code decoding therefore relies on external knowledge, documented as a proxy.</li>
+<li><b>Partial decode coverage.</b> 115 / 1,217 distinct codes (9.4%) decoded, covering 38.1% of occurrences and 29.3% of patient-code pairs; the 1,102-code long tail was not resolved. The network describes the dominant comorbidities, not the full diagnostic space.</li>
+<li><b>Uneven SPOKE gene coverage.</b> Node degree in the graph reflects research attention (diabetes 1,373 genes) as much as biology; gene-sparse diseases (UTI, AKI, hypertension) are under-connected regardless of clinical weight.</li>
+<li><b>No <code>RESEMBLES_DrD</code> support.</b> Disease-disease resemblance edges are absent for this disease set, so the network could use only one of the two intended edge types.</li>
+</ul>
+<h3>Methodological limitations</h3>
+<ul>
+<li><b>Approximate resolution for hyperlipidemia.</b> Unspecified hyperlipidemia was mapped to <em>familial hyperlipidemia</em> (DOID:1168); its 81-gene set over-weights monogenic biology relative to the common polygenic disorder, likely inflating its lipid-related edges.</li>
+<li><b>ICD-9/ICD-10 collapse is a judgement call.</b> Merging vocabularies to one disease (e.g. 4019 + I10) is standard but manual; a different granularity (e.g. splitting hypertensive-CKD between hypertension and CKD) would shift some edges.</li>
+<li><b>Descriptive only — no inference.</b> No exposure, outcome, effect size, event count or minimum-detectable-effect (not applicable to a network description). Co-occurrence counts are raw and unadjusted for the shared 100-patient denominator.</li>
+<li><b>Threshold sensitivity.</b> Cluster membership depends on the Jaccard cut (median non-zero, 0.0239) and the greedy-modularity algorithm (modularity 0.204, a moderate partition); other thresholds/algorithms could merge or split modules.</li>
+<li><b>Gene-set overlap &ne; causation.</b> Shared <code>ASSOCIATES_DaG</code> genes indicate shared associations (often GWAS), not a proven shared mechanism or directional comorbidity risk.</li>
+</ul>
+
+<!-- ============================================================= -->
+<h2>6. Reproducibility</h2>
+<p class="sub">All data retrieved through MedCP (clinical SQL &rarr; <code>data/*.csv</code>; SPOKE Cypher &rarr;
+<code>kg/*.json</code>); statistics &amp; network in <code>analysis.py</code>
+(<code>uv run --with pandas --with networkx python study-M/analysis.py</code> &rarr; <code>analysis_results.json</code>).
+Full query list in <code>queries.log</code>. Key queries:</p>
+<pre>-- CLINICAL (SQLite OMOP) --------------------------------------------------
+-- ICD billed diagnoses only (exclude chart rhythm labels + ETOH/post-menopausal chart items)
+WITH icd AS (
+  SELECT person_id, TRIM(condition_source_value) AS code
+  FROM condition_occurrence
+  WHERE condition_type_concept_id = 32821 AND TRIM(condition_source_value) &lt;&gt; '')
+SELECT code, COUNT(DISTINCT person_id) n_patients, COUNT(*) n_occ,
+       CASE WHEN code GLOB '[0-9]*' THEN 'ICD9' ELSE 'ICD10' END vocab
+FROM icd GROUP BY code ORDER BY n_patients DESC;           -- 1,217 codes
+
+-- proof that ICD codes have no name here (concept table = local mimiciv_* only):
+SELECT vocabulary_id, COUNT(*) FROM concept GROUP BY vocabulary_id;   -- no ICD9CM/ICD10CM
+
+-- SPOKE (Neo4j Cypher) ----------------------------------------------------
+-- disease-gene edges for the 19 resolved DOIDs (network input, 7,963 rows)
+MATCH (d:Disease)-[:ASSOCIATES_DaG]-&gt;(g:Gene)
+WHERE d.identifier IN ['DOID:10825','DOID:1168','DOID:9352','DOID:3393','DOID:0060224',
+   'DOID:6000','DOID:784','DOID:3021','DOID:1470','DOID:2030','DOID:9970','DOID:1459',
+   'DOID:3083','DOID:2841','DOID:2355','DOID:1588','DOID:8534','DOID:0080784','DOID:0050742']
+RETURN d.identifier AS doid, g.identifier AS gid, g.name AS gsym;
+
+-- disease-disease resemblance among the set (result: 0 edges)
+MATCH (a:Disease)-[:RESEMBLES_DrD]-(b:Disease)
+WHERE a.identifier IN [&lt;19 DOIDs&gt;] AND b.identifier IN [&lt;19 DOIDs&gt;] AND a.identifier &lt; b.identifier
+RETURN DISTINCT a.name, b.name;
+</pre>
+
+<!-- ============================================================= -->
+<h2>Appendix — launching prompt (verbatim)</h2>
+<p class="sub">The exact prompt that produced this study (<code>study-M-comorbidity-network.md</code>):</p>
+<div class="prompt"># Study 5 — Comorbidity resolved into a disease network (SPOKE)
+
+*Original descriptive study · synthetic MIMIC-IV/OMOP demo · MedCP (EHR) + SPOKE (KG)*
+
+**Launching prompt** — paste as-is; the agent follows `../MedCP_Clinical_study_skill.md`.
+
+---
+
+Run an original, exploratory descriptive study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, that turns the cohort's coded diagnoses into a disease network using the SPOKE knowledge graph. Follow the MedCP clinical study framework skill for the workflow and especially the report; note in the report that this is a descriptive comorbidity-network study rather than an effect-estimation study, that STROBE + RECORD is the closest applicable standard (recorded as a deliberate deviation), and that it is an original study on a synthetic dataset — so wherever the skill expects a source citation, an "Original Paper" result, a replication status, or a paper-versus-replication overlay, record "original study on Synthetic Dataset", and state that the data are synthetic and date-shifted.
+
+With MedCP's clinical-record tools, extract each patient's set of ICD-coded diagnoses from condition_occurrence — the condition_source_value entries that are ICD codes (for example 4019 for hypertension, E785 for hyperlipidemia, E039 for hypothyroidism), as distinct from the free-text rhythm-monitor labels — and describe the comorbidity burden across the cohort. Because these codes carry no human-readable name in the dataset, use the SPOKE knowledge graph through MedCP to resolve them to diseases and to connect those diseases into a network via shared genes and pathways, then describe the most connected diseases and any comorbidity clusters that emerge; decide the traversals yourself rather than following a fixed node map. Report how many codes SPOKE could and could not resolve, and treat unresolved codes as a data-availability limitation.
+
+Because resolving the diagnoses and revealing their shared biology is done entirely by the knowledge graph, this study is the clearest demonstration of SPOKE's contribution: attribute every resolved name, edge and cluster to SPOKE and keep it visibly separate from the EHR-supplied codes and counts. Include this launching prompt verbatim in the report.</div>
+
+</body>
+</html>

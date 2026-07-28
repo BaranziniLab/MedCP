@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 4 — Opioid exposure and respiratory parameters</title>
+<style>
+  :root{--ink:#1a2230;--mut:#5b6675;--line:#e2e6ec;--ehr:#0b6bcb;--kg:#7a3ea8;--bg:#fff;--card:#f7f9fc;--warn:#b6540a;}
+  *{box-sizing:border-box}
+  body{font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+       max-width:920px;margin:0 auto;padding:32px 20px;background:var(--bg)}
+  h1{font-size:1.7rem;margin:.2em 0}h2{font-size:1.25rem;margin-top:2em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+  h3{font-size:1.05rem;margin-top:1.4em}
+  .sub{color:var(--mut);font-size:.95rem}
+  .banner{background:#fff8e1;border:1px solid #f0d98a;border-radius:8px;padding:10px 14px;font-size:.9rem;margin:14px 0}
+  table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  .tblwrap{overflow-x:auto}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:10px;color:#fff;vertical-align:middle}
+  .badge.ehr{background:var(--ehr)} .badge.kg{background:var(--kg)}
+  .kgbox{border-left:4px solid var(--kg);background:#faf6fd;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  .ehrbox{border-left:4px solid var(--ehr);background:#f2f8ff;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  figure{margin:1.2em 0;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:8px}
+  figcaption{font-size:.85rem;color:var(--mut);margin-top:.5em}
+  pre{background:#0f1622;color:#d6e2f0;padding:14px;border-radius:8px;overflow:auto;font-size:.82rem;line-height:1.5}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prompt{white-space:pre-wrap;background:#0f1622;color:#e7eefc;padding:16px;border-radius:8px;font-size:.86rem}
+  ul{margin:.4em 0}
+  .sig{color:#0b6bcb;font-weight:700}.ns{color:var(--mut)}
+  .key{background:#eef6ff}
+  @media print{body{max-width:none}}
+</style>
+</head>
+<body>
+
+<h1>Study 4 — Opioid exposure and respiratory parameters</h1>
+<p class="sub">Original observational study on a synthetic dataset · MedCP (EHR) + SPOKE (knowledge graph) · drug-exposure study (STROBE + RECORD + RECORD-PE)</p>
+<div class="banner"><b>Synthetic data.</b> Analyses use the synthetic, date-shifted MIMIC-IV demo (100 ICU patients,
+OMOP CDM) served through MedCP. Results are <b>computed from that data, not fabricated</b>. This is an
+<b>original study on Synthetic Dataset</b>, not a replication of a published paper; every field a
+replication framework would fill with a source paper is recorded as <em>"original study on Synthetic Dataset"</em>.</div>
+
+<p class="sub">Provenance legend:
+<span class="badge ehr">EHR</span> measured in the clinical records (via MedCP) ·
+<span class="badge kg">SPOKE</span> derived from the biomedical knowledge graph (via MedCP).</p>
+
+<h2>1. Executive summary</h2>
+<p><b>Source study.</b> original study on Synthetic Dataset. <b>Design.</b> Retrospective, two-group
+comparison (opioid-exposed vs unexposed) on routinely-collected ICU vital signs. <b>Reporting standard.</b>
+STROBE + RECORD + <b>RECORD-PE</b> (a drug-exposure study). <b>Unit of analysis.</b> Patient (person).</p>
+<p><b>Cohort.</b> <span class="badge ehr">EHR</span> All 100 patients in the demo. <b>38</b> were opioid-exposed
+(any fentanyl <i>or</i> hydromorphone/Dilaudid record in <code>drug_exposure</code>: fentanyl n=27,
+hydromorphone/Dilaudid n=19, both n=8); <b>62</b> were unexposed. Respiratory rate and pulse-oximetry SpO2
+were present for all 100 patients. Each patient was summarised first (mean respiratory rate, minimum SpO2),
+then groups were compared with the Mann–Whitney U test.</p>
+<p><b>Headline result</b> <span class="badge ehr">EHR</span>. <b>Respiratory rate did not differ</b> between
+groups (mean RR: exposed median 19.7 vs unexposed 18.9 breaths/min; p=0.59; rank-biserial +0.07,
+95% CI −0.16 to +0.29 — CI spans the null and does not reach the minimum detectable effect, so this is
+<b>uninformative</b>, not evidence of no effect). <b>Minimum SpO2 was lower in the opioid-exposed group</b>
+(median 88% vs 91%; p&lt;0.001; rank-biserial −0.46, 95% CI −0.65 to −0.26; Hodges–Lehmann shift −4
+percentage points, 95% CI −7 to −2). <b>Average SpO2 was identical</b> (96.5% vs 96.8%; p=0.50).</p>
+<p><b>Bottom line.</b> The opioid-exposed group shows lower oxygen-saturation <i>nadirs</i> but no shift in
+respiratory rate or mean oxygenation. The nadir signal is <b>confounded and partly artefactual</b>: exposed
+patients are substantially sicker (higher mortality, more drugs) and are <b>monitored ~4× more often</b>
+(178 vs 44 SpO2 readings/patient), and the minimum is a running-minimum statistic that falls mechanically
+with more readings (Spearman ρ = −0.66 between reading count and minimum SpO2; the group difference collapses
+within reading-count strata). SPOKE <span class="badge kg">SPOKE</span> supplies the <i>mechanism</i> the EHR
+cannot: fentanyl and hydromorphone both bind the μ-opioid receptor (OPRM1 → OPRM_HUMAN, UniProt P35372) and
+both are recorded causes of respiratory depression. Consistent with a genuine opioid mechanism, but in this
+synthetic cohort <b>not demonstrable free of severity and surveillance confounding</b>.</p>
+
+<h2>1b. Protocol header &amp; design</h2>
+<p class="sub">Protocol header (skill §0B), reproduced verbatim. Every undeterminable field is recorded as an explicit assumption.</p>
+<div class="tblwrap"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Citation (source study)</td><td>original study on Synthetic Dataset</td></tr>
+<tr><td>Design of source study</td><td>original study on Synthetic Dataset — retrospective two-group (exposed vs unexposed) comparison of continuous vital-sign summaries</td></tr>
+<tr><td>Reporting standard applied (§0A)</td><td>STROBE + RECORD + <b>RECORD-PE</b> (drug/exposure study on routinely-collected data)</td></tr>
+<tr><td>Setting and calendar timeframe</td><td>Synthetic MIMIC-IV demo ICU; dates are <b>date-shifted</b> (year_of_birth 2030–2149; visit years in the 2100s–2180s). Calendar time is not interpretable.</td></tr>
+<tr><td>Unit of analysis</td><td>Person (patient); one row per patient after within-patient summarisation.</td></tr>
+<tr><td>Primary endpoint</td><td>Per-patient <b>mean respiratory rate</b> and <b>minimum SpO2</b> (secondary: median RR, mean SpO2, % of SpO2 readings &lt;90%).</td></tr>
+<tr><td>Primary estimand</td><td>Marginal between-group difference in the distribution of each per-patient summary (Mann–Whitney; rank-biserial / Hodges–Lehmann). <b>Associational, not causal.</b></td></tr>
+<tr><td>Time zero (index date)</td><td><b>Assumption:</b> none defined. Exposure and vitals are ascertained over the whole record; they are <b>not aligned to a common index</b>. This is a deliberate, disclosed limitation of the prompt's design (no anchoring event).</td></tr>
+<tr><td>Eligibility assessment window</td><td>Entire available record for each of the 100 demo patients (no restriction).</td></tr>
+<tr><td>Baseline lookback window</td><td><b>Assumption:</b> not applicable — no index date, so no pre-index lookback; baseline/severity proxies are whole-record counts.</td></tr>
+<tr><td>Exposure ascertainment window and washout</td><td>Any qualifying <code>drug_exposure</code> record anywhere in the record; <b>no washout</b> (assumption: ever-exposed vs never-exposed classification).</td></tr>
+<tr><td>Follow-up start</td><td><b>Assumption:</b> not applicable — cross-sectional summary of vitals, no time-to-event follow-up.</td></tr>
+<tr><td>Follow-up end / administrative censoring</td><td>Not applicable (no survival outcome analysed).</td></tr>
+<tr><td>Censoring: loss to follow-up</td><td>Not applicable (no time-to-event outcome).</td></tr>
+<tr><td>Censoring: death</td><td>Not applicable to the vital-sign comparison; in-dataset death is reported as a severity descriptor only (15 deaths overall).</td></tr>
+<tr><td>Censoring: treatment switch/discontinuation</td><td>Not applicable (ever-exposed classification).</td></tr>
+<tr><td>Competing risks handling</td><td>Not applicable (no time-to-event / cumulative-incidence endpoint).</td></tr>
+</tbody></table></div>
+
+<h3>Design table</h3>
+<p class="sub">Per the original-study adaptation, the "original paper" column reads "original study on Synthetic Dataset"; deviations are carried into Limitations.</p>
+<div class="tblwrap"><table><thead><tr><th>Design element</th><th>original study on Synthetic Dataset</th><th>This study</th><th>Deviation / expected effect</th></tr></thead><tbody>
+<tr><td>Time zero</td><td>original study on Synthetic Dataset</td><td>None (unanchored)</td><td>Exposure/vital timing not aligned → temporal ordering of drug and desaturation unknown; can inflate or deflate the association.</td></tr>
+<tr><td>Exposure ascertainment &amp; washout</td><td>original study on Synthetic Dataset</td><td>Ever fentanyl OR hydromorphone/Dilaudid in <code>drug_source_value</code>; no washout</td><td>Ever-exposed captures sicker patients; no new-user design → confounding by indication.</td></tr>
+<tr><td>Outcome definition &amp; code set</td><td>original study on Synthetic Dataset</td><td>RR = 'Respiratory Rate' (src 2000030002 → std 3024171); SpO2 = 'O2 saturation pulseoxymetry' (src 2000030003 → std 40762499), via <code>concept_relationship</code> 'Maps to'</td><td>Concept mapped through the OMOP vocabulary because the source concept_id is not stored on measurement rows; faithful, documented.</td></tr>
+<tr><td>Statistical model</td><td>original study on Synthetic Dataset</td><td>Mann–Whitney U on per-patient summaries; rank-biserial + Hodges–Lehmann with bootstrap 95% CI</td><td>Non-parametric, appropriate for small n and skewed vitals; no covariate adjustment (see below).</td></tr>
+<tr><td>Covariate adjustment</td><td>original study on Synthetic Dataset</td><td>None (univariate); severity/monitoring reported descriptively and as a stratified sensitivity analysis</td><td>Multivariable adjustment deliberately avoided (n=38 exposed / 15 deaths → overfitting); residual confounding remains.</td></tr>
+</tbody></table></div>
+
+<h2>2. Results</h2>
+
+<h3>2.1 Cohort flow</h3>
+<div class="ehrbox"><span class="badge ehr">EHR</span>
+100 patients in the demo → exposure ascertained from <code>drug_exposure.drug_source_value</code>:
+<b>fentanyl 27</b> (mostly "Fentanyl Citrate 50 mL Vial"), <b>hydromorphone/Dilaudid 19</b>
+(14 via the "HYDROmorphone (Dilaudid) …" brand string + 5 more via the unbranded "HYDROmorphone 20 mg …"
+premix), <b>8 received both</b> → <b>38 opioid-exposed, 62 unexposed</b>. All 100 patients had ≥1 valid
+respiratory-rate and ≥1 valid SpO2 reading.
+<br><span class="sub">Sanity note: the harness-grounded estimate expected ~14 hydromorphone patients; that figure
+counts only the "Dilaudid" brand string. The prompt's definition (<code>%hydromorphone% OR %dilaudid%</code>)
+correctly also captures the 5 patients on the unbranded HYDROmorphone premix — both source values are the same
+μ-opioid agonist — giving 19. Retained per the specified exposure definition.</span></div>
+
+<h3>2.2 Baseline &amp; severity (confounding-by-indication check)</h3>
+<p><span class="badge ehr">EHR</span> The two groups are <b>not exchangeable</b>: opioid-exposed patients carry
+markedly more treatment and monitoring and higher mortality — the ICU pattern where sicker patients receive
+more opioids.</p>
+<div class="tblwrap"><table><thead><tr><th>Characteristic</th><th>Exposed (n=38)</th><th>Unexposed (n=62)</th><th>p</th></tr></thead><tbody>
+<tr><td>Age at first visit, median (yr)</td><td>56.5</td><td>65.5</td><td>0.013</td></tr>
+<tr><td>Female</td><td>44.7%</td><td>41.9%</td><td>0.95</td></tr>
+<tr class="key"><td>In-dataset mortality</td><td>26.3% (10/38)</td><td>8.1% (5/62)</td><td>0.028</td></tr>
+<tr class="key"><td>Drug-exposure records / patient, median</td><td>209</td><td>87.5</td><td>&lt;0.001</td></tr>
+<tr class="key"><td>Distinct drugs / patient, median</td><td>87</td><td>49.5</td><td>&lt;0.001</td></tr>
+<tr class="key"><td>Measurement records / patient, median</td><td>3667</td><td>1224.5</td><td>&lt;0.001</td></tr>
+</tbody></table></div>
+<p class="sub">Balance diagnostics such as standardised mean differences for a matched design are
+<b>not applicable (no matching or weighting model was fitted)</b>. These rows are reported to make the
+confounding explicit, not to adjust for it.</p>
+
+<h3>2.3 Primary &amp; secondary respiratory comparisons</h3>
+<p><span class="badge ehr">EHR</span> Per-patient summaries, exposed vs unexposed, Mann–Whitney U (two-sided,
+α=0.05). Rank-biserial r is oriented exposed − unexposed (positive = higher in exposed). "Events" for a
+continuous outcome = patients contributing a summary value per group (all 38 / 62). Plausibility filters:
+RR kept to 4–60 breaths/min (67/19,667 rows dropped); SpO2 kept to 50–100% (3/17,683 dropped).</p>
+<div class="tblwrap"><table><thead><tr>
+<th>Outcome</th><th>Exposed<br>median (IQR)</th><th>Unexposed<br>median (IQR)</th>
+<th>Mann–Whitney p</th><th>Rank-biserial (95% CI)</th><th>Hodges–Lehmann shift (95% CI)</th></tr></thead><tbody>
+<tr class="key"><td><b>Minimum SpO2 (%)</b> — primary</td><td>88 (81–90)</td><td>91 (88–93)</td>
+<td class="sig">&lt;0.001</td><td class="sig">−0.46 (−0.65, −0.26)</td><td>−4.0 (−7.0, −2.0) pts</td></tr>
+<tr><td><b>Mean respiratory rate</b> (breaths/min) — primary</td><td>19.7 (17.7–21.2)</td><td>18.9 (16.7–21.1)</td>
+<td class="ns">0.59</td><td class="ns">+0.07 (−0.16, +0.29)</td><td>+0.46 (−0.94, +1.75)</td></tr>
+<tr><td>Median respiratory rate (breaths/min)</td><td>19.0 (17.1–21.0)</td><td>18.5 (16.1–21.0)</td>
+<td class="ns">0.65</td><td class="ns">+0.05 (−0.18, +0.29)</td><td>0.0 (−1.0, +2.0)</td></tr>
+<tr><td>Mean SpO2 (%)</td><td>96.6 (95.6–97.7)</td><td>96.9 (95.7–97.8)</td>
+<td class="ns">0.50</td><td class="ns">−0.08 (−0.31, +0.16)</td><td>−0.24 (−0.85, +0.37)</td></tr>
+<tr><td>% of SpO2 readings &lt;90%</td><td>0.53 (0–1.32)</td><td>0.0 (0–0.97)</td>
+<td class="ns">0.058</td><td class="ns">+0.20 (0.00, +0.41)</td><td>0.0 (0.0, +0.60)</td></tr>
+</tbody></table></div>
+<p class="sub"><b>Event counts &amp; minimum detectable effect (design property, same for every endpoint):</b>
+38 exposed vs 62 unexposed patients. By Noether's approximation for the Mann–Whitney test (α=0.05 two-sided,
+80% power, allocation 0.38), the smallest detectable effect is a <b>probability of superiority of 0.67</b>,
+i.e. <b>|rank-biserial| ≈ 0.33</b>. Only <b>Minimum SpO2</b> reaches and exceeds this threshold with a CI
+excluding the null; the RR endpoints and mean SpO2 have CIs that neither exclude the null nor reach the MDE,
+so they are <b>uninformative</b> (compatible with a real effect up to |r|≈0.33), <b>not</b> evidence of no
+difference.</p>
+
+<h3>2.4 Is the minimum-SpO2 signal real, or a surveillance artefact?</h3>
+<p><span class="badge ehr">EHR</span> Minimum SpO2 is a <i>running-minimum</i>: the more readings a patient
+has, the lower their observed nadir tends to be, independent of physiology. Exposed patients have far more
+readings, so this must be checked.</p>
+<ul>
+<li>SpO2 readings per patient: exposed median <b>178.5</b> vs unexposed <b>44</b> (p&lt;0.001) — ~4× monitoring.</li>
+<li>Across all patients, minimum SpO2 falls as reading count rises: Spearman <b>ρ = −0.66</b> (p&lt;10⁻¹²).</li>
+<li>Stratifying by reading-count tertile, the exposed–unexposed gap in minimum SpO2 <b>no longer reaches
+significance in any stratum</b> (low p=0.46, mid p=0.075, high p=0.60) — i.e. most of the crude difference
+tracks how often the patient was measured, compounded by illness severity.</li>
+</ul>
+<p>Consistently, the <b>sampling-insensitive</b> summary — <b>mean SpO2</b> — shows <b>no</b> group difference
+(96.5% vs 96.8%). The reasonable reading is that opioid-exposed ICU patients do reach lower oxygen nadirs, but
+in this synthetic cohort that is explained by <b>who gets opioids (sicker patients)</b> and <b>how closely they
+are watched (more readings)</b> at least as much as by any direct drug effect — which cannot be isolated here.</p>
+
+<h2>3. Figure</h2>
+<figure>
+  <img src="figures/fig_main.png" alt="Three-panel figure: (a) minimum SpO2 by opioid exposure, (b) SpO2 nadir versus number of readings showing surveillance bias, (c) mean respiratory rate by exposure" style="max-width:100%;height:auto">
+  <figcaption><b>Respiratory outcomes by opioid exposure — and why the SpO2 nadir is largely a surveillance
+  artefact.</b> <span class="badge ehr">EHR</span>
+  <b>(a)</b> Per-patient minimum SpO2, opioid-exposed (n=38) vs unexposed (n=62): the nadir is lower in exposed
+  patients (Mann–Whitney p&lt;0.001; Hodges–Lehmann shift −4 percentage points).
+  <b>(b)</b> The key panel — each patient's SpO2 nadir against their number of SpO2 readings (log scale),
+  coloured by exposure. The nadir falls mechanically as sampling rises (<b>Spearman ρ = −0.66</b>), and the
+  opioid-exposed patients — monitored ~4× more often (median 178 vs 44 readings) — occupy the high-sampling,
+  low-nadir corner. The −4-point gap in (a) is therefore <b>largely a running-minimum / surveillance effect</b>,
+  not a demonstrated drug effect; the sampling-robust mean SpO2 shows no group difference.
+  <b>(c)</b> Mean respiratory rate does not differ between groups (p=0.59, n.s.). Boxes show median and IQR,
+  whiskers 1.5×IQR, points individual patients. No source-paper overlay (original study on Synthetic
+  Dataset).</figcaption>
+</figure>
+
+<h2>4. Knowledge-graph contribution (what SPOKE added)</h2>
+<figure>
+  <img src="figures/fig_spoke.png" alt="SPOKE mechanism schematic: fentanyl and hydromorphone both bind the mu-opioid receptor OPRM_HUMAN (encoded by OPRM1) and both cause respiratory depression" style="max-width:100%;height:auto">
+  <figcaption><b>SPOKE-supplied mechanism (knowledge-graph-derived).</b> <span class="badge kg">SPOKE</span>
+  Both cohort-defining opioids bind the μ-opioid receptor —
+  <code>(:Compound)-[:BINDS_CbP]->(:Protein OPRM_HUMAN, UniProt P35372)&lt;-[:ENCODES_GeP]-(:Gene OPRM1)</code> —
+  and both are recorded causes of respiratory depression <code>(:SideEffect C0235063)</code>, one of 89
+  compounds carrying that class effect in SPOKE. This supplies biological plausibility for the EHR-measured
+  signal; it does not establish causality in this cohort. Diagram faithful to the saved <code>kg/*.json</code>.</figcaption>
+</figure>
+<div class="kgbox">
+<p>The EHR measures <i>what happened</i> (oxygen saturations, drug records) but carries no pharmacology. SPOKE
+supplies the <b>mechanism</b> the clinical records cannot, and every statement here is knowledge-graph-derived
+<span class="badge kg">SPOKE</span>:</p>
+<ul>
+<li><b>Both cohort-defining opioids cause respiratory depression.</b>
+<code>(:Compound {Fentanyl})-[:CAUSES_CcSE]->(:SideEffect {Respiratory depression, C0235063})</code> and the
+identical edge for <code>Hydromorphone</code>. In SPOKE, respiratory depression is a recorded adverse effect
+of <b>89</b> compounds — placing the two study drugs within a known pharmacologic class effect.</li>
+<li><b>Shared molecular target = the μ-opioid receptor.</b> Traversing
+<code>(:Compound)-[:BINDS_CbP]->(:Protein)&lt;-[:ENCODES_GeP]-(:Gene)</code>, both fentanyl and hydromorphone
+bind proteins encoded by <b>OPRM1, OPRD1, OPRK1</b> — the μ-, δ- and κ-opioid receptors. OPRM1's canonical
+protein is <b>OPRM_HUMAN (UniProt P35372)</b>, the μ-opioid receptor: the receptor whose activation in
+brainstem respiratory centres produces opioid-induced respiratory depression.</li>
+<li><b>Off-target context the EHR could never surface.</b> The same traversal shows fentanyl also binds
+<code>KCNH2</code> (hERG — QT-liability), <code>DRD2/DRD3/DRD4</code>, <code>CHRM2/CHRM3</code>,
+<code>HRH1</code> and the transporter <code>ABCB1</code> — a fuller pharmacology profile than any drug-exposure
+row conveys.</li>
+</ul>
+<p class="sub">Provenance separation: the lower SpO2 nadir in §2.3 is an <span class="badge ehr">EHR</span>
+<b>measured</b> signal; the μ-opioid-receptor mechanism and the respiratory-depression class effect above are
+<span class="badge kg">SPOKE</span> <b>knowledge</b>. SPOKE makes the observed association biologically
+plausible; it does not, and cannot, establish that the association is causal in this cohort.</p>
+</div>
+
+<h2>5. Limitations</h2>
+<h3>Data-availability limitations</h3>
+<ul>
+<li><b>Synthetic, date-shifted demo.</b> 100 patients only; calendar time is not interpretable; estimates are
+illustrative of the workflow, not of real opioid effects.</li>
+<li><b>ICU-only case mix.</b> All patients are critically ill; there is no general-ward or outpatient comparator,
+so exposed/unexposed differ in baseline severity by construction.</li>
+<li><b>Exposure captured from free-text source values.</b> Opioids were identified by
+<code>drug_source_value</code> string match; dose, route, timing and cumulative exposure were not modelled
+(ever-exposed only). Dilaudid vs unbranded HYDROmorphone had to be reconciled (both retained).</li>
+<li><b>Concept mapping required.</b> Vital-sign rows store the standard concept_id, not the readable source
+concept; RR and SpO2 were mapped via <code>concept_relationship</code> 'Maps to' (2000030002→3024171,
+2000030003→40762499). Faithful but a documented indirection.</li>
+<li><b>Differential monitoring density.</b> Exposed patients have ~4× more SpO2 readings, so extreme-value
+summaries (minimum SpO2) are captured with unequal fidelity across groups — a surveillance/measurement bias.</li>
+</ul>
+<h3>Methodological limitations</h3>
+<ul>
+<li><b>No common index date (immortal-time / alignment).</b> Exposure and vitals are not anchored to a shared
+time zero, so the temporal order of opioid administration and desaturation is unknown; the comparison is
+associational, and directionality cannot be inferred.</li>
+<li><b>Confounding by indication / severity.</b> Opioid-exposed patients are sicker (higher mortality, ~2.4×
+drug records, ~3× measurement volume). Any respiratory difference is entangled with illness severity; RECORD-PE
+applies and this is the dominant threat.</li>
+<li><b>Minimum SpO2 is sampling-dependent.</b> The nadir falls mechanically with reading count (ρ = −0.66); the
+group difference does not survive stratification by reading count, and the sampling-robust mean SpO2 shows no
+difference. The crude −4-point nadir gap is therefore not attributable to opioids on these data.</li>
+<li><b>No multivariable adjustment.</b> With 38 exposed patients and 15 deaths, an outcome-adjusted model would
+overfit; adjustment was deliberately withheld (per the study kit), leaving residual confounding unaddressed.</li>
+<li><b>Underpowered for the null endpoints.</b> Minimum detectable |rank-biserial| ≈ 0.33; the respiratory-rate
+and mean-SpO2 CIs cannot exclude effects up to that size, so their null results are <b>compatible with</b> a
+real effect and must not be read as confirmation of no effect.</li>
+<li><b>Diagnostics not applicable.</b> No proportional-hazards test (no Cox model) and no standardised mean
+differences after matching (no matching/weighting model) were fitted; both are marked not applicable.</li>
+</ul>
+
+<h2>6. Reproducibility</h2>
+<p class="sub">All data retrieved through MedCP (clinical SQL on the sham OMOP SQLite; SPOKE Cypher).
+Extractions saved under <code>study-G/data/*.csv</code> and <code>study-G/kg/*.json</code>; statistics in
+<code>study-G/analysis.py</code> (<code>uv run --with pandas --with scipy python study-G/analysis.py</code>),
+outputs in <code>study-G/results.json</code>. Full query strings in <code>study-G/queries.log</code>.
+Key queries:</p>
+<pre>-- exposure cohort (per patient, 100 rows) → data/cohort.csv
+SELECT p.person_id, p.gender_source_value AS gender, p.year_of_birth,
+  (SELECT MIN(CAST(strftime('%Y', vo.visit_start_datetime) AS INT)) FROM visit_occurrence vo WHERE vo.person_id=p.person_id) AS first_visit_year,
+  CASE WHEN EXISTS(SELECT 1 FROM death d WHERE d.person_id=p.person_id) THEN 1 ELSE 0 END AS died,
+  (SELECT COUNT(*) FROM drug_exposure de WHERE de.person_id=p.person_id) AS n_drug_rows,
+  (SELECT COUNT(DISTINCT de.drug_source_value) FROM drug_exposure de WHERE de.person_id=p.person_id) AS n_distinct_drugs,
+  (SELECT COUNT(*) FROM measurement m WHERE m.person_id=p.person_id) AS n_meas_rows,
+  MAX(CASE WHEN LOWER(de.drug_source_value) LIKE '%fentanyl%' THEN 1 ELSE 0 END) AS fentanyl,
+  MAX(CASE WHEN LOWER(de.drug_source_value) LIKE '%hydromorphone%' OR LOWER(de.drug_source_value) LIKE '%dilaudid%' THEN 1 ELSE 0 END) AS hydromorphone
+FROM person p LEFT JOIN drug_exposure de ON de.person_id=p.person_id
+GROUP BY p.person_id, p.gender_source_value, p.year_of_birth;
+
+-- concept mapping (readable name → standard concept_id used on measurement rows)
+SELECT relationship_id, concept_id_1, concept_id_2 FROM concept_relationship WHERE concept_id_1=2000030002; -- Respiratory Rate 'Maps to' 3024171
+SELECT relationship_id, concept_id_1, concept_id_2 FROM concept_relationship WHERE concept_id_1=2000030003; -- O2 saturation pulseoxymetry 'Maps to' 40762499
+
+-- vital-sign values → data/rr.csv , data/spo2.csv
+SELECT person_id, value_as_number FROM measurement WHERE measurement_concept_id=3024171  AND value_as_number IS NOT NULL; -- Respiratory Rate
+SELECT person_id, value_as_number FROM measurement WHERE measurement_concept_id=40762499 AND value_as_number IS NOT NULL; -- SpO2
+
+-- SPOKE (Cypher) — mechanism, kept separate from the EHR signal
+MATCH (c:Compound)-[:CAUSES_CcSE]->(s:SideEffect {identifier:'C0235063'}) WHERE toLower(c.name) CONTAINS 'fentanyl'      RETURN c.name, s.name; -- Respiratory depression
+MATCH (c:Compound)-[:CAUSES_CcSE]->(s:SideEffect {identifier:'C0235063'}) WHERE toLower(c.name) CONTAINS 'hydromorphone' RETURN c.name, s.name;
+MATCH (c:Compound)-[:BINDS_CbP]->(p:Protein)&lt;-[:ENCODES_GeP]-(g:Gene) WHERE toLower(c.name) CONTAINS 'fentanyl' RETURN DISTINCT g.name, p.name ORDER BY g.name; -- OPRM1/OPRD1/OPRK1 + off-targets
+MATCH (g:Gene {name:'OPRM1'})-[:ENCODES_GeP]->(p:Protein) RETURN g.name, p.name, p.identifier; -- OPRM_HUMAN / UniProt P35372</pre>
+
+<h2>Appendix — launching prompt (verbatim)</h2>
+<p class="sub">The exact prompt (file <code>study-G-opioid-respiratory.md</code>) that produced this study:</p>
+<div class="prompt"># Study 4 — Opioid exposure and respiratory parameters
+
+*Original observational study · synthetic MIMIC-IV/OMOP demo · MedCP (EHR) + SPOKE (KG)*
+
+**Launching prompt** — paste as-is; the agent follows `../MedCP_Clinical_study_skill.md`.
+
+---
+
+Run an original observational study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, on opioid exposure and respiratory parameters in a critical-care cohort. Follow the MedCP clinical study framework skill for the analysis and especially the report, as an original study on a synthetic dataset rather than a replication: wherever the skill expects a source citation, an "Original Paper" result, a replication status, or a paper-versus-replication overlay, record "original study on Synthetic Dataset", and make the synthetic, date-shifted nature of the data explicit.
+
+Using MedCP's clinical-record tools, split the cohort by opioid exposure — any fentanyl or hydromorphone (Dilaudid) record in drug_exposure — and compare the two groups on respiratory rate (measurement 'Respiratory Rate') and pulse-oximetry oxygen saturation (measurement 'O2 saturation pulseoxymetry'). Summarise each patient's values first (for example minimum SpO2 and mean respiratory rate), then compare groups with Mann–Whitney, reporting effect sizes with 95% confidence intervals and the minimum detectable effect at 80% power. Be explicit that this is a drug-exposure study to which RECORD-PE applies, that exposure and vital-sign timing are not aligned to a common index date, and that opioid exposure is confounded by illness severity in the ICU (sicker patients receive more opioids) — carry these into the limitations.
+
+Then use MedCP's SPOKE knowledge graph to provide the mechanistic context — opioid action at the μ-opioid receptor and respiratory depression as a recognised adverse effect — choosing the traversals yourself and attributing every knowledge-graph-derived statement so the report separates the EHR-measured respiratory signal from the SPOKE-supplied mechanism. Include this launching prompt verbatim in the report.</div>
+
+</body>
+</html>

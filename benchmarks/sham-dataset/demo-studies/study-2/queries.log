@@ -1,0 +1,64 @@
+# Study C — Lactate and in-hospital mortality
+# Every SQL (clinical, sham OMOP SQLite) and Cypher (SPOKE) string run through the MedCP harness:
+#   uv run --with fastmcp --with neo4j python _harness/medcp_query.py --sql/--cypher "<q>" --out <file>
+# ---------------------------------------------------------------------------
+
+## [SQL] Concept discovery — find lactate concepts
+SELECT concept_id, concept_name, vocabulary_id, domain_id FROM concept WHERE concept_name LIKE '%Lactate%' ORDER BY concept_name;
+
+## [SQL] Determine link column (measurement_concept_id vs measurement_source_concept_id)
+SELECT 'by_concept_id' AS link, measurement_concept_id AS cid, COUNT(*) AS n_rows, COUNT(DISTINCT person_id) AS n_pat, SUM(CASE WHEN value_as_number IS NOT NULL THEN 1 ELSE 0 END) AS n_numeric FROM measurement WHERE measurement_concept_id IN (2000001241,2000001010) GROUP BY measurement_concept_id
+UNION ALL
+SELECT 'by_source_concept_id', measurement_source_concept_id, COUNT(*), COUNT(DISTINCT person_id), SUM(CASE WHEN value_as_number IS NOT NULL THEN 1 ELSE 0 END) FROM measurement WHERE measurement_source_concept_id IN (2000001241,2000001010) GROUP BY measurement_source_concept_id;
+
+## [SQL] Verify cohort by name-join + unit/value range (grounded sanity check: ~83 patients, mmol/L)
+SELECT COUNT(*) AS n_rows, COUNT(DISTINCT m.person_id) AS n_pat, MIN(value_as_number) AS minv, MAX(value_as_number) AS maxv, GROUP_CONCAT(DISTINCT unit_source_value) AS units FROM measurement m JOIN concept c ON c.concept_id = m.measurement_source_concept_id WHERE c.concept_name = 'Lactate|Blood|Blood Gas' AND m.value_as_number IS NOT NULL;
+
+## [SQL] EXTRACTION 1 -> data/lactate_measurements.csv
+SELECT m.person_id, m.measurement_date, m.measurement_datetime, m.value_as_number, m.unit_source_value, m.visit_occurrence_id FROM measurement m JOIN concept c ON c.concept_id = m.measurement_source_concept_id WHERE c.concept_name = 'Lactate|Blood|Blood Gas' AND m.value_as_number IS NOT NULL ORDER BY m.person_id, m.measurement_datetime, m.measurement_date;
+
+## [SQL] EXTRACTION 2 -> data/death.csv
+SELECT person_id, death_date, death_datetime, death_type_concept_id, cause_source_value FROM death ORDER BY person_id;
+
+## [SQL] EXTRACTION 3 -> data/visits.csv
+SELECT person_id, visit_occurrence_id, visit_concept_id, visit_start_date, visit_start_datetime, visit_end_date, visit_end_datetime, visit_source_value FROM visit_occurrence ORDER BY person_id, visit_start_datetime;
+
+## [SQL] EXTRACTION 4 -> data/person.csv
+SELECT person_id, gender_source_value, year_of_birth, race_source_value, ethnicity_source_value FROM person ORDER BY person_id;
+
+## [SQL] Cohort/outcome sanity: lactate patients, total deaths, total persons, deaths within lactate cohort
+WITH lac AS (SELECT DISTINCT m.person_id FROM measurement m JOIN concept c ON c.concept_id=m.measurement_source_concept_id WHERE c.concept_name='Lactate|Blood|Blood Gas' AND m.value_as_number IS NOT NULL) SELECT (SELECT COUNT(*) FROM lac) AS lac_patients, (SELECT COUNT(*) FROM death) AS total_deaths, (SELECT COUNT(*) FROM person) AS total_persons, (SELECT COUNT(*) FROM death d WHERE d.person_id IN (SELECT person_id FROM lac)) AS lac_deaths;
+
+## [SQL] Visit concept distribution (context for follow-up window)
+SELECT visit_concept_id, COUNT(*) n FROM visit_occurrence GROUP BY visit_concept_id ORDER BY n DESC;
+
+# ---------------------------------------------------------------------------
+# SPOKE knowledge-graph (Cypher via MedCP query_knowledge_graph)
+# ---------------------------------------------------------------------------
+
+## [Cypher] Bacterial sepsis (DOID:0040085): gene + treating-compound counts -> kg/sepsis_counts.json
+MATCH (d:Disease {identifier:'DOID:0040085'}) OPTIONAL MATCH (d)-[:ASSOCIATES_DaG]->(g:Gene) WITH d, count(DISTINCT g) AS genes OPTIONAL MATCH (c:Compound)-[:TREATS_CtD]->(d) RETURN d.name AS disease, genes, count(DISTINCT c) AS treating_compounds;
+
+## [Cypher] Bacterial sepsis associated genes -> kg/sepsis_genes.json
+MATCH (:Disease {identifier:'DOID:0040085'})-[:ASSOCIATES_DaG]->(g:Gene) RETURN DISTINCT g.name AS gene ORDER BY gene LIMIT 40;
+
+## [Cypher] Compounds that TREAT bacterial sepsis -> kg/sepsis_treatments.json
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0040085'}) RETURN DISTINCT c.name AS compound ORDER BY compound LIMIT 60;
+
+## [Cypher] Resolve sepsis/septic/lactic-acidosis disease nodes w/ gene+treatment richness -> kg/sepsis_variants.json
+MATCH (d:Disease) WHERE toLower(d.name) CONTAINS 'sepsis' OR toLower(d.name) CONTAINS 'septic' OR toLower(d.name) CONTAINS 'lactic acidosis' OPTIONAL MATCH (d)-[:ASSOCIATES_DaG]->(g:Gene) WITH d, count(DISTINCT g) AS genes OPTIONAL MATCH (c:Compound)-[:TREATS_CtD]->(d) RETURN d.name AS disease, d.identifier AS id, genes, count(DISTINCT c) AS treatments ORDER BY genes DESC, treatments DESC LIMIT 20;
+
+## [Cypher] Sepsis presentations (symptoms) -> kg/sepsis_symptoms.json  (returned empty)
+MATCH (:Disease {identifier:'DOID:0040085'})-[:PRESENTS_DpS]->(s:Symptom) RETURN DISTINCT s.name AS symptom ORDER BY symptom LIMIT 30;
+
+## [Cypher] Pharmacologic classes of the sepsis-treating compounds -> kg/sepsis_drug_classes.json
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0040085'}) MATCH (pc:PharmacologicClass)-[:INCLUDES_PCiC]->(c) RETURN pc.name AS drug_class, count(DISTINCT c) AS n_compounds ORDER BY n_compounds DESC LIMIT 25;
+
+## [Cypher] Lactic acidosis (DOID:3650) associated genes -> kg/lactic_acidosis_genes.json
+MATCH (:Disease {identifier:'DOID:3650'})-[:ASSOCIATES_DaG]->(g:Gene) RETURN DISTINCT g.name AS gene ORDER BY gene LIMIT 60;
+
+## [Cypher] Lactic acidosis: presence of key pyruvate/OXPHOS marker genes -> kg/lactic_acidosis_markers.json
+MATCH (:Disease {identifier:'DOID:3650'})-[:ASSOCIATES_DaG]->(g:Gene) WHERE g.name IN ['LDHA','LDHB','PDHA1','HIF1A','SLC16A1','SLC16A3','PDK1','PDK4','MPC1','G6PD','PFKL','GAPDH','MT-ND1','PDHB','DLD','PC'] RETURN g.name AS marker_gene ORDER BY marker_gene;
+
+## [Cypher] Compounds that TREAT lactic acidosis -> kg/lactic_acidosis_treatments.json
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:3650'}) RETURN DISTINCT c.name AS compound ORDER BY compound LIMIT 20;

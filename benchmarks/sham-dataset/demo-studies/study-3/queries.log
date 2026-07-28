@@ -1,0 +1,81 @@
+# Study F — Polypharmacy & QT-prolonging drug burden
+# Every clinical SQL and SPOKE Cypher string executed through the MedCP harness
+# (_harness/medcp_query.py). Clinical -> data/*.csv, SPOKE -> kg/*.json.
+# Dataset: synthetic, date-shifted MIMIC-IV demo (100 patients, OMOP CDM) via MedCP.
+
+## ---- Schema / feasibility probes (clinical SQL) ----
+
+# person count (sanity: expect 100)
+SELECT COUNT(*) AS n_persons FROM person;
+
+# drug_exposure & concept columns
+SELECT name FROM pragma_table_info('drug_exposure');
+SELECT name FROM pragma_table_info('concept');
+SELECT name FROM pragma_table_info('condition_occurrence');
+SELECT name FROM pragma_table_info('person');
+
+# vocabularies available in the concept dictionary
+SELECT vocabulary_id, COUNT(*) AS n FROM concept GROUP BY vocabulary_id ORDER BY n DESC;
+
+# drug_exposure size and NDC-resolution coverage
+SELECT COUNT(*) AS n_rows, COUNT(DISTINCT person_id) AS n_persons FROM drug_exposure;
+SELECT COUNT(*) AS n_ndc_rows, COUNT(DISTINCT de.person_id) AS n_persons
+  FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id
+  WHERE c.vocabulary_id='mimiciv_drug_ndc';
+SELECT (SELECT COUNT(*) FROM drug_exposure) AS total_rows,
+       (SELECT COUNT(*) FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id WHERE c.vocabulary_id='mimiciv_drug_ndc') AS ndc_resolved_rows,
+       (SELECT COUNT(DISTINCT drug_source_concept_id) FROM drug_exposure) AS distinct_src_concepts,
+       (SELECT COUNT(DISTINCT c.concept_name) FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id WHERE c.vocabulary_id='mimiciv_drug_ndc') AS distinct_ndc_names;
+
+# raw drug_source_value population (are unresolved rows raw NDC codes?)
+SELECT CASE WHEN drug_source_value IS NULL OR TRIM(drug_source_value)='' THEN 'empty' ELSE 'nonempty' END AS status, COUNT(*) AS n_rows FROM drug_exposure GROUP BY status;
+SELECT drug_source_value, COUNT(DISTINCT person_id) AS n_pts FROM drug_exposure WHERE drug_source_value IS NOT NULL AND TRIM(drug_source_value)<>'' GROUP BY drug_source_value ORDER BY n_pts DESC LIMIT 30;
+
+# do QT agents appear via STANDARD drug_concept_id, or in raw source text? (coverage diagnostics)
+SELECT c.vocabulary_id, c.concept_name, COUNT(DISTINCT de.person_id) AS n_pts FROM drug_exposure de JOIN concept c ON de.drug_concept_id=c.concept_id WHERE LOWER(c.concept_name) LIKE '%amiodarone%' OR LOWER(c.concept_name) LIKE '%ondansetron%' OR LOWER(c.concept_name) LIKE '%haloperidol%' OR LOWER(c.concept_name) LIKE '%levofloxacin%' OR LOWER(c.concept_name) LIKE '%methadone%' OR LOWER(c.concept_name) LIKE '%famotidine%' OR LOWER(c.concept_name) LIKE '%quetiapine%' OR LOWER(c.concept_name) LIKE '%sotalol%' GROUP BY c.concept_name ORDER BY n_pts DESC LIMIT 30;
+SELECT LOWER(drug_source_value) AS src, COUNT(DISTINCT person_id) AS n_pts FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%amiodarone%' OR LOWER(drug_source_value) LIKE '%ondansetron%' OR LOWER(drug_source_value) LIKE '%haloperidol%' OR LOWER(drug_source_value) LIKE '%levofloxacin%' OR LOWER(drug_source_value) LIKE '%methadone%' OR LOWER(drug_source_value) LIKE '%quetiapine%' GROUP BY LOWER(drug_source_value) ORDER BY n_pts DESC LIMIT 30;
+
+# per-person distinct NDC-resolved medication count (histogram) & cohort size >=5
+SELECT n_drugs, COUNT(*) AS n_patients FROM (SELECT de.person_id, COUNT(DISTINCT c.concept_name) AS n_drugs FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id WHERE c.vocabulary_id='mimiciv_drug_ndc' GROUP BY de.person_id) GROUP BY n_drugs ORDER BY n_drugs;
+
+# rhythm-label inventory in condition_occurrence
+SELECT co.condition_source_value, COUNT(DISTINCT co.person_id) AS n_pts, COUNT(*) AS n_rows FROM condition_occurrence co GROUP BY co.condition_source_value ORDER BY n_pts DESC LIMIT 60;
+SELECT condition_source_value, COUNT(DISTINCT person_id) AS n FROM condition_occurrence WHERE condition_source_value LIKE '%(%Tachy%' OR condition_source_value LIKE '%Fib%' OR condition_source_value LIKE '%Flutter%' OR condition_source_value LIKE '%Ventric%' OR condition_source_value LIKE '%Junctional%' OR condition_source_value LIKE '%Paced%' OR condition_source_value LIKE 'S_ (%' GROUP BY condition_source_value ORDER BY n DESC;
+
+## ---- Final extractions saved to files ----
+
+# data/med_counts.csv — per-person distinct NDC-resolved medication count (all 100 persons)
+SELECT de.person_id, COUNT(DISTINCT c.concept_name) AS n_named_drugs
+  FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id
+  WHERE c.vocabulary_id='mimiciv_drug_ndc'
+  GROUP BY de.person_id ORDER BY de.person_id;
+
+# data/patient_drugs.csv — distinct (person_id, NDC-resolved drug name) pairs (all persons)
+SELECT DISTINCT de.person_id, c.concept_name
+  FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id
+  WHERE c.vocabulary_id='mimiciv_drug_ndc'
+  ORDER BY de.person_id, c.concept_name;
+
+# data/ndc_universe.csv — the 39 distinct NDC-resolved drug names with patient counts
+SELECT c.concept_name, COUNT(DISTINCT de.person_id) AS n_pts
+  FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id
+  WHERE c.vocabulary_id='mimiciv_drug_ndc'
+  GROUP BY c.concept_name ORDER BY n_pts DESC;
+
+# data/rhythm_flags.csv — per-person cardiac-rhythm annotations (chart-derived text labels)
+SELECT DISTINCT person_id, condition_source_value FROM condition_occurrence
+  WHERE condition_source_value IN ('SR (Sinus Rhythm)','ST (Sinus Tachycardia)','SB (Sinus Bradycardia)',
+    'AF (Atrial Fibrillation)','A Paced','A Flut (Atrial Flutter)','V Paced',
+    'SVT (Supra Ventricular Tachycardia)','SA (Sinus Arrhythmia)','AV Paced','JR (Junctional Rhythm)')
+  ORDER BY person_id;
+
+# data/demographics.csv — sex, year_of_birth, first visit, death flag (all persons)
+SELECT p.person_id, p.gender_source_value AS sex, p.year_of_birth,
+       (SELECT MIN(vo.visit_start_date) FROM visit_occurrence vo WHERE vo.person_id=p.person_id) AS first_visit,
+       CASE WHEN d.person_id IS NOT NULL THEN 1 ELSE 0 END AS died
+  FROM person p LEFT JOIN death d ON p.person_id=d.person_id ORDER BY p.person_id;
+
+## ---- SPOKE knowledge-graph (Cypher) ----
+
+# kg/qt_compounds.json — ALL compounds that CAUSE 'Electrocardiogram QT prolonged' (SideEffect C0151878)
+MATCH (c:Compound)-[:CAUSES_CcSE]->(:SideEffect {identifier:'C0151878'}) RETURN c.name ORDER BY c.name;

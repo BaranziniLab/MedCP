@@ -1,0 +1,106 @@
+# Study M — Comorbidity network. All queries executed through MedCP via _harness/medcp_query.py.
+# Clinical = query_clinical_records (SQLite OMOP), SPOKE = query_knowledge_graph (Neo4j Cypher).
+# ---------------------------------------------------------------------------------------------
+
+## CLINICAL (SQL) --------------------------------------------------------------
+
+# [sanity] person count -> data/_n_person.csv
+SELECT COUNT(*) AS n_person FROM person;
+
+# [explore] condition_occurrence overview
+SELECT COUNT(*) AS n_rows, COUNT(DISTINCT person_id) AS n_persons,
+       COUNT(DISTINCT condition_source_value) AS n_distinct_src FROM condition_occurrence;
+
+# [explore] distinct source values (sample) -> data/_src_sample.csv
+SELECT DISTINCT condition_source_value FROM condition_occurrence ORDER BY condition_source_value LIMIT 60;
+
+# [explore] non-numeric source values (rhythm labels + ICD-10) -> data/_src_nonnumeric.csv
+SELECT DISTINCT TRIM(condition_source_value) AS v FROM condition_occurrence
+WHERE TRIM(condition_source_value) GLOB '*[A-Za-z ()]*' ORDER BY v LIMIT 80;
+
+# [explore] free-text rhythm labels -> data/_rhythm_labels.csv
+SELECT DISTINCT TRIM(condition_source_value) AS v, COUNT(*) AS n FROM condition_occurrence
+WHERE condition_source_value LIKE '%(%' OR condition_source_value LIKE '% %' GROUP BY v ORDER BY n DESC;
+
+# [provenance] how 225106 vs real ICDs map to concept ids -> data/_code_concept_map.csv
+SELECT TRIM(condition_source_value) AS code, condition_concept_id, condition_source_concept_id,
+       condition_type_concept_id, COUNT(*) n FROM condition_occurrence
+WHERE TRIM(condition_source_value) IN ('225106','4019','E785')
+GROUP BY code, condition_concept_id, condition_source_concept_id, condition_type_concept_id;
+
+# [provenance] decode concept ids in the concept table -> data/_concept_decode.csv
+SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code
+FROM concept WHERE concept_id IN (433753, 2000030113, 320128, 44821949, 432867, 35207065);
+
+# [provenance] concept table vocabulary breakdown (shows only local mimiciv_* vocabs; no ICD9CM/ICD10CM) -> data/_concept_vocabs.csv
+SELECT vocabulary_id, domain_id, COUNT(*) n FROM concept GROUP BY vocabulary_id, domain_id ORDER BY n DESC;
+
+# [provenance] custom Condition-domain concepts (rhythm labels + ETOH/Post-menopausal, all NON-ICD) -> data/_custom_condition_concepts.csv
+SELECT concept_code, concept_name, vocabulary_id FROM concept WHERE domain_id='Condition' ORDER BY vocabulary_id, concept_code;
+
+# [validate] type_concept_id distribution among space/paren-free source values -> data/_typeconcept_dist.csv
+#   result: 32817 -> 2 codes (225106 ETOH, 225085 Post menopausal); 32821 -> 1217 true ICD billing codes.
+
+## ---- FINAL ICD EXTRACTION (filter: condition_type_concept_id = 32821 = EHR billing diagnosis) ----
+
+# ICD overview -> data/icd_overview.csv
+WITH icd AS (SELECT person_id, TRIM(condition_source_value) AS code FROM condition_occurrence
+             WHERE condition_type_concept_id = 32821 AND TRIM(condition_source_value) <> '')
+SELECT COUNT(*) n_rows, COUNT(DISTINCT person_id) n_patients, COUNT(DISTINCT code) n_codes,
+       SUM(CASE WHEN code GLOB '[0-9]*' THEN 1 ELSE 0 END) rows_icd9,
+       SUM(CASE WHEN code GLOB '[A-Z]*' THEN 1 ELSE 0 END) rows_icd10 FROM icd;
+
+# ALL per-code counts (1217 codes) -> data/icd_all_codes.csv   (LIMIT 60 variant -> data/icd_top_codes.csv)
+WITH icd AS (SELECT person_id, TRIM(condition_source_value) AS code FROM condition_occurrence
+             WHERE condition_type_concept_id = 32821 AND TRIM(condition_source_value) <> '')
+SELECT code, COUNT(DISTINCT person_id) n_patients, COUNT(*) n_occ,
+       CASE WHEN code GLOB '[0-9]*' THEN 'ICD9' ELSE 'ICD10' END vocab
+FROM icd GROUP BY code ORDER BY n_patients DESC, n_occ DESC;
+
+# per-patient comorbidity burden -> data/patient_burden.csv ; summary -> data/burden_summary.csv
+WITH per AS (SELECT person_id, COUNT(DISTINCT TRIM(condition_source_value)) AS n_codes FROM condition_occurrence
+             WHERE condition_type_concept_id = 32821 AND TRIM(condition_source_value) <> '' GROUP BY person_id)
+SELECT person_id, n_codes FROM per ORDER BY n_codes DESC;
+
+# distinct patient-code pairs (for EHR co-occurrence layer) -> data/patient_code_pairs.csv
+SELECT DISTINCT person_id, TRIM(condition_source_value) AS code FROM condition_occurrence
+WHERE condition_type_concept_id = 32821 AND TRIM(condition_source_value) <> '';
+
+## SPOKE (Cypher) --------------------------------------------------------------
+
+# [sanity] AF anchor gene count -> kg/_conn_test.json
+MATCH (d:Disease {identifier:'DOID:0060224'})-[:ASSOCIATES_DaG]->(g:Gene) RETURN count(g) AS af_genes;
+
+# Entity resolution of decoded disease names was performed with the spokeagent resolve_entity helper
+# (same SPOKE graph); the 19 resolved DOIDs are then anchored in the harness queries below.
+
+# gene-association count per resolved disease -> kg/disease_gene_counts.json
+MATCH (d:Disease)-[:ASSOCIATES_DaG]->(g:Gene)
+WHERE d.identifier IN [<19 DOIDs>]
+RETURN d.identifier AS doid, d.name AS name, count(DISTINCT g) AS n_genes ORDER BY n_genes DESC;
+
+# all disease-gene edges (network input) -> kg/disease_gene_edges.json  (7963 rows)
+MATCH (d:Disease)-[:ASSOCIATES_DaG]->(g:Gene)
+WHERE d.identifier IN [<19 DOIDs>]
+RETURN d.identifier AS doid, g.identifier AS gid, g.name AS gsym;
+
+# RESEMBLES_DrD edges among the resolved set -> kg/resembles_edges.json  (result: [] none)
+MATCH (a:Disease)-[:RESEMBLES_DrD]-(b:Disease)
+WHERE a.identifier IN [<19 DOIDs>] AND b.identifier IN [<19 DOIDs>] AND a.identifier < b.identifier
+RETURN DISTINCT a.identifier AS a, a.name AS aname, b.identifier AS b, b.name AS bname;
+
+# [validate] RESEMBLES_DrD exists globally -> kg/_resembles_global.json  (46670 edges)
+MATCH ()-[r:RESEMBLES_DrD]-() RETURN count(r) AS total_resembles_edges;
+
+# [validate] probe RESEMBLES for key chronic diseases -> kg/_resembles_probe.json  (result: [] none touch these)
+MATCH (a:Disease)-[:RESEMBLES_DrD]-(b:Disease)
+WHERE a.identifier IN ['DOID:9352','DOID:3393','DOID:9970','DOID:0060224','DOID:6000','DOID:784','DOID:2841','DOID:1470']
+RETURN a.name AS a, count(DISTINCT b) AS n_resembles ORDER BY n_resembles DESC;
+
+# DOID list = DOID:10825 essential hypertension | DOID:1168 familial hyperlipidemia (approx proxy) |
+#   DOID:9352 T2DM | DOID:3393 coronary artery disease | DOID:0060224 atrial fibrillation |
+#   DOID:6000 congestive heart failure | DOID:784 chronic kidney disease | DOID:3021 acute kidney failure |
+#   DOID:1470 major depressive disorder | DOID:2030 anxiety disorder | DOID:9970 obesity |
+#   DOID:1459 hypothyroidism | DOID:3083 COPD | DOID:2841 asthma | DOID:2355 anemia |
+#   DOID:1588 thrombocytopenia | DOID:8534 GERD | DOID:0080784 urinary tract infection |
+#   DOID:0050742 nicotine dependence

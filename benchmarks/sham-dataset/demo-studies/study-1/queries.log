@@ -1,0 +1,89 @@
+# Study B — Atrial fibrillation and the anticoagulation gap
+# Every query below was executed through MedCP via the harness:
+#   uv run --with fastmcp --with neo4j python _harness/medcp_query.py --sql "<...>"    --out study-B/data/<name>.csv
+#   uv run --with fastmcp --with neo4j python _harness/medcp_query.py --cypher "<...>" --out study-B/kg/<name>.json
+# Clinical -> CSV (SQLite OMOP), SPOKE -> JSON. Literals inlined (harness takes no params).
+
+## ---------- Schema discovery (SQLite OMOP) ----------
+SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;
+SELECT name FROM pragma_table_info('person');
+SELECT name FROM pragma_table_info('condition_occurrence');
+SELECT name FROM pragma_table_info('drug_exposure');
+SELECT name FROM pragma_table_info('death');
+SELECT name FROM pragma_table_info('measurement');
+
+## ---------- Value discovery ----------
+-- gender coding
+SELECT gender_concept_id, gender_source_value, COUNT(*) n FROM person GROUP BY 1,2;
+-- confirm NO non-heparin anticoagulant exists anywhere in drug_exposure (returned EMPTY)
+SELECT DISTINCT drug_source_value FROM drug_exposure
+ WHERE LOWER(drug_source_value) LIKE '%warfarin%' OR LOWER(drug_source_value) LIKE '%coumadin%'
+    OR LOWER(drug_source_value) LIKE '%apixaban%'  OR LOWER(drug_source_value) LIKE '%eliquis%'
+    OR LOWER(drug_source_value) LIKE '%rivaroxaban%' OR LOWER(drug_source_value) LIKE '%xarelto%'
+    OR LOWER(drug_source_value) LIKE '%dabigatran%' OR LOWER(drug_source_value) LIKE '%pradaxa%'
+    OR LOWER(drug_source_value) LIKE '%edoxaban%'   OR LOWER(drug_source_value) LIKE '%savaysa%'
+    OR LOWER(drug_source_value) LIKE '%enoxaparin%' OR LOWER(drug_source_value) LIKE '%lovenox%'
+    OR LOWER(drug_source_value) LIKE '%fondaparinux%' OR LOWER(drug_source_value) LIKE '%dalteparin%'
+    OR LOWER(drug_source_value) LIKE '%argatroban%' OR LOWER(drug_source_value) LIKE '%bivalirudin%'
+    OR LOWER(drug_source_value) LIKE '%acenocoumarol%' OR LOWER(drug_source_value) LIKE '%phenprocoumon%';
+-- heart-rate storage for AF patients is MIMIC itemid 220045 (bpm); GLOBAL HEART RATE label covers only 6 non-AF persons
+SELECT m.measurement_source_value, COUNT(*) n, COUNT(DISTINCT m.person_id) pts
+  FROM measurement m JOIN (SELECT DISTINCT person_id FROM condition_occurrence
+  WHERE condition_source_value='AF (Atrial Fibrillation)') af ON af.person_id=m.person_id
+  GROUP BY 1 ORDER BY n DESC LIMIT 25;
+
+## ---------- Sanity counts ----------
+SELECT (SELECT COUNT(*) FROM person) AS persons,
+       (SELECT COUNT(*) FROM condition_occurrence WHERE condition_source_value='AF (Atrial Fibrillation)') AS af_annotations,
+       (SELECT COUNT(DISTINCT person_id) FROM condition_occurrence WHERE condition_source_value='AF (Atrial Fibrillation)') AS af_patients;
+-- returned: persons=100, af_annotations=2405, af_patients=23
+
+## ---------- Cohort extraction -> data/af_cohort.csv ----------
+SELECT p.person_id,
+       p.gender_source_value AS sex,
+       p.year_of_birth,
+       af.first_af_date,
+       (CAST(strftime('%Y', af.first_af_date) AS INTEGER) - p.year_of_birth) AS age_at_af,
+       CASE WHEN hep.person_id IS NOT NULL THEN 1 ELSE 0 END AS heparin,
+       CASE WHEN d.person_id  IS NOT NULL THEN 1 ELSE 0 END AS died
+FROM (SELECT person_id, MIN(condition_start_date) AS first_af_date
+      FROM condition_occurrence
+      WHERE condition_source_value='AF (Atrial Fibrillation)'
+      GROUP BY person_id) af
+JOIN person p ON p.person_id=af.person_id
+LEFT JOIN (SELECT DISTINCT person_id FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%heparin%') hep ON hep.person_id=af.person_id
+LEFT JOIN (SELECT DISTINCT person_id FROM death) d ON d.person_id=af.person_id
+ORDER BY p.person_id;
+
+## ---------- Heart-rate extraction -> data/af_heart_rate.csv ----------
+SELECT m.person_id, m.value_as_number
+FROM measurement m
+JOIN (SELECT DISTINCT person_id FROM condition_occurrence WHERE condition_source_value='AF (Atrial Fibrillation)') af ON af.person_id=m.person_id
+WHERE m.measurement_source_value='220045' AND m.value_as_number IS NOT NULL
+  AND m.value_as_number >= 20 AND m.value_as_number <= 250;
+
+## ---------- Heparin product breakdown -> data/heparin_products.csv ----------
+SELECT de.drug_source_value, COUNT(*) exposures, COUNT(DISTINCT de.person_id) af_pts
+FROM drug_exposure de
+JOIN (SELECT DISTINCT person_id FROM condition_occurrence WHERE condition_source_value='AF (Atrial Fibrillation)') af ON af.person_id=de.person_id
+WHERE LOWER(de.drug_source_value) LIKE '%heparin%'
+GROUP BY 1 ORDER BY af_pts DESC;
+-- returned: 5% Dextrose HEPARIN BASE (15 pts); Heparin Sodium 25,000 unit Premix Bag (2); 0.9% Sodium Chloride HEPARIN BASE (2)
+
+## ---------- SPOKE knowledge graph (via MedCP) ----------
+# atrial fibrillation = DOID:0060224 ; stroke = DOID:0051061
+-- kg/af_treatments.json  (compounds that TREAT atrial fibrillation)
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0060224'})
+  WHERE NOT coalesce(c.vestige,false) RETURN c.name AS compound ORDER BY c.name;
+-- kg/af_treatment_count.json
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0060224'})
+  WHERE NOT coalesce(c.vestige,false) RETURN count(DISTINCT c) AS n_af_treatments;
+-- kg/af_stroke_shared_genes.json  (genes linking AF to stroke)
+MATCH (:Disease {identifier:'DOID:0060224'})-[:ASSOCIATES_DaG]->(g:Gene)<-[:ASSOCIATES_DaG]-(:Disease {identifier:'DOID:0051061'})
+  RETURN g.name AS gene, g.identifier AS id ORDER BY g.name;
+-- kg/gene_counts.json
+MATCH (:Disease {identifier:'DOID:0060224'})-[:ASSOCIATES_DaG]->(g:Gene) WITH count(DISTINCT g) AS af_genes
+MATCH (:Disease {identifier:'DOID:0051061'})-[:ASSOCIATES_DaG]->(g2:Gene) RETURN af_genes, count(DISTINCT g2) AS stroke_genes;
+-- kg/af_and_stroke_treatments.json  (compounds treating BOTH; returned EMPTY under direct TREATS_CtD)
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0060224'}),
+      (c)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0051061'}) RETURN c.name AS compound ORDER BY c.name;

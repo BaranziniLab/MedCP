@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 3 — Polypharmacy and QT-prolonging drug burden</title>
+<style>
+  :root{--ink:#1a2230;--mut:#5b6675;--line:#e2e6ec;--ehr:#0b6bcb;--kg:#7a3ea8;--bg:#fff;--card:#f7f9fc;--warn:#b06a00;}
+  *{box-sizing:border-box}
+  body{font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+       max-width:920px;margin:0 auto;padding:32px 20px;background:var(--bg)}
+  h1{font-size:1.7rem;margin:.2em 0}h2{font-size:1.25rem;margin-top:2em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+  h3{font-size:1.05rem;margin-top:1.4em}
+  .sub{color:var(--mut);font-size:.95rem}
+  .banner{background:#fff8e1;border:1px solid #f0d98a;border-radius:8px;padding:10px 14px;font-size:.9rem;margin:14px 0}
+  .keyfind{background:#f4eefb;border:1px solid #d9c6ee;border-left:4px solid var(--kg);border-radius:0 8px 8px 0;padding:12px 16px;margin:16px 0}
+  table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:10px;color:#fff;vertical-align:middle}
+  .badge.ehr{background:var(--ehr)} .badge.kg{background:var(--kg)}
+  .kgbox{border-left:4px solid var(--kg);background:#faf6fd;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  .ehrbox{border-left:4px solid var(--ehr);background:#f2f8ff;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  figure{margin:1.2em 0;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:8px}
+  figcaption{font-size:.85rem;color:var(--mut);margin-top:.5em}
+  pre{background:#0f1622;color:#d6e2f0;padding:14px;border-radius:8px;overflow:auto;font-size:.82rem;line-height:1.5}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prompt{white-space:pre-wrap;background:#0f1622;color:#e7eefc;padding:16px;border-radius:8px;font-size:.86rem}
+  ul{margin:.4em 0}
+  .small{font-size:.85rem;color:var(--mut)}
+  @media print{body{max-width:none}}
+</style>
+</head>
+<body>
+
+<h1>Study 3 — Polypharmacy and QT-prolonging drug burden</h1>
+<p class="sub">Original observational study on a synthetic dataset · MedCP (EHR) + SPOKE (knowledge graph) · cross-sectional drug-exposure design</p>
+<div class="banner"><b>Synthetic data.</b> Analyses use the synthetic, date-shifted MIMIC-IV demo (100 patients,
+OMOP CDM) served through MedCP. Results are computed from that data, not fabricated. This is an
+<b>original study on Synthetic Dataset</b>, not a replication of a published paper; every field a
+replication framework would fill with a source paper is recorded as <em>"original study on Synthetic Dataset"</em>.</div>
+
+<p class="sub">Provenance legend:
+<span class="badge ehr">EHR</span> measured in the clinical records (via MedCP) ·
+<span class="badge kg">SPOKE</span> derived from the biomedical knowledge graph (via MedCP).</p>
+
+<!-- ============================================================ -->
+<h2>1. Executive summary</h2>
+
+<p><b>Question.</b> Among critically-ill patients on multiple medications, does the burden of
+QT-prolonging drugs — and the co-prescription of several such drugs in one regimen — track with
+cardiac-rhythm disturbances recorded in the chart?</p>
+
+<p><b>Source study.</b> <em>Original study on Synthetic Dataset</em> (no published comparator).</p>
+
+<p><b>Cohort.</b> <span class="badge ehr">EHR</span> Of 100 persons, <b>77</b> were exposed to
+&ge;5 distinct <em>named</em> (NDC-resolved) medications and form the polypharmacy cohort. Within the
+cohort the per-patient named-medication count was a median of <b>9</b> (IQR 6&ndash;11; range 5&ndash;17);
+across all 100 persons the median was 7 (IQR 5&ndash;9). Median age 62 y (IQR 51&ndash;72), 42.9% female,
+in-hospital mortality 16.9% (13/77).</p>
+
+<p><b>Knowledge-graph exposure.</b> <span class="badge kg">SPOKE</span> The knowledge graph supplied a
+validated, EHR-independent reference set of <b>83</b> compounds that <em>cause</em> the side effect
+"Electrocardiogram QT prolonged" (SideEffect <code>C0151878</code>). This is knowledge the EHR does not
+contain.</p>
+
+<div class="keyfind">
+<b>Headline result &mdash; a coverage-driven null.</b> Matching the 83 SPOKE QT-prolongers against the
+<b>39</b> distinct NDC-resolved drug names in the whole dataset yielded <b>0 matches</b>. The
+NDC-resolved vocabulary surfaces almost entirely IV fluids, electrolytes and supportive agents
+(sodium chloride, dextrose, magnesium sulfate, calcium gluconate, pantoprazole, fentanyl, hydromorphone,
+acetaminophen, vancomycin, ceftriaxone/cefepime, nitroglycerin, phenylephrine, heparin, insulin) &mdash;
+none of which SPOKE flags for QT prolongation. Consequently the measured <b>QT-drug burden was 0 for all
+77 cohort patients</b>, the exposure has no variance, and the pre-specified arrhythmia-by-burden test
+(&chi;&sup2;/trend) is <b>not estimable</b>. The reason is <b>data coverage, not biology</b>: only
+2,431 of 18,229 drug rows (13.3%) resolve to a named medication; the other 86.7% carry only raw 11-digit
+NDC codes (e.g. <code>63323026201</code> in 85 patients) with no dictionary entry, and the QT-relevant
+ICU agents (amiodarone, ondansetron, haloperidol, levofloxacin, sotalol&hellip;) live in that unresolved
+stratum.
+</div>
+
+<p><b>Bottom line.</b> Polypharmacy is common and readily measured, and SPOKE contributes a rigorous
+QT-prolonger reference the EHR lacks; but in this synthetic demo the drug-name coverage is too thin for
+the resolvable regimen to contain any QT-prolonger, so the QT-burden&ndash;arrhythmia association is
+<b>unanswerable here</b>. Descriptively, tachyarrhythmia annotations are highly prevalent in the cohort
+(any of AF/sinus-tachycardia/SVT/atrial-flutter: 64/77 = 83.1%, 95% CI 73.2&ndash;89.9%), but with a
+uniformly zero exposure this prevalence cannot be attributed to QT-drug burden.</p>
+
+<!-- ============================================================ -->
+<h2>1b. Protocol header &amp; design</h2>
+<p class="sub">Reporting standard applied: <b>STROBE + RECORD + RECORD-PE</b> (routinely-collected OMOP
+data; a drug-exposure study). Reproduced verbatim from the framework's Protocol Header; source-study
+fields are recorded as "original study on Synthetic Dataset".</p>
+
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Citation (source study)</td><td>original study on Synthetic Dataset</td></tr>
+<tr><td>Design of source study</td><td>original study on Synthetic Dataset (cross-sectional drug-exposure / prevalence analysis)</td></tr>
+<tr><td>Reporting standard applied</td><td>STROBE + RECORD + RECORD-PE</td></tr>
+<tr><td>Setting and calendar timeframe</td><td>Synthetic, date-shifted MIMIC-IV ICU demo (100 patients), OMOP CDM, via MedCP. Calendar dates are shifted per-patient; only within-patient intervals are meaningful.</td></tr>
+<tr><td>Unit of analysis</td><td>Person (one row per patient)</td></tr>
+<tr><td>Primary endpoint</td><td>Presence of any cardiac-rhythm disturbance annotation (tachyarrhythmia composite: AF, sinus tachycardia, SVT, atrial flutter) in <code>condition_occurrence</code> <span class="badge ehr">EHR</span></td></tr>
+<tr><td>Primary exposure</td><td>Per-patient QT-drug burden = count of distinct NDC-resolved medications that SPOKE lists as causing QT prolongation (SideEffect C0151878) <span class="badge kg">SPOKE</span></td></tr>
+<tr><td>Primary estimand</td><td>Marginal association (prevalence ratio / &chi;&sup2; across burden strata). No causal contrast; cross-sectional.</td></tr>
+<tr><td>Time zero (index)</td><td>First ICU admission for the patient. The analysis is cross-sectional over the admission record; there is no time-to-event follow-up.</td></tr>
+<tr><td>Eligibility assessment window</td><td>Entire available record; eligibility = &ge;5 distinct NDC-resolved medications.</td></tr>
+<tr><td>Baseline lookback window</td><td>Not applicable (single-admission demo; no pre-index history). Explicit assumption: all data drawn from the index admission.</td></tr>
+<tr><td>Exposure ascertainment window</td><td>All <code>drug_exposure</code> rows for the patient (whole record); no washout (prevalent-user design). Assumption: prevalent exposure, stated as a limitation.</td></tr>
+<tr><td>Follow-up start</td><td>Not applicable (cross-sectional; no follow-up clock).</td></tr>
+<tr><td>Follow-up end / administrative censoring</td><td>Not applicable (cross-sectional).</td></tr>
+<tr><td>Censoring: loss to follow-up</td><td>Not applicable (no follow-up).</td></tr>
+<tr><td>Censoring: death</td><td>Not applicable to the cross-sectional endpoint (death recorded descriptively: 13/77 in cohort).</td></tr>
+<tr><td>Censoring: treatment switch/discontinuation</td><td>Not applicable (prevalent-exposure, cross-sectional).</td></tr>
+<tr><td>Competing risks handling</td><td>Not applicable (no time-to-event outcome).</td></tr>
+</tbody></table>
+
+<p class="small"><b>Immortal-time check.</b> Not applicable &mdash; the design is cross-sectional with no
+person-time and no time-to-event outcome, so no interval is mis-classified as exposed follow-up.
+<b>Timeline-direction check.</b> Exposure and outcome are both ascertained over the same admission window;
+temporality (drug before vs after the rhythm annotation) <em>cannot</em> be established and is carried into
+the Methodological limitations.</p>
+
+<h3>Design comparison</h3>
+<table><thead><tr><th>Design element</th><th>Original paper</th><th>This study</th><th>Deviation &amp; expected effect</th></tr></thead><tbody>
+<tr><td>Time zero</td><td>original study on Synthetic Dataset</td><td>First ICU admission; cross-sectional</td><td>&mdash;</td></tr>
+<tr><td>Eligibility window</td><td>original study on Synthetic Dataset</td><td>&ge;5 distinct NDC-resolved meds, whole record</td><td>Prevalent-user; over-counts chronic exposure</td></tr>
+<tr><td>Exposure ascertainment</td><td>original study on Synthetic Dataset</td><td>NDC-resolved names only; SPOKE QT flag</td><td>Only 13.3% of drug rows resolve &rarr; biases exposure toward null (drives the null result)</td></tr>
+<tr><td>Outcome definition</td><td>original study on Synthetic Dataset</td><td>Chart rhythm annotations (AF, ST, SVT, AFlutter)</td><td>KG-flagged QT is not a measured QT interval; rhythm labels are chart proxies</td></tr>
+<tr><td>Follow-up start/end</td><td>original study on Synthetic Dataset</td><td>Not applicable (cross-sectional)</td><td>No temporality between drug and rhythm</td></tr>
+<tr><td>Censoring rules</td><td>original study on Synthetic Dataset</td><td>Not applicable</td><td>&mdash;</td></tr>
+<tr><td>Competing risks</td><td>original study on Synthetic Dataset</td><td>Not applicable</td><td>&mdash;</td></tr>
+<tr><td>Covariates in adjustment set</td><td>original study on Synthetic Dataset</td><td>None (descriptive/univariate only)</td><td>No confounding control; small N precludes multivariate models</td></tr>
+<tr><td>Statistical model</td><td>original study on Synthetic Dataset</td><td>Descriptive + &chi;&sup2;/trend (pre-specified)</td><td>Test not estimable &mdash; exposure invariant (burden&equiv;0)</td></tr>
+</tbody></table>
+
+<!-- ============================================================ -->
+<h2>2. Results</h2>
+
+<h3>2.1 Cohort flow</h3>
+<table><thead><tr><th>Step</th><th class="num">N persons</th></tr></thead><tbody>
+<tr><td>Persons in dataset <span class="badge ehr">EHR</span></td><td class="num">100</td></tr>
+<tr><td>&hellip; with &ge;1 NDC-resolved medication</td><td class="num">100</td></tr>
+<tr><td><b>&hellip; with &ge;5 distinct NDC-resolved medications (polypharmacy cohort)</b></td><td class="num"><b>77</b></td></tr>
+<tr><td>&hellip; excluded (&lt;5 named medications)</td><td class="num">23</td></tr>
+</tbody></table>
+
+<h3>2.2 Baseline characteristics <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Characteristic</th><th class="num">Cohort (&ge;5)</th><th class="num">Excluded (&lt;5)</th><th class="num">Overall</th></tr></thead><tbody>
+<tr><td>N</td><td class="num">77</td><td class="num">23</td><td class="num">100</td></tr>
+<tr><td>Age, y — median (IQR)</td><td class="num">62 (51&ndash;72)</td><td class="num">64 (50&ndash;76)</td><td class="num">63 (51&ndash;72)</td></tr>
+<tr><td>Female — n (%)</td><td class="num">33 (42.9)</td><td class="num">10 (43.5)</td><td class="num">43 (43.0)</td></tr>
+<tr><td>In-hospital death — n (%)</td><td class="num">13 (16.9)</td><td class="num">2 (8.7)</td><td class="num">15 (15.0)</td></tr>
+<tr><td>Named-medication count — median (IQR)</td><td class="num">9 (6&ndash;11)</td><td class="num">3 (2&ndash;4)</td><td class="num">7 (5&ndash;9)</td></tr>
+</tbody></table>
+
+<h3>2.3 Per-patient medication-count distribution <span class="badge ehr">EHR</span></h3>
+<p>Distinct NDC-resolved medication counts (via <code>drug_source_concept_id</code> &rarr; <code>concept</code>,
+<code>vocabulary_id='mimiciv_drug_ndc'</code>) ranged from 1 to 17 across the 100 persons; 77 reached the
+&ge;5 threshold. See Figure&nbsp;1. Note this is a <b>floor</b>: it counts only resolvable names, so the true
+regimen size is larger (see coverage below).</p>
+
+<h3>2.4 Drug-name coverage (data-availability audit) <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Metric</th><th class="num">Value</th></tr></thead><tbody>
+<tr><td>Total <code>drug_exposure</code> rows</td><td class="num">18,229</td></tr>
+<tr><td>Rows resolving to a name via <code>mimiciv_drug_ndc</code></td><td class="num">2,431 (13.3%)</td></tr>
+<tr><td>Rows carrying only a raw 11-digit NDC code (no dictionary entry)</td><td class="num">15,798 (86.7%)</td></tr>
+<tr><td>Distinct NDC-resolved drug names in the whole dataset</td><td class="num">39</td></tr>
+</tbody></table>
+<p class="small">The most frequent drug records are raw NDC codes (e.g. <code>63323026201</code> in 85 patients,
+<code>00409672924</code> in 81) that do not resolve to any name. QT-prolonging ICU agents were sought in the
+raw text as well: none appeared, except <code>methadone 1 syringe</code> in <b>1</b> patient — and even that
+row is not NDC-resolved, so it is excluded from the primary definition (sensitivity note only).</p>
+
+<h3>2.5 SPOKE QT-prolonger reference &amp; name-match <span class="badge kg">SPOKE</span></h3>
+<div class="kgbox">
+SPOKE returned <b>83</b> compounds that <span class="badge kg">SPOKE</span> <em>cause</em> QT prolongation
+(<code>MATCH (c:Compound)-[:CAUSES_CcSE]-&gt;(:SideEffect {identifier:'C0151878'})</code>), including
+classic offenders — amiodarone, sotalol, haloperidol, ondansetron, methadone, levofloxacin/moxifloxacin,
+citalopram/escitalopram, quetiapine, clarithromycin/erythromycin, voriconazole/posaconazole, tacrolimus.
+<b>Matched against the 39 NDC-resolved cohort drug names: 0.</b> None of the resolvable medications is a
+SPOKE QT-prolonger.
+</div>
+
+<h3>2.6 Primary analysis — arrhythmia by QT-drug burden</h3>
+<div class="ehrbox">
+<b>QT-drug burden distribution (cohort, N=77):</b> burden = 0 in <b>77/77 (100%)</b>; burden &ge;1 in
+<b>0</b>. Maximum burden observed = 0. Modelling "clinically relevant interactions" as a <b>shared QT
+side effect</b> (&ge;2 QT-prolongers co-prescribed — SPOKE has no direct drug&ndash;drug-interaction edge)
+identifies <b>0</b> at-risk patients, since no patient carries even one flagged drug.
+</div>
+
+<table><thead><tr><th>QT-drug burden stratum</th><th class="num">N</th><th class="num">Tachyarrhythmia events</th><th class="num">% (95% CI)</th></tr></thead><tbody>
+<tr><td>0 QT-prolongers</td><td class="num">77</td><td class="num">64</td><td class="num">83.1 (73.2&ndash;89.9)</td></tr>
+<tr><td>&ge;1 QT-prolonger</td><td class="num">0</td><td class="num">&mdash;</td><td class="num">&mdash;</td></tr>
+</tbody></table>
+
+<p><b>Association test (pre-specified &chi;&sup2;/trend): not estimable.</b> QT-drug burden is 0 for every
+cohort patient, so the exposure has no variance — no odds/prevalence ratio, &chi;&sup2;, or trend statistic
+is defined. With <b>0 exposed patients</b> the <b>minimum detectable effect at 80% power is undefined</b>
+(there is no exposed arm to compare); increasing N would not help, because the limitation is exposure
+ascertainment, not sample size. This null is assigned to the <b>Data-availability</b> discrepancy category
+(NDC coverage), not to biology.</p>
+
+<h3>2.7 Descriptive arrhythmia prevalence (cohort) <span class="badge ehr">EHR</span></h3>
+<p>Reported for context only; with a uniformly zero exposure these cannot be attributed to QT-drug burden.
+95% CIs are Wilson score intervals.</p>
+<table><thead><tr><th>Rhythm annotation</th><th class="num">n / 77</th><th class="num">% (95% CI)</th></tr></thead><tbody>
+<tr><td>Any tachyarrhythmia (AF / sinus tachycardia / SVT / atrial flutter)</td><td class="num">64</td><td class="num">83.1 (73.2&ndash;89.9)</td></tr>
+<tr><td>Sinus tachycardia (ST)</td><td class="num">53</td><td class="num">68.8 (57.8&ndash;78.1)</td></tr>
+<tr><td>Atrial fibrillation (AF)</td><td class="num">22</td><td class="num">28.6 (19.7&ndash;39.5)</td></tr>
+<tr><td>Non-sinus atrial tachyarrhythmia (AF / atrial flutter / SVT)</td><td class="num">24</td><td class="num">31.2 (21.9&ndash;42.2)</td></tr>
+</tbody></table>
+
+<h3>2.8 Result table (framework format)</h3>
+<table><thead><tr><th>Variable / Metric</th><th>Original Paper Result</th><th>This study (computed)</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Cohort size (&ge;5 named meds)</td><td>original study on Synthetic Dataset</td><td>77 / 100</td><td>&mdash;</td><td>EHR, NDC-resolved</td></tr>
+<tr><td>Median named-med count (cohort)</td><td>original study on Synthetic Dataset</td><td>9 (IQR 6&ndash;11)</td><td>&mdash;</td><td>Floor (coverage-limited)</td></tr>
+<tr><td>SPOKE QT-prolonger reference set</td><td>original study on Synthetic Dataset</td><td>83 compounds</td><td>&mdash;</td><td>KG-derived</td></tr>
+<tr><td>QT-drug burden (per patient)</td><td>original study on Synthetic Dataset</td><td>0 for 77/77</td><td>Null (coverage-driven)</td><td>0 of 39 NDC names matched</td></tr>
+<tr><td>Arrhythmia by burden (&chi;&sup2;/trend)</td><td>original study on Synthetic Dataset</td><td>Not estimable</td><td>Exposure invariant</td><td>0 exposed &rarr; MDE undefined</td></tr>
+<tr><td>Tachyarrhythmia prevalence (cohort)</td><td>original study on Synthetic Dataset</td><td>64/77 = 83.1% (73.2&ndash;89.9)</td><td>Descriptive</td><td>Not attributable to burden</td></tr>
+</tbody></table>
+
+<!-- ============================================================ -->
+<h2>3. Figures</h2>
+
+<figure>
+  <img src="figures/fig_coverage.png" style="max-width:100%;height:auto" alt="Panel a: histogram of distinct NDC-resolved medications per patient across 100 persons, with the 77-patient polypharmacy cohort (>=5) in blue and 23 excluded (<5) in grey. Panel b: a stacked bar showing 13.3% of drug_exposure rows resolve to a name and 86.7% carry only raw NDC codes.">
+  <figcaption><b>Figure 1. Polypharmacy and the NDC name-resolution coverage gap.</b>
+  <b>(a)</b> Distribution of distinct NDC-resolved medications per patient across all 100 persons; blue bars
+  (&ge;5) are the polypharmacy cohort (N=77; median 9, IQR 6&ndash;11, range 5&ndash;17), grey bars (&lt;5)
+  are excluded (N=23). Because only 13.3% of drug rows resolve to a name, these counts are a <em>lower bound</em>
+  on true regimen size. <b>(b)</b> Name-resolution coverage of the 18,229 <code>drug_exposure</code> rows: only
+  <b>13.3% (2,431 rows)</b> resolve to one of 39 distinct named medications, while <b>86.7% (15,798 rows)</b>
+  carry only raw 11-digit NDC codes &mdash; and the QT-relevant ICU agents (amiodarone, ondansetron, haloperidol,
+  levofloxacin, sotalol&hellip;) live in that unresolved stratum. This coverage gap, not biology, drives the
+  null that follows.</figcaption>
+</figure>
+
+<figure>
+  <img src="figures/fig_qt.png" style="max-width:100%;height:auto" alt="Panel a: bar chart of 83 SPOKE QT-prolonging compounds versus 0 matched among the 39 resolvable cohort drug names, annotated QT-burden identically 0 and not estimable. Panel b: cohort rhythm-annotation prevalence with Wilson 95% CI error bars.">
+  <figcaption><b>Figure 2. A coverage-driven QT-burden null.</b>
+  <b>(a)</b> SPOKE supplies <b>83</b> compounds that cause QT prolongation (SideEffect <code>C0151878</code>);
+  <b>0</b> of the 39 NDC-resolved cohort drug names match, so the per-patient QT-drug burden is identically
+  <b>0 for all 77 patients</b> and the pre-specified arrhythmia-by-burden test is <b>not estimable</b> &mdash; a
+  <em>data-coverage null, not a biological one</em>. <b>(b)</b> Descriptive rhythm-annotation prevalence in the
+  cohort (points = estimate, bars = Wilson 95% CI): any tachyarrhythmia 83.1% (73.2&ndash;89.9), sinus
+  tachycardia 68.8% (57.8&ndash;78.1), atrial fibrillation 28.6% (19.7&ndash;39.5). Because the exposure is
+  invariant at 0, this prevalence <em>cannot</em> be attributed to QT-drug burden.</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<h2>4. Knowledge-graph contribution (what SPOKE added)</h2>
+<div class="kgbox">
+<ul>
+<li><span class="badge kg">SPOKE</span> <b>A validated QT-prolonger reference the EHR does not contain.</b>
+The clinical record has no field marking a drug as QT-prolonging and (in this demo) no measured QT interval.
+SPOKE supplied <b>83</b> compounds causally linked to "Electrocardiogram QT prolonged"
+(<code>C0151878</code>) via <code>CAUSES_CcSE</code> — an external pharmacovigilance layer laid over the
+patients' regimens.</li>
+<li><span class="badge kg">SPOKE</span> <b>Interaction modelled as shared side effect.</b> SPOKE has no
+direct drug&ndash;drug-interaction edge, so "clinically relevant interaction" was operationalised as
+<em>two or more compounds causing the same QT side-effect node in one regimen</em> (additive torsadogenic
+risk). This is a deliberate, stated proxy for a DDI edge.</li>
+<li><span class="badge kg">SPOKE</span> <b>The KG turned an unanswerable question into a diagnosable data
+gap.</b> By cross-referencing its QT set against the resolvable drug names, the graph revealed that the
+cohort's <em>measurable</em> medications contain no QT-prolongers, and therefore that the QT-relevant agents
+must sit in the 86.7% of drug rows that carry only raw NDC codes. The EHR alone could not have surfaced this:
+it would simply have shown a list of drug names with no notion of QT risk.</li>
+</ul>
+<b>Kept separate from EHR facts:</b> every QT flag above is <span class="badge kg">SPOKE</span>-derived
+knowledge; the medication exposures, NDC coverage, and rhythm annotations are
+<span class="badge ehr">EHR</span>-measured. No QT interval was measured in this dataset — the "QT" label is
+entirely a knowledge-graph attribute, never a lab value.
+</div>
+
+<!-- ============================================================ -->
+<h2>5. Limitations</h2>
+<h3>Data-availability limitations</h3>
+<ul>
+<li><b>NDC name coverage (dominant limitation).</b> Only 2,431/18,229 drug rows (13.3%) resolve to a named
+medication; 86.7% carry a raw 11-digit NDC code absent from the concept dictionary. Just 39 distinct names
+exist dataset-wide, dominated by fluids/electrolytes/supportive agents. This — not biology — produces the
+zero QT-drug burden and the not-estimable primary test.</li>
+<li><b>QT flag is knowledge-graph, not measured.</b> There is no QT-interval measurement in this dataset;
+"QT-prolonging" is entirely a SPOKE attribute. A drug flagged by SPOKE need not have prolonged QT in any
+given patient, and an unflagged drug is not proven safe.</li>
+<li><b>Synthetic, date-shifted, ICU-only demo.</b> 100 patients; dates shifted per-patient (only within-patient
+intervals meaningful); a critical-care case mix that does not generalise. Small N (and 15 total deaths)
+precludes multivariable modelling.</li>
+<li><b>Rhythm annotations are chart proxies.</b> AF/ST/SVT/atrial-flutter come from nursing "Heart Rhythm"
+chart labels in <code>condition_occurrence</code>, not adjudicated ECG diagnoses; sinus tachycardia in
+particular is ubiquitous in the ICU and non-specific.</li>
+<li><b>SPOKE completeness.</b> The 83-compound QT set reflects the graph's current knowledge; a truly
+QT-prolonging drug absent from SPOKE would be missed. (Moot here, since 0 resolvable drugs matched.)</li>
+</ul>
+<h3>Methodological limitations</h3>
+<ul>
+<li><b>Exposure invariant &rarr; no effect estimate.</b> With burden = 0 for all patients the &chi;&sup2;/trend
+test and any odds/prevalence ratio are undefined, and the minimum detectable effect at 80% power is undefined
+(no exposed arm). Larger N cannot fix an ascertainment gap.</li>
+<li><b>Cross-sectional, no temporality.</b> Exposure and rhythm annotation are ascertained over the same
+admission; the design cannot say whether a drug preceded an arrhythmia. Prevalent-user exposure (no washout,
+no new-user design) further precludes causal reading.</li>
+<li><b>Distinct-name counting.</b> The cohort definition counts distinct product-level <code>concept_name</code>s,
+so different bag sizes of one agent count once each and formulation duplicates can inflate counts; the count is
+a pragmatic exposure-breadth proxy, not an ingredient count.</li>
+<li><b>No confounding control.</b> Descriptive/univariate only by design (small N); had burden varied, age,
+severity and comorbidity would still confound any crude association.</li>
+<li><b>Interaction proxy.</b> "Shared QT side effect" approximates additive torsadogenic risk but is not a
+curated DDI assertion; it cannot capture pharmacokinetic interactions.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>6. Reproducibility</h2>
+<p class="sub">All data retrieved through MedCP (harness <code>_harness/medcp_query.py</code>). Clinical SQL &rarr;
+<code>study-F/data/*.csv</code>, SPOKE Cypher &rarr; <code>study-F/kg/*.json</code>, statistics in
+<code>study-F/analysis.py</code> (&rarr; <code>results.json</code>). Full query log in
+<code>study-F/queries.log</code>. Key queries:</p>
+<pre>-- Cohort: distinct NDC-resolved medications per person (>=5 = cohort)
+SELECT de.person_id, COUNT(DISTINCT c.concept_name) AS n_named_drugs
+  FROM drug_exposure de JOIN concept c ON de.drug_source_concept_id=c.concept_id
+  WHERE c.vocabulary_id='mimiciv_drug_ndc'
+  GROUP BY de.person_id;                         -- 77 persons reach >=5
+
+-- Coverage audit
+SELECT COUNT(*) FROM drug_exposure;                                   -- 18,229 rows
+SELECT COUNT(*) FROM drug_exposure de JOIN concept c
+  ON de.drug_source_concept_id=c.concept_id
+  WHERE c.vocabulary_id='mimiciv_drug_ndc';                          -- 2,431 rows (13.3%)
+
+-- Cardiac-rhythm annotations (chart-derived labels)
+SELECT DISTINCT person_id, condition_source_value FROM condition_occurrence
+  WHERE condition_source_value IN ('AF (Atrial Fibrillation)','ST (Sinus Tachycardia)',
+     'SVT (Supra Ventricular Tachycardia)','A Flut (Atrial Flutter)', ...);
+
+-- SPOKE: ALL compounds that CAUSE QT prolongation (fetched once)   [83 compounds]
+MATCH (c:Compound)-[:CAUSES_CcSE]->(:SideEffect {identifier:'C0151878'})
+  RETURN c.name ORDER BY c.name;
+-- Local match of 83 SPOKE names vs 39 NDC-resolved drug names -> 0 matches -> burden=0 for all 77
+</pre>
+
+<!-- ============================================================ -->
+<h2>Appendix — launching prompt (verbatim)</h2>
+<p class="sub">The exact prompt that produced this study:</p>
+<div class="prompt">Run an original observational study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, on polypharmacy and QT-prolonging drug burden in a critical-care cohort. Follow the MedCP clinical study framework skill for the analysis and above all the report, as an original study on a synthetic dataset rather than a replication: wherever the skill expects a source citation, an "Original Paper" result, a replication status, or a paper-versus-replication overlay, record "original study on Synthetic Dataset", and state that the data are synthetic and date-shifted.
+
+With MedCP's clinical-record tools, build the cohort of patients exposed to at least five distinct named medications, using the NDC-resolved drug names in drug_exposure (join drug_source_concept_id to the concept dictionary), and describe the distribution of the per-patient medication count. For each patient's regimen, use the SPOKE knowledge graph through MedCP to identify which of their drugs are associated with QT prolongation and which pairs carry clinically relevant interactions — deciding the traversals yourself rather than following a fixed node map — and from this derive a per-patient QT-drug-burden count. Then relate that burden to the cardiac-rhythm annotations in condition_occurrence (for example atrial fibrillation and sinus tachycardia), comparing arrhythmia frequency across burden strata with χ² or a test for trend and reporting counts with a 95% confidence interval. Because many drug records carry only a raw NDC code with no resolvable name, restrict the analysis to NDC-resolved drugs and carry that coverage limitation — together with the fact that the QT flags come from the knowledge graph rather than from a measured QT interval — into the limitations.
+
+Attribute every SPOKE-derived flag and statement so the report makes visible exactly which drugs the knowledge graph classified as QT-prolonging or interacting, kept clearly separate from the EHR-measured exposures and rhythms. Include this launching prompt verbatim in the report.</div>
+
+</body>
+</html>

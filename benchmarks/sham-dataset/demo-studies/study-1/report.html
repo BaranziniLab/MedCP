@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 1 — Atrial fibrillation and anticoagulation coverage</title>
+<style>
+  :root{--ink:#1a2230;--mut:#5b6675;--line:#e2e6ec;--ehr:#0b6bcb;--kg:#7a3ea8;--bg:#fff;--card:#f7f9fc;}
+  *{box-sizing:border-box}
+  body{font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+       max-width:920px;margin:0 auto;padding:32px 20px;background:var(--bg)}
+  h1{font-size:1.7rem;margin:.2em 0}h2{font-size:1.25rem;margin-top:2em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+  h3{font-size:1.05rem;margin-top:1.4em}
+  .sub{color:var(--mut);font-size:.95rem}
+  .banner{background:#fff8e1;border:1px solid #f0d98a;border-radius:8px;padding:10px 14px;font-size:.9rem;margin:14px 0}
+  table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:10px;color:#fff;vertical-align:middle}
+  .badge.ehr{background:var(--ehr)} .badge.kg{background:var(--kg)}
+  .kgbox{border-left:4px solid var(--kg);background:#faf6fd;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  .ehrbox{border-left:4px solid var(--ehr);background:#f2f8ff;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  figure{margin:1.2em 0;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:8px}
+  figcaption{font-size:.85rem;color:var(--mut);margin-top:.5em}
+  pre{background:#0f1622;color:#d6e2f0;padding:14px;border-radius:8px;overflow:auto;font-size:.82rem;line-height:1.5}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prompt{white-space:pre-wrap;background:#0f1622;color:#e7eefc;padding:16px;border-radius:8px;font-size:.86rem}
+  ul{margin:.4em 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+  .kpi b{font-size:1.5rem;display:block;line-height:1.1}
+  .null{color:#8a5a00}
+  @media print{body{max-width:none}}
+</style>
+</head>
+<body>
+
+<h1>Study 1 — Atrial fibrillation and anticoagulation coverage</h1>
+<p class="sub">Original observational study on a synthetic dataset · MedCP (EHR) + SPOKE (knowledge graph) · drug-exposure design (STROBE + RECORD + RECORD-PE)</p>
+<div class="banner"><b>Synthetic data.</b> Analyses use the synthetic, date-shifted MIMIC-IV demo (100 patients,
+OMOP CDM; event dates shifted to 2111&ndash;2201) served through MedCP. Results are computed from that data, not fabricated. This is an
+<b>original study on Synthetic Dataset</b>, not a replication of a published paper; every field that a
+replication framework would fill with a source paper is recorded as <em>"original study on Synthetic Dataset"</em>.</div>
+
+<p class="sub">Provenance legend:
+<span class="badge ehr">EHR</span> measured in the clinical records (via MedCP) ·
+<span class="badge kg">SPOKE</span> derived from the biomedical knowledge graph (via MedCP).</p>
+
+<!-- =================================================================== -->
+<h2>1. Executive summary</h2>
+<p><b>Source study.</b> <em>Original study on Synthetic Dataset</em> — there is no antecedent paper; the protocol, cohort, and analysis below were designed <em>de novo</em> for the synthetic MIMIC-IV demo.</p>
+
+<p><b>Question.</b> Among critically ill patients carrying at least one atrial-fibrillation (AF) rhythm annotation, how many have <em>any</em> documented anticoagulant, and does documented heparin exposure distinguish patients on size, sex, age, heart rate, or in-hospital death?</p>
+
+<div class="ehrbox">
+<p style="margin:.2em 0"><b>Cohort <span class="badge ehr">EHR</span>.</b> Of 100 patients, <b>23</b> carry &ge;1 AF annotation (<code>condition_source_value = 'AF (Atrial Fibrillation)'</code>; 2,405 annotation rows &mdash; a rhythm-monitor label repeated across telemetry, not 2,405 diagnoses). <b>15/23</b> have any heparin exposure; <b>8/23 (34.8%)</b> have <b>no documented anticoagulant of any kind</b> &mdash; the anticoagulation gap.</p>
+<p style="margin:.2em 0"><b>The only anticoagulant in the entire dataset is heparin.</b> A structured search for warfarin, all four DOACs (apixaban, rivaroxaban, edoxaban, dabigatran), enoxaparin, fondaparinux, argatroban and bivalirudin returned <b>zero</b> records. "No heparin" is therefore identical to "no anticoagulant," and every heparin record is an <em>intravenous</em> product (D5W / saline base, one 25,000-unit premix bag) &mdash; parenteral, short-acting, not definitive oral stroke-prevention anticoagulation.</p>
+</div>
+
+<p><b>Primary contrast <span class="badge ehr">EHR</span>.</b> In-hospital death was <b>6/15 (40.0%)</b> with heparin vs <b>3/8 (37.5%)</b> without &mdash; risk difference <b>+2.5 pp (95% CI &minus;35.3 to +36.5)</b>, odds ratio <b>1.08 (95% CI 0.20&ndash;5.72)</b>, Fisher p = 1.00. The heparin group was older (median 78 vs 66&nbsp;y; Mann&ndash;Whitney p = 0.05) with more women (40% vs 12.5%; p = 0.35); median heart rate was near-identical (90 vs 88 bpm; p = 0.92).</p>
+
+<p><b>Bottom line.</b> <span class="null">The primary contrast is null and profoundly underpowered</span>: with 15 vs 8 patients the minimum detectable difference at 80% power is <b>~54 percentage points</b> and observed power is 0.03, so this design <em>cannot</em> distinguish no effect from a very large one. The finding is <em>compatible with</em> any effect, never a confirmation of none. The interpretable signal is descriptive: a one-third documentation gap in a population for which <span class="badge kg">SPOKE</span> confirms anticoagulation is a first-line, mechanistically-grounded therapy.</p>
+
+<!-- =================================================================== -->
+<h2>1b. Protocol header &amp; design</h2>
+<p class="sub">Reporting standard: <b>STROBE + RECORD</b> (routinely-collected OMOP data) <b>+ RECORD-PE</b> (drug-exposure study). Source-study fields = "original study on Synthetic Dataset." No field left blank; undeterminable parameters recorded as explicit assumptions.</p>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Citation (source study)</td><td>original study on Synthetic Dataset</td></tr>
+<tr><td>Design of source study</td><td>original study on Synthetic Dataset &mdash; cross-sectional, drug-exposure descriptive analysis of an ICU cohort</td></tr>
+<tr><td>Reporting standard applied</td><td>STROBE + RECORD + RECORD-PE</td></tr>
+<tr><td>Setting &amp; calendar timeframe</td><td>Synthetic, date-shifted MIMIC-IV demo ICU (single-centre; 100 patients). Event dates shifted to 2111&ndash;2201; true calendar time not recoverable (assumption: date shift preserves within-patient intervals and age).</td></tr>
+<tr><td>Unit of analysis</td><td>Person (patient); one row per AF patient</td></tr>
+<tr><td>Primary endpoint</td><td>In-hospital death (presence in OMOP <code>death</code> table)</td></tr>
+<tr><td>Primary estimand</td><td>As-treated, marginal <em>association</em> between any documented heparin exposure and in-hospital death. No causal/ITT claim (assumption: descriptive contrast only).</td></tr>
+<tr><td>Time zero (index date)</td><td>First AF rhythm annotation (earliest <code>condition_start_date</code> for 'AF (Atrial Fibrillation)')</td></tr>
+<tr><td>Eligibility assessment window</td><td>Entire available record (assumption: no fixed enrolment window in demo)</td></tr>
+<tr><td>Baseline lookback window</td><td>Entire record; demographics fixed, heart rate summarised as within-stay median (assumption: no &minus;365d lookback feasible in a single ICU stay)</td></tr>
+<tr><td>Exposure ascertainment &amp; washout</td><td>Any heparin record anywhere in the stay (prevalent exposure); no washout (assumption: demo lacks pre-admission drug history)</td></tr>
+<tr><td>Follow-up start</td><td>Time zero (first AF annotation)</td></tr>
+<tr><td>Follow-up end / administrative censoring</td><td>End of record (hospital discharge or death)</td></tr>
+<tr><td>Censoring: loss to follow-up</td><td>None modelled &mdash; single continuous admission</td></tr>
+<tr><td>Censoring: death</td><td>Death is the endpoint, not a censoring event</td></tr>
+<tr><td>Censoring: treatment switch / discontinuation</td><td>Not modelled (prevalent-exposure, cross-sectional design)</td></tr>
+<tr><td>Competing risks handling</td><td>None &mdash; binary endpoint (died vs discharged alive); no competing-risk model (assumption: adequate for a descriptive contrast)</td></tr>
+</tbody></table>
+
+<p class="sub"><b>Immortal-time &amp; timeline checks.</b> Exposure is <em>prevalent</em> (ascertained over the whole stay), so this is explicitly <em>not</em> an immortal-time-safe survival design: a patient must survive long enough to be started on heparin, which can bias a na&iuml;ve exposure&ndash;death contrast. Because the reported endpoint is a single binary in-hospital-death flag rather than time-to-event, no follow-up interval is counted as exposed person-time and no outcome precedes time zero; the prevalent-exposure / reverse-causation concern is carried into the Limitations instead.</p>
+
+<h3>Design comparison</h3>
+<table><thead><tr><th>Design element</th><th>Original paper</th><th>This study</th><th>Deviation &amp; expected effect</th></tr></thead><tbody>
+<tr><td>Time zero</td><td>original study on Synthetic Dataset</td><td>First AF rhythm annotation</td><td>&mdash; (defined de novo)</td></tr>
+<tr><td>Eligibility window</td><td>original study on Synthetic Dataset</td><td>Whole record</td><td>Prevalent AF, not incident &rarr; case-mix uncertain</td></tr>
+<tr><td>Exposure &amp; washout</td><td>original study on Synthetic Dataset</td><td>Any heparin, no washout</td><td>Prevalent exposure &rarr; reverse-causation / confounding by indication</td></tr>
+<tr><td>Outcome &amp; code set</td><td>original study on Synthetic Dataset</td><td>OMOP <code>death</code> table presence</td><td>In-hospital only; out-of-hospital deaths unobserved &rarr; undercount</td></tr>
+<tr><td>Follow-up start / end</td><td>original study on Synthetic Dataset</td><td>Index &rarr; discharge/death</td><td>No person-time modelled &rarr; no rate/HR</td></tr>
+<tr><td>Censoring rules</td><td>original study on Synthetic Dataset</td><td>None (single admission)</td><td>&mdash;</td></tr>
+<tr><td>Competing risks</td><td>original study on Synthetic Dataset</td><td>None</td><td>Discharge-alive is the complement &rarr; acceptable for binary contrast</td></tr>
+<tr><td>Covariates in adjustment set</td><td>original study on Synthetic Dataset</td><td>None (unadjusted)</td><td>~9 deaths &rarr; multivariate models overfit; confounding uncontrolled</td></tr>
+<tr><td>Statistical model</td><td>original study on Synthetic Dataset</td><td>Fisher / &chi;&sup2; · Mann&ndash;Whitney</td><td>Exact tests suit tiny cells; no modelling</td></tr>
+</tbody></table>
+<p class="sub">Every non-empty deviation above is carried into &sect;5 Limitations.</p>
+
+<!-- =================================================================== -->
+<h2>2. Results</h2>
+
+<h3>2.1 Cohort flow <span class="badge ehr">EHR</span></h3>
+<div class="grid2">
+  <div class="kpi"><b>100</b>patients in the synthetic demo</div>
+  <div class="kpi"><b>23</b>with &ge;1 AF annotation (from 2,405 rows)</div>
+  <div class="kpi"><b>15</b>with any heparin exposure</div>
+  <div class="kpi"><b>8 <span class="null">(34.8%)</span></b>anticoagulation gap: no anticoagulant of any kind</div>
+</div>
+<p style="margin-top:1em">100 patients &rarr; 23 with an AF annotation (inclusion) &rarr; split by any heparin record into <b>15 exposed</b> and <b>8 unexposed</b>. Because heparin is the <em>only</em> anticoagulant present in the whole database, the 8 unexposed patients constitute the full anticoagulation gap.</p>
+
+<h3>2.2 Baseline characteristics &amp; group comparison <span class="badge ehr">EHR</span></h3>
+<table><thead><tr>
+<th>Characteristic</th><th>Heparin (n=15)</th><th>No anticoagulant (n=8)</th><th>Test</th><th>p</th><th>Effect size (95% CI)</th>
+</tr></thead><tbody>
+<tr><td>Female, n (%)</td><td>6 (40.0)</td><td>1 (12.5)</td><td>Fisher</td><td>0.345</td><td>&mdash; (small cells)</td></tr>
+<tr><td>Male, n (%)</td><td>9 (60.0)</td><td>7 (87.5)</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+<tr><td>Age at first AF, y &mdash; median [IQR]</td><td>78 [65&ndash;80]</td><td>66 [60&ndash;69]</td><td>Mann&ndash;Whitney</td><td>0.052</td><td>Median diff +11.5&nbsp;y (95% CI &minus;2 to +20); rank-biserial &minus;0.51</td></tr>
+<tr><td>Heart rate, bpm &mdash; median [IQR]<sup>a</sup></td><td>90 [83&ndash;99]</td><td>88 [81&ndash;97]</td><td>Mann&ndash;Whitney</td><td>0.923</td><td>Median diff +2 bpm (95% CI &minus;15 to +15); rank-biserial &minus;0.03</td></tr>
+<tr><td><b>In-hospital death, n (%)</b></td><td><b>6 (40.0)</b></td><td><b>3 (37.5)</b></td><td>Fisher</td><td>1.000</td><td>OR 1.08 (0.20&ndash;5.72); RD +2.5 pp (&minus;35.3 to +36.5)</td></tr>
+</tbody></table>
+<p class="sub"><sup>a</sup> Per-patient median of intra-stay heart rate (MIMIC itemid 220045, bpm; 9,342 physiologic readings, 20&ndash;250 bpm, across all 23 patients). 95% CIs for continuous effect sizes are non-parametric bootstrap (10,000 resamples, seed 20260723); proportion-difference CI by the Newcombe method; odds-ratio CI by Woolf with Haldane&ndash;Anscombe 0.5 correction.</p>
+
+<h3>2.3 Primary analysis &mdash; in-hospital death, heparin vs no anticoagulant <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Metric</th><th>Original Paper Result</th><th>This study</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Events / N &mdash; heparin</td><td>original study on Synthetic Dataset</td><td>6 / 15 (40.0%; 95% CI 19.8&ndash;64.3)</td><td>Wilson CI</td></tr>
+<tr><td>Events / N &mdash; no anticoagulant</td><td>original study on Synthetic Dataset</td><td>3 / 8 (37.5%; 95% CI 13.7&ndash;69.4)</td><td>Wilson CI</td></tr>
+<tr><td>Risk difference</td><td>original study on Synthetic Dataset</td><td>+2.5 pp (95% CI &minus;35.3 to +36.5)</td><td>Newcombe</td></tr>
+<tr><td>Odds ratio</td><td>original study on Synthetic Dataset</td><td>1.08 (95% CI 0.20&ndash;5.72)</td><td>Fisher p = 1.000</td></tr>
+<tr><td><b>Min. detectable effect @ 80% power</b></td><td>original study on Synthetic Dataset</td><td><b>~53.9 pp absolute risk difference</b></td><td>Two-proportion, n=15 vs 8, &alpha;=0.05; observed power 0.03</td></tr>
+<tr><td>Overall AF mortality</td><td>original study on Synthetic Dataset</td><td>9 / 23 (39.1%)</td><td>Context</td></tr>
+</tbody></table>
+<p>The two mortality estimates are essentially identical (40.0% vs 37.5%) and their confidence intervals overlap almost completely. Per the framework's single-centre power guidance, a confidence interval spanning &minus;35 to +37 percentage points is <b>uninformative</b>: it is compatible with a large protective effect, no effect, or a large harmful effect. Only an effect of ~54 percentage points would be reliably detectable here &mdash; so no inference beyond feasibility is drawn. Multivariable adjustment was deliberately <em>not</em> attempted (9 total deaths would overfit any model with more than ~1 covariate).</p>
+
+<!-- =================================================================== -->
+<h2>3. Figure</h2>
+<figure>
+  <img src="figures/fig_main.png" alt="Panel a: the AF cohort (n=23) split into heparin (n=15) and no anticoagulant (n=8), with in-hospital deaths overlaid as the darker segment of each bar. Panel b: forest plot of the in-hospital-death odds ratio, heparin versus no anticoagulant, on a log scale with the reference line at OR=1." style="max-width:100%;height:auto">
+  <figcaption><b>The anticoagulation gap and the (uninformative) primary mortality contrast. <span class="badge ehr">EHR</span></b>
+  <b>(a)</b> Of 23 AF patients, 15 have documented heparin and 8 (34.8%) have no anticoagulant of any kind; the darker segment of each bar is the in-hospital deaths (heparin 6/15 = 40.0%; no anticoagulant 3/8 = 37.5%). Because heparin is the only anticoagulant in the database, even the "treated" fraction received <em>parenteral</em> heparin only &mdash; zero patients had any oral anticoagulant (VKA or DOAC).
+  <b>(b)</b> In-hospital-death odds ratio, heparin vs no anticoagulant: OR 1.08 (95% CI 0.20&ndash;5.72), reference line at OR = 1, log scale; Fisher exact p = 1.00. The interval spans a large protective to a large harmful effect &mdash; the minimum detectable absolute risk difference at 80% power is ~54 pp (observed power 0.03), so this is a descriptive, not confirmatory, comparison.</figcaption>
+</figure>
+
+<!-- =================================================================== -->
+<h2>4. Knowledge-graph contribution (what SPOKE added)</h2>
+<figure>
+  <img src="figures/fig_spoke.png" alt="Panel a: grouped horizontal bars comparing anticoagulant compounds that treat AF in SPOKE (four classes) versus those present in the EHR (only intravenous unfractionated heparin). Panel b: a bar of the 26 ischaemic-stroke-associated genes with the 6 shared with atrial fibrillation highlighted." style="max-width:100%;height:auto">
+  <figcaption><b>What SPOKE adds beyond the EHR. <span class="badge kg">SPOKE</span></b>
+  <b>(a)</b> SPOKE lists anticoagulants across four classes that <code>TREATS</code> atrial fibrillation &mdash; oral vitamin-K antagonists (3 compounds), oral direct anticoagulants / factor-Xa&ndash;IIa inhibitors (9), parenteral heparins / LMWH / pentasaccharide (5) and investigational factor-XI inhibitors (2); the EHR contains only intravenous unfractionated heparin, so every oral-anticoagulant class &mdash; the guideline mainstay for AF stroke prevention &mdash; is absent.
+  <b>(b)</b> Atrial fibrillation (613 genes) and ischaemic stroke (26 genes) share 6 genes &mdash; ALDH2, CASZ1, CDK6, LRCH1, SH3PXD2A, ZFHX3 (23% of all stroke-associated genes); ZFHX3 is the canonical AF / cardioembolic-stroke locus. This shared genetic architecture is the mechanistic thromboembolic rationale for anticoagulating AF patients.</figcaption>
+</figure>
+<div class="kgbox">
+<p style="margin:.3em 0">The EHR can count anticoagulant records but cannot say whether anticoagulation is <em>indicated</em>, why it matters, or what the missing drugs are. SPOKE (via MedCP) supplies exactly that biomedical context, kept separate from the EHR below.</p>
+<ul>
+<li><b>Anticoagulation is a first-line AF therapy, and the EHR is missing entire drug classes. <span class="badge kg">SPOKE</span></b> &mdash; SPOKE lists <b>135 compounds</b> that <code>TREATS</code> atrial fibrillation (DOID:0060224). Among them are <b>&ge;18 anticoagulants across four classes</b>: oral vitamin-K antagonists (<i>warfarin, acenocoumarol, tecarfarin</i>), the oral direct anticoagulants / factor-Xa&ndash;IIa inhibitors (<i>apixaban, rivaroxaban, edoxaban, dabigatran, betrixaban, darexaban, ximelagatran, atecegatran</i>), parenteral heparins / LMWH / pentasaccharide (<i>heparin, enoxaparin, certoparin, heparin&nbsp;pentasaccharide</i>), and investigational factor-XI inhibitors (<i>abelacimab, milvexian</i>). <b>The EHR contains only intravenous heparin</b> &mdash; so SPOKE reveals that the entire oral-anticoagulant armamentarium that defines guideline AF stroke prophylaxis is <em>absent</em> from these records, deepening the documented gap beyond what the EHR alone shows.</li>
+<li><b>Why the gap matters: AF and stroke share biology. <span class="badge kg">SPOKE</span></b> &mdash; atrial fibrillation is associated with <b>613 genes</b> and ischaemic stroke (DOID:0051061) with <b>26 genes</b>; the two diseases share <b>6 genes</b> &mdash; <b>ALDH2, CASZ1, CDK6, LRCH1, SH3PXD2A, ZFHX3</b> &mdash; i.e. <b>23% of all stroke-associated genes</b> also map to AF. <b>ZFHX3</b> is the canonical AF / cardioembolic-stroke GWAS locus. This shared-genetics linkage is the mechanistic thromboembolic rationale for anticoagulating AF patients &mdash; a connection the clinical records contain no representation of.</li>
+<li><b>Negative KG result, reported for transparency. <span class="badge kg">SPOKE</span></b> &mdash; a query for compounds that directly <code>TREATS</code> <em>both</em> AF and stroke returned empty: SPOKE models anticoagulants as AF <em>treatments</em> and stroke as a downstream <em>consequence</em> linked through shared genes, rather than as a single drug&ndash;disease edge to both. The rationale is therefore <em>mechanistic</em> (shared genes), not a direct dual-indication edge.</li>
+</ul>
+<p style="margin:.3em 0"><b>Net contribution:</b> SPOKE converts a bare EHR count ("8 patients without heparin") into an interpretable clinical statement &mdash; those patients lack a therapy that is (i) mechanistically indicated because AF and stroke share genetic architecture, and (ii) available in forms (oral VKA / DOAC) that never appear in the record at all.</p>
+</div>
+
+<!-- =================================================================== -->
+<h2>5. Limitations</h2>
+<h3>Data-availability limitations</h3>
+<ul>
+<li><b>Synthetic, date-shifted, single-centre ICU demo</b> (100 patients; dates shifted to 2111&ndash;2201). Counts are real computations on synthetic data; absolute rates and calendar effects do not generalise.</li>
+<li><b>Only one anticoagulant class exists in the database.</b> No warfarin, no DOAC, no enoxaparin / fondaparinux / argatroban / bivalirudin were recorded anywhere &mdash; a data-capture artefact of the demo. The "anticoagulation gap" is measured against a database that itself cannot represent oral anticoagulation.</li>
+<li><b>AF ascertainment is a rhythm-monitor label, not a diagnosis.</b> 2,405 annotation rows across 23 patients are repeated telemetry labels; <code>condition_source_value = 'AF (Atrial Fibrillation)'</code> is not a formal, adjudicated AF diagnosis and may over- or under-capture true AF.</li>
+<li><b>Heparin &ne; definitive anticoagulation.</b> Every heparin record is intravenous (D5W / saline base; one 25,000-unit premix bag) &mdash; consistent with short-term ICU infusions or line management, not the sustained oral stroke-prophylaxis that AF guidelines intend. "On heparin" overstates true therapeutic anticoagulation.</li>
+<li><b>Outcome capture is in-hospital only.</b> The OMOP <code>death</code> table records in-hospital death; post-discharge deaths are unobserved, so mortality is a floor.</li>
+<li><b>SPOKE gene / treatment lists reflect curated public knowledge</b> (mixed clinical and investigational compounds), not this cohort; the 6 shared genes depend on SPOKE's disease&ndash;gene curation and are context, not patient-level findings.</li>
+</ul>
+<h3>Methodological limitations</h3>
+<ul>
+<li><b>Profoundly underpowered.</b> 15 vs 8 patients, 9 total deaths; minimum detectable risk difference ~54 pp at 80% power, observed power 0.03. The null primary result is <em>uninformative</em>, never a confirmation of no effect.</li>
+<li><b>Prevalent-exposure / reverse-causation.</b> Heparin is ascertained over the whole stay, so sicker patients who survive longer have more opportunity to be exposed (and confounding by indication runs both ways). This is not an immortal-time-safe survival design.</li>
+<li><b>Unadjusted.</b> No multivariable model was fitted (would overfit with 9 deaths); the age imbalance (heparin group older, p = 0.05) is uncontrolled and could bias the mortality contrast.</li>
+<li><b>No time-to-event structure.</b> A binary in-hospital-death flag ignores differing lengths of stay; no rate, hazard ratio, or person-time is estimable from the demo.</li>
+<li><b>Multiplicity.</b> Four group comparisons were made without correction; the borderline age difference (p = 0.05) should be read as hypothesis-generating only.</li>
+<li><b>Diagnostics not applicable:</b> standardized mean differences (no matching / weighting model) and the proportional-hazards test (no Cox model) are <em>not applicable</em> to this descriptive design.</li>
+</ul>
+
+<!-- =================================================================== -->
+<h2>6. Reproducibility</h2>
+<p class="sub">All data retrieved through MedCP (clinical SQL &rarr; SQLite OMOP; SPOKE Cypher &rarr; Neo4j). Extractions saved to <code>study-B/data/*.csv</code> and <code>study-B/kg/*.json</code>; statistics in <code>study-B/analysis.py</code> (loads only those files); full query set in <code>study-B/queries.log</code>. Key queries below.</p>
+<pre>
+# --- Clinical (MedCP query_clinical_records) ---
+# Sanity: persons=100, AF annotations=2405, AF patients=23
+SELECT (SELECT COUNT(*) FROM person) persons,
+       (SELECT COUNT(*) FROM condition_occurrence WHERE condition_source_value='AF (Atrial Fibrillation)') af_annotations,
+       (SELECT COUNT(DISTINCT person_id) FROM condition_occurrence WHERE condition_source_value='AF (Atrial Fibrillation)') af_patients;
+
+# Confirm heparin is the ONLY anticoagulant (this returned ZERO rows):
+SELECT DISTINCT drug_source_value FROM drug_exposure
+ WHERE LOWER(drug_source_value) LIKE '%warfarin%' OR LIKE '%apixaban%' OR LIKE '%rivaroxaban%'
+    OR LIKE '%dabigatran%' OR LIKE '%edoxaban%' OR LIKE '%enoxaparin%' OR LIKE '%fondaparinux%'
+    OR LIKE '%argatroban%' OR LIKE '%bivalirudin%' OR LIKE '%coumadin%';   -- (OR-chain elided)
+
+# Cohort -> data/af_cohort.csv  (one row per AF patient)
+SELECT p.person_id, p.gender_source_value AS sex, p.year_of_birth, af.first_af_date,
+       (CAST(strftime('%Y', af.first_af_date) AS INTEGER) - p.year_of_birth) AS age_at_af,
+       CASE WHEN hep.person_id IS NOT NULL THEN 1 ELSE 0 END AS heparin,
+       CASE WHEN d.person_id  IS NOT NULL THEN 1 ELSE 0 END AS died
+FROM (SELECT person_id, MIN(condition_start_date) first_af_date FROM condition_occurrence
+      WHERE condition_source_value='AF (Atrial Fibrillation)' GROUP BY person_id) af
+JOIN person p ON p.person_id=af.person_id
+LEFT JOIN (SELECT DISTINCT person_id FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%heparin%') hep ON hep.person_id=af.person_id
+LEFT JOIN (SELECT DISTINCT person_id FROM death) d ON d.person_id=af.person_id;
+
+# Heart rate -> data/af_heart_rate.csv  (MIMIC itemid 220045, bpm)
+SELECT m.person_id, m.value_as_number FROM measurement m
+JOIN (SELECT DISTINCT person_id FROM condition_occurrence WHERE condition_source_value='AF (Atrial Fibrillation)') af ON af.person_id=m.person_id
+WHERE m.measurement_source_value='220045' AND m.value_as_number BETWEEN 20 AND 250;
+
+# --- SPOKE (MedCP query_knowledge_graph) ; AF=DOID:0060224, stroke=DOID:0051061 ---
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0060224'})
+  WHERE NOT coalesce(c.vestige,false) RETURN c.name ORDER BY c.name;               # -> kg/af_treatments.json (135)
+MATCH (:Disease {identifier:'DOID:0060224'})-[:ASSOCIATES_DaG]->(g:Gene)&lt;-[:ASSOCIATES_DaG]-(:Disease {identifier:'DOID:0051061'})
+  RETURN g.name, g.identifier ORDER BY g.name;                                     # -> kg/af_stroke_shared_genes.json (6)
+MATCH (:Disease {identifier:'DOID:0060224'})-[:ASSOCIATES_DaG]->(g:Gene) WITH count(DISTINCT g) af_genes
+MATCH (:Disease {identifier:'DOID:0051061'})-[:ASSOCIATES_DaG]->(g2:Gene) RETURN af_genes, count(DISTINCT g2) stroke_genes;   # 613 / 26
+</pre>
+
+<!-- =================================================================== -->
+<h2>Appendix — launching prompt (verbatim)</h2>
+<p class="sub">The exact prompt that produced this study:</p>
+<div class="prompt">Run an original observational study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, on documented anticoagulation among critically ill patients flagged with atrial fibrillation. Follow the MedCP clinical study framework skill end to end for the analysis and above all for the report, but treat this as an original study on a synthetic dataset, not a replication of a published paper: wherever the skill expects a source citation, an "Original Paper" result, a replication status, or a paper-versus-replication figure overlay, record "original study on Synthetic Dataset", and state plainly in the report that the data are synthetic and date-shifted.
+
+With MedCP's clinical-record tools, build the cohort of patients carrying at least one atrial-fibrillation rhythm annotation — condition_source_value equal to 'AF (Atrial Fibrillation)' — and divide it by whether the record contains any heparin exposure in drug_exposure. Describe the two groups by size, sex, age and heart rate, and by in-hospital death, and quantify the anticoagulation gap, i.e. the AF patients with no documented anticoagulant. Report exact group counts, compare groups with Fisher/χ² for categorical and Mann–Whitney for continuous variables, and give an effect size with a 95% confidence interval and the minimum detectable effect at 80% power for the primary contrast. State explicitly that rhythm-monitor labels are not formal AF diagnoses and that heparin is not equivalent to definitive oral anticoagulation, and carry both into the limitations.
+
+Then, through MedCP's SPOKE knowledge graph, bring in the biomedical context that makes the gap interpretable — the thromboembolic consequences of atrial fibrillation and the pharmacologic rationale for anticoagulation — choosing the graph traversals yourself rather than following a prescribed node map, and attributing every knowledge-graph-derived statement so the report shows exactly what SPOKE added beyond the EHR. Include this launching prompt verbatim in the report.</div>
+
+</body>
+</html>

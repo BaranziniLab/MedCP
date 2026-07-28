@@ -1,0 +1,54 @@
+# Study G — Opioid exposure and respiratory parameters
+# Every SQL (clinical, sham OMOP SQLite) and Cypher (SPOKE) string run through the MedCP harness.
+# Harness: uv run --with fastmcp --with neo4j python _harness/medcp_query.py --sql|--cypher "<q>" --out <file>
+
+## ---- Schema / sanity discovery (clinical SQL) ----
+SQL  persons: SELECT COUNT(*) AS n_person FROM person
+SQL  fentanyl pts: SELECT COUNT(DISTINCT person_id) FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%fentanyl%'
+SQL  hydromorphone/dilaudid pts: SELECT COUNT(DISTINCT person_id) FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%hydromorphone%' OR LOWER(drug_source_value) LIKE '%dilaudid%'
+SQL  opioid (either) pts: SELECT COUNT(DISTINCT person_id) FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%fentanyl%' OR LOWER(drug_source_value) LIKE '%hydromorphone%' OR LOWER(drug_source_value) LIKE '%dilaudid%'
+SQL  hydromorphone source values: SELECT drug_source_value, COUNT(DISTINCT person_id), COUNT(*) FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%hydromorphone%' OR LOWER(drug_source_value) LIKE '%dilaudid%' GROUP BY drug_source_value
+SQL  dilaudid-brand-only pts: SELECT COUNT(DISTINCT person_id) FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%dilaudid%'
+SQL  fentanyl source values: SELECT drug_source_value, COUNT(DISTINCT person_id) FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%fentanyl%' GROUP BY drug_source_value
+SQL  fentanyl&hydromorphone overlap: SELECT COUNT(*) FROM (SELECT person_id FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%fentanyl%' INTERSECT SELECT person_id FROM drug_exposure WHERE LOWER(drug_source_value) LIKE '%hydromorphone%' OR LOWER(drug_source_value) LIKE '%dilaudid%')
+SQL  concept name search: SELECT concept_id, concept_name, domain_id, vocabulary_id FROM concept WHERE LOWER(concept_name) LIKE '%respiratory rate%' OR LOWER(concept_name) LIKE '%o2 saturation%' OR LOWER(concept_name) LIKE '%pulseox%'
+SQL  RR concept mapping: SELECT relationship_id, concept_id_1, concept_id_2 FROM concept_relationship WHERE concept_id_1=2000030002   -- 'Maps to' -> 3024171
+SQL  SpO2 concept mapping: SELECT relationship_id, concept_id_1, concept_id_2 FROM concept_relationship WHERE concept_id_1=2000030003 -- 'Maps to' -> 40762499
+SQL  RR coverage: SELECT COUNT(DISTINCT person_id), COUNT(*), MIN(value_as_number), MAX(value_as_number), AVG(value_as_number) FROM measurement WHERE measurement_concept_id=3024171 AND value_as_number IS NOT NULL
+SQL  SpO2 coverage: SELECT COUNT(DISTINCT person_id), COUNT(*), MIN(value_as_number), MAX(value_as_number), AVG(value_as_number) FROM measurement WHERE measurement_concept_id=40762499 AND value_as_number IS NOT NULL
+SQL  death count: SELECT COUNT(*) FROM death
+SQL  gender distribution: SELECT gender_source_value, COUNT(*) FROM person GROUP BY gender_source_value
+
+## ---- Main extractions (saved to data/) ----
+SQL  data/cohort.csv:
+     SELECT p.person_id, p.gender_source_value AS gender, p.year_of_birth,
+       (SELECT MIN(CAST(strftime('%Y', vo.visit_start_datetime) AS INT)) FROM visit_occurrence vo WHERE vo.person_id=p.person_id) AS first_visit_year,
+       CASE WHEN EXISTS(SELECT 1 FROM death d WHERE d.person_id=p.person_id) THEN 1 ELSE 0 END AS died,
+       (SELECT COUNT(*) FROM drug_exposure de WHERE de.person_id=p.person_id) AS n_drug_rows,
+       (SELECT COUNT(DISTINCT de.drug_source_value) FROM drug_exposure de WHERE de.person_id=p.person_id) AS n_distinct_drugs,
+       (SELECT COUNT(*) FROM measurement m WHERE m.person_id=p.person_id) AS n_meas_rows,
+       MAX(CASE WHEN LOWER(de.drug_source_value) LIKE '%fentanyl%' THEN 1 ELSE 0 END) AS fentanyl,
+       MAX(CASE WHEN LOWER(de.drug_source_value) LIKE '%hydromorphone%' OR LOWER(de.drug_source_value) LIKE '%dilaudid%' THEN 1 ELSE 0 END) AS hydromorphone
+     FROM person p LEFT JOIN drug_exposure de ON de.person_id=p.person_id
+     GROUP BY p.person_id, p.gender_source_value, p.year_of_birth
+
+SQL  data/rr.csv:   SELECT person_id, value_as_number FROM measurement WHERE measurement_concept_id=3024171 AND value_as_number IS NOT NULL
+SQL  data/spo2.csv: SELECT person_id, value_as_number FROM measurement WHERE measurement_concept_id=40762499 AND value_as_number IS NOT NULL
+
+## ---- SPOKE knowledge-graph (Cypher, saved to kg/) ----
+CYPHER kg/fentanyl_respdepression.json:
+       MATCH (c:Compound)-[:CAUSES_CcSE]->(s:SideEffect {identifier:'C0235063'}) WHERE toLower(c.name) CONTAINS 'fentanyl' RETURN c.name AS compound, s.name AS side_effect
+CYPHER kg/fentanyl_targets.json:
+       MATCH (c:Compound)-[:BINDS_CbP]->(p:Protein)<-[:ENCODES_GeP]-(g:Gene) WHERE toLower(c.name) CONTAINS 'fentanyl' RETURN DISTINCT g.name AS gene, p.name AS protein ORDER BY gene LIMIT 40
+CYPHER kg/hydromorphone_respdepression.json:
+       MATCH (c:Compound)-[:CAUSES_CcSE]->(s:SideEffect {identifier:'C0235063'}) WHERE toLower(c.name) CONTAINS 'hydromorphone' RETURN c.name AS compound, s.name AS side_effect
+CYPHER kg/hydromorphone_targets.json:
+       MATCH (c:Compound)-[:BINDS_CbP]->(p:Protein)<-[:ENCODES_GeP]-(g:Gene) WHERE toLower(c.name) CONTAINS 'hydromorphone' RETURN DISTINCT g.name AS gene ORDER BY gene
+CYPHER kg/respdepression_context.json:
+       MATCH (c:Compound)-[:CAUSES_CcSE]->(s:SideEffect {identifier:'C0235063'}) RETURN s.name AS side_effect, count(DISTINCT c) AS n_compounds
+CYPHER kg/oprm1.json:
+       MATCH (g:Gene {name:'OPRM1'})-[:ENCODES_GeP]->(p:Protein) RETURN g.name AS gene, p.name AS protein, p.identifier AS uniprot
+
+## ---- Sampling-intensity sensitivity (computed in analysis.py from spo2.csv + cohort.csv) ----
+#  SpO2 readings/patient by group; Spearman(n_readings, min_SpO2); min-SpO2 exposed-vs-unexposed
+#  stratified within reading-count tertiles. No new MedCP query; derived from saved extractions.

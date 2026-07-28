@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 2 — Blood lactate and in-hospital mortality</title>
+<style>
+  :root{--ink:#1a2230;--mut:#5b6675;--line:#e2e6ec;--ehr:#0b6bcb;--kg:#7a3ea8;--bg:#fff;--card:#f7f9fc;}
+  *{box-sizing:border-box}
+  body{font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+       max-width:920px;margin:0 auto;padding:32px 20px;background:var(--bg)}
+  h1{font-size:1.7rem;margin:.2em 0}h2{font-size:1.25rem;margin-top:2em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+  h3{font-size:1.05rem;margin-top:1.4em}
+  .sub{color:var(--mut);font-size:.95rem}
+  .banner{background:#fff8e1;border:1px solid #f0d98a;border-radius:8px;padding:10px 14px;font-size:.9rem;margin:14px 0}
+  table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:10px;color:#fff;vertical-align:middle}
+  .badge.ehr{background:var(--ehr)} .badge.kg{background:var(--kg)}
+  .kgbox{border-left:4px solid var(--kg);background:#faf6fd;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  .ehrbox{border-left:4px solid var(--ehr);background:#f2f8ff;padding:10px 14px;border-radius:0 8px 8px 0;margin:1em 0}
+  figure{margin:1.2em 0;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:8px}
+  figcaption{font-size:.85rem;color:var(--mut);margin-top:.5em}
+  pre{background:#0f1622;color:#d6e2f0;padding:14px;border-radius:8px;overflow:auto;font-size:.82rem;line-height:1.5}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prompt{white-space:pre-wrap;background:#0f1622;color:#e7eefc;padding:16px;border-radius:8px;font-size:.86rem}
+  ul{margin:.4em 0}
+  .kpi{display:flex;flex-wrap:wrap;gap:10px;margin:1em 0}
+  .kpi div{flex:1 1 140px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .kpi b{display:block;font-size:1.35rem}
+  .kpi span{font-size:.78rem;color:var(--mut)}
+  .ns{color:#8a6d00}
+  .sig{color:#0b6bcb;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>Study 2 — Blood lactate and in-hospital mortality</h1>
+<p class="sub">Original observational study on a synthetic dataset · MedCP (EHR) + SPOKE (knowledge graph) · Reporting standard: STROBE + RECORD (cohort) · Generated 2026-07-23</p>
+<div class="banner"><b>Synthetic data.</b> Analyses use the synthetic, date-shifted MIMIC-IV demo (100 patients,
+OMOP CDM) served through MedCP. Results are computed from that data, not fabricated. This is an
+<b>original study on Synthetic Dataset</b>, not a replication of a published paper; every field that a
+replication framework would fill with a source paper is recorded as <em>"original study on Synthetic Dataset"</em>.
+Calendar years are date-shifted (values such as 2137/2185 are expected).</div>
+
+<p class="sub">Provenance legend:
+<span class="badge ehr">EHR</span> measured in the clinical records (via MedCP) ·
+<span class="badge kg">SPOKE</span> derived from the biomedical knowledge graph (via MedCP).</p>
+
+<h2>1. Executive summary</h2>
+<p><b>Source study.</b> Original study on Synthetic Dataset (no published paper is being replicated).</p>
+<p><b>Question.</b> In a critical-care cohort, is a higher blood lactate associated with in-hospital death?
+This is framed as an <b>association</b> study, not a prediction model.</p>
+<div class="kpi">
+  <div><b>83</b><span>patients with &ge;1 blood lactate (of 100 in the demo) <span class="badge ehr">EHR</span></span></div>
+  <div><b>15</b><span>in-hospital deaths (18.1%); all 15 fall inside the lactate cohort <span class="badge ehr">EHR</span></span></div>
+  <div><b>749</b><span>numeric lactate results, 0.5&ndash;13.2 mmol/L <span class="badge ehr">EHR</span></span></div>
+  <div><b>0.68</b><span>ROC AUC of peak lactate for death (95% CI 0.52&ndash;0.83) <span class="badge ehr">EHR</span></span></div>
+</div>
+<p><b>Headline result <span class="badge ehr">EHR</span>.</b> Peak lactate was higher in non-survivors than survivors
+(median 3.2 vs 2.8 mmol/L; Hodges&ndash;Lehmann difference <b>+1.1 mmol/L</b>, 95% CI 0.1&ndash;3.9;
+Mann&ndash;Whitney <b>p=0.031</b>). Peak lactate discriminated death with <b>AUC 0.68</b> (95% CI 0.52&ndash;0.83).
+Kaplan&ndash;Meier survival fell monotonically across peak-lactate tertiles at the 28-day landmark
+(T1 0.90, T2 0.96, T3 0.77), but the log-rank test was not significant (28-day landmark &chi;&sup2;=3.12,
+<b>p=0.21</b>; full follow-up p=0.67). <b>Last</b> lactate and lactate <b>clearance</b> did not differ by outcome (p=0.29, p=0.99).</p>
+<p><b>Bottom line.</b> The direction and magnitude are consistent with the well-established lactate&ndash;mortality
+association: elevated <em>peak</em> lactate marks higher in-hospital mortality risk. With only <b>15 deaths</b> the
+study is underpowered for time-to-event inference (minimum detectable Cohen's d &asymp; 0.80; minimum detectable
+AUC &asymp; 0.73), so the non-significant log-rank is <b>uninformative, not a refutation</b>. No multivariate model was
+fitted (see &sect;5). SPOKE supplied the biology the EHR cannot: the pyruvate/mitochondrial gene programme behind
+hyperlactatemia and the therapeutic landscape (antibiotics for the septic source; pyruvate-dehydrogenase&ndash;directed
+lactate-lowering agents).</p>
+
+<h2>1b. Protocol header &amp; design</h2>
+<p class="sub">Reporting standard: <b>STROBE + RECORD</b> (routinely-collected EHR data, cohort design). Reproduced verbatim per the framework's mandatory gate; undeterminable parameters are recorded as explicit assumptions, no field left blank.</p>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Citation (source study)</td><td>original study on Synthetic Dataset</td></tr>
+<tr><td>Design of source study</td><td>original study on Synthetic Dataset — retrospective single-center critical-care cohort</td></tr>
+<tr><td>Reporting standard applied</td><td>STROBE + RECORD (cohort)</td></tr>
+<tr><td>Setting and calendar timeframe</td><td>Synthetic, date-shifted MIMIC-IV demo ICU (single institution, OMOP CDM); calendar time date-shifted — "original study on Synthetic Dataset"</td></tr>
+<tr><td>Unit of analysis</td><td>Person (patient); one row per patient</td></tr>
+<tr><td>Primary endpoint</td><td>In-hospital death (OMOP <code>death</code> table)</td></tr>
+<tr><td>Primary estimand</td><td>Marginal <em>association</em> between peak blood lactate and in-hospital death (not a treatment/causal effect; not a prediction model)</td></tr>
+<tr><td>Time zero (index date)</td><td>Datetime of each patient's <b>first</b> numeric blood-gas lactate measurement</td></tr>
+<tr><td>Eligibility assessment window</td><td>Entire available record; eligibility = &ge;1 numeric <code>Lactate|Blood|Blood Gas</code> result (mmol/L)</td></tr>
+<tr><td>Baseline lookback window</td><td>Not applicable — biomarker-defined cohort (<b>assumption</b>: peak / last / clearance summarize the lactate trajectory; no pre-index covariate lookback used because no multivariable adjustment is performed)</td></tr>
+<tr><td>Exposure ascertainment window</td><td>All lactate results from time zero onward. Peak = maximum; last = chronologically last; clearance = (first &minus; last)/first &times; 100%</td></tr>
+<tr><td>Follow-up start</td><td>Time zero (first lactate)</td></tr>
+<tr><td>Follow-up end / administrative censoring</td><td>Last in-hospital contact (latest visit discharge datetime in the record). Secondary landmark analysis administratively censors at 28 days</td></tr>
+<tr><td>Censoring: loss to follow-up</td><td>None modeled — closed demo cohort; last hospital discharge serves as the censoring time for survivors (<b>assumption</b>)</td></tr>
+<tr><td>Censoring: death</td><td>Event of interest (not censored)</td></tr>
+<tr><td>Censoring: treatment switch/discontinuation</td><td>Not applicable — no treatment exposure is studied</td></tr>
+<tr><td>Competing risks handling</td><td>None modeled; discharge-alive is treated as censoring and in-hospital death as the sole event (<b>assumption</b>; acceptable for an association study). Post-discharge death cannot occur in an in-hospital endpoint</td></tr>
+</tbody></table>
+
+<p class="sub"><b>Immortal-time / timeline checks.</b> Follow-up begins at time zero (first lactate); no interval before time zero is counted, and the outcome (death) can only occur at or after time zero. No lookback window extends into follow-up (none is used). Timeline direction verified.</p>
+
+<h4>Design comparison</h4>
+<table><thead><tr><th>Design element</th><th>Original study</th><th>This study (Synthetic Dataset)</th><th>Deviation / expected effect</th></tr></thead><tbody>
+<tr><td>Time zero</td><td>original study on Synthetic Dataset</td><td>First blood lactate measurement</td><td>n/a — original design</td></tr>
+<tr><td>Eligibility window</td><td>original study on Synthetic Dataset</td><td>&ge;1 numeric blood-gas lactate</td><td>ICU-biased; excludes 17 patients with no lactate</td></tr>
+<tr><td>Exposure ascertainment</td><td>original study on Synthetic Dataset</td><td>Peak / last / clearance from all results</td><td>n/a</td></tr>
+<tr><td>Outcome &amp; code set</td><td>original study on Synthetic Dataset</td><td>In-hospital death, OMOP <code>death</code> table (15 events)</td><td>n/a</td></tr>
+<tr><td>Follow-up start &amp; end</td><td>original study on Synthetic Dataset</td><td>First lactate &rarr; last hospital discharge (28-day landmark for KM)</td><td>Mixed clock: 7/15 deaths occur in a later admission (see &sect;5)</td></tr>
+<tr><td>Censoring rules</td><td>original study on Synthetic Dataset</td><td>Discharge-alive = censor</td><td>No loss-to-follow-up modeled</td></tr>
+<tr><td>Competing risks</td><td>original study on Synthetic Dataset</td><td>None</td><td>Acceptable for association endpoint</td></tr>
+<tr><td>Covariates in adjustment set</td><td>original study on Synthetic Dataset</td><td><b>None</b> (univariate only)</td><td>Deliberate: 15 events preclude multivariable modeling (&sect;5)</td></tr>
+<tr><td>Statistical model</td><td>original study on Synthetic Dataset</td><td>Mann&ndash;Whitney; Kaplan&ndash;Meier + log-rank; descriptive ROC/AUC</td><td>n/a</td></tr>
+</tbody></table>
+
+<h2>2. Results</h2>
+
+<h3>2.1 Cohort flow <span class="badge ehr">EHR</span></h3>
+<ul>
+<li>100 patients in the synthetic OMOP demo &rarr; <b>83</b> have &ge;1 numeric <code>Lactate|Blood|Blood Gas</code> result in mmol/L (17 excluded: no lactate).</li>
+<li>749 numeric lactate results (median 5 per patient, IQR 2&ndash;11); value range 0.5&ndash;13.2 mmol/L (physiologically plausible).</li>
+<li>Outcome: <b>15</b> in-hospital deaths recorded in the <code>death</code> table. All 15 decedents are within the lactate cohort &rarr; in-cohort mortality 15/83 = <b>18.1%</b>; 68 survivors.</li>
+<li>Two <code>concept</code> rows share the name <code>Lactate|Blood|Blood Gas</code> (ids 2000001010, 2000001241); only 2000001010 carries measurements. Linkage is via <code>measurement_source_concept_id</code> (the standard <code>measurement_concept_id</code> maps to no local <code>concept</code> row in this demo).</li>
+</ul>
+<p class="sub">Grounded sanity checks met: lactate present for 83 patients (numeric mmol/L); total deaths = 15; total persons = 100.</p>
+
+<h3>2.2 Baseline characteristics by outcome <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Characteristic</th><th>All (n=83)</th><th>Survivors (n=68)</th><th>Non-survivors (n=15)</th></tr></thead><tbody>
+<tr><td>Age, median (IQR) — years*</td><td>62 (52&ndash;71)</td><td>59 (50&ndash;70)</td><td>67 (64&ndash;75)</td></tr>
+<tr><td>Male, n (%)</td><td>46 (55%)</td><td>34 (50%)</td><td>12 (80%)</td></tr>
+<tr><td>Lactate results per patient, median (IQR)</td><td>5 (2&ndash;11)</td><td>4 (2&ndash;9)</td><td>15 (6&ndash;25)</td></tr>
+<tr><td>Peak lactate, median (IQR) — mmol/L</td><td>2.8 (2.1&ndash;4.1)</td><td>2.8 (2.0&ndash;3.6)</td><td>3.2 (2.7&ndash;6.9)</td></tr>
+<tr><td>Last lactate, median (IQR) — mmol/L</td><td>1.5 (1.1&ndash;2.1)</td><td>1.6 (1.0&ndash;2.1)</td><td>1.5 (1.3&ndash;3.1)</td></tr>
+<tr><td>Lactate clearance, median (IQR) — %</td><td>7 (&minus;26&ndash;46)</td><td>4 (&minus;18&ndash;45)</td><td>20 (&minus;41&ndash;48)</td></tr>
+<tr><td>Index-stay length (all), median (IQR) — days</td><td colspan="3">7.3 (4.8&ndash;11.5)</td></tr>
+</tbody></table>
+<p class="sub">*Age computed from year-of-birth to the index (first-lactate) year on date-shifted timelines. Non-survivors are older, more often male, and had markedly more lactate draws (a sicker, more intensively monitored group — a confounder, not an exposure).</p>
+
+<h3>2.3 Primary analysis — peak lactate, survivors vs non-survivors <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Metric</th><th>Result</th><th>Event counts / notes</th></tr></thead><tbody>
+<tr><td>Peak lactate, non-survivors (median, IQR)</td><td>3.2 (2.7&ndash;6.9) mmol/L</td><td>n=15 deaths</td></tr>
+<tr><td>Peak lactate, survivors (median, IQR)</td><td>2.8 (2.0&ndash;3.6) mmol/L</td><td>n=68 survivors</td></tr>
+<tr><td>Hodges&ndash;Lehmann location shift (dead &minus; survivor)</td><td class="sig">+1.1 mmol/L (95% CI 0.1&ndash;3.9)</td><td>bootstrap CI, 5000 resamples</td></tr>
+<tr><td>Mann&ndash;Whitney U (two-sided)</td><td class="sig">U=693, p=0.031</td><td>rank-biserial r=0.36</td></tr>
+<tr><td>Probability of superiority (= AUC)</td><td>0.68</td><td>P(peak<sub>dead</sub> &gt; peak<sub>survivor</sub>)</td></tr>
+<tr><td>Descriptive ROC AUC, peak &rarr; death</td><td>0.68 (95% CI 0.52&ndash;0.83)</td><td>15 events / 68 non-events</td></tr>
+</tbody></table>
+<p><b>Interpretation.</b> Peak lactate is statistically higher in non-survivors, with a moderate effect (rank-biserial 0.36; AUC 0.68). The 95% CI for the location shift excludes zero but is wide (0.1&ndash;3.9 mmol/L): the data are compatible with anything from a clinically trivial to a very large difference.</p>
+
+<h3>2.4 Secondary — last lactate &amp; clearance <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Metric</th><th>Non-survivors</th><th>Survivors</th><th>Test</th></tr></thead><tbody>
+<tr><td>Last lactate (median) — mmol/L</td><td>1.5</td><td>1.6</td><td class="ns">MWU p=0.29 (NS)</td></tr>
+<tr><td>Lactate clearance (median) — %</td><td>20</td><td>3.6</td><td class="ns">MWU p=0.99 (NS)</td></tr>
+</tbody></table>
+<p class="sub">Neither the last value nor first&rarr;last clearance separated the groups. In this synthetic demo the mortality signal sits in the <em>peak</em>, not in the trajectory — plausibly because most patients (survivors and decedents alike) normalize their final lactate, and clearance is noisy when the number of draws is small.</p>
+
+<h3>2.5 Kaplan&ndash;Meier by peak-lactate tertile + log-rank <span class="badge ehr">EHR</span></h3>
+<table><thead><tr><th>Tertile (peak mmol/L)</th><th>n</th><th>Deaths (in index stay)</th><th>KM survival, 7 d</th><th>KM survival, 28 d</th></tr></thead><tbody>
+<tr><td>T1 low (0.7&ndash;2.3)</td><td>28</td><td>3 (2)</td><td>0.90</td><td>0.90</td></tr>
+<tr><td>T2 mid (2.4&ndash;3.2)</td><td>28</td><td>5 (1)</td><td>0.96</td><td>0.96</td></tr>
+<tr><td>T3 high (3.5&ndash;13.2)</td><td>27</td><td>7 (5)</td><td>0.92</td><td>0.77</td></tr>
+</tbody></table>
+<p><b>Log-rank.</b> 28-day landmark (8 in-hospital events): &chi;&sup2;=3.12, <b class="ns">p=0.21</b>. Full follow-up (all 15 events): &chi;&sup2;=0.80, p=0.67; T1 vs T3 &chi;&sup2;=0.13, p=0.72. The highest tertile has the lowest early survival (28-day 0.77 vs 0.90) and the most in-hospital deaths (5 of 8), directionally consistent with the lactate&ndash;mortality association, but the separation is not statistically significant.</p>
+
+<h3>2.6 Event counts, person-time &amp; minimum detectable effect <span class="badge ehr">EHR</span></h3>
+<ul>
+<li><b>Events:</b> 15 deaths (non-survivor arm) vs 68 survivors. Deaths per tertile: T1 3, T2 5, T3 7.</li>
+<li><b>Person-time (in-hospital, index stay):</b> total 791 patient-days; index-stay length median 7.3 d (IQR 4.8&ndash;11.5).</li>
+<li><b>Person-time (full follow-up, first lactate &rarr; last hospital contact):</b> 30,293 patient-days (deaths 4,347; survivors 25,946). This mixes in- and between-admission time (see &sect;5).</li>
+<li><b>Minimum detectable effect at 80% power</b> (&alpha;=0.05, two-sided), given 15 vs 68: minimum detectable standardized difference <b>Cohen's d &asymp; 0.80</b> (a <em>large</em> effect); minimum detectable <b>AUC &asymp; 0.73</b> above the null 0.5. The observed AUC (0.68) sits <em>below</em> this threshold, which is exactly why the time-to-event tests do not reach significance. This is a property of the design, reported irrespective of the estimate.</li>
+</ul>
+<p class="sub"><b>No multivariate model was fitted.</b> With only 15 events, even the ~10-events-per-variable rule of thumb permits at most one covariate; any logistic or Cox model with age, sex, severity, etc. would be overfit and its estimates unreliable. We therefore report descriptive/univariate statistics only, as specified.</p>
+
+<h2>3. Figures</h2>
+<figure>
+  <img src="figures/fig_main.png" style="max-width:100%;height:auto" alt="Three-panel figure: peak lactate by outcome, ROC of peak lactate for death, Kaplan-Meier survival by peak-lactate tertile">
+  <figcaption><b>Figure 1. Peak blood lactate and in-hospital mortality <span class="badge ehr">EHR</span>.</b>
+  <b>(a)</b> Peak lactate is higher in non-survivors than survivors (medians 3.2 vs 2.8 mmol/L; Mann&ndash;Whitney U=693, <b>p=0.031</b>); boxes = median/IQR, points = individual patients (survivors n=68, non-survivors n=15).
+  <b>(b)</b> Descriptive ROC of peak lactate for in-hospital death: <b>AUC 0.68</b> (95% CI 0.52&ndash;0.83, stratified bootstrap); dashed diagonal = chance. The lower confidence bound (0.52) barely exceeds 0.5 — discrimination is real in direction but statistically fragile, and this ROC is descriptive, not a validated prediction model.
+  <b>(c)</b> Kaplan&ndash;Meier in-hospital survival by peak-lactate tertile at the 28-day landmark (T1 low blue, T2 mid teal, T3 high red; n and 28-day deaths shown at each curve end). Higher peak lactate (T3) tracks the lowest early survival; 28-day landmark log-rank &chi;&sup2;=3.12, <b>p=0.21</b> (8 in-hospital events) — directionally consistent with the lactate&ndash;mortality association but underpowered at 15 total deaths.</figcaption>
+</figure>
+
+<h2>4. Knowledge-graph contribution (what SPOKE added)</h2>
+<div class="kgbox">
+<p>The EHR returns lactate <em>numbers</em> and a death flag; it explains neither the biology of the elevation nor the therapeutics. SPOKE (traversed live via MedCP) supplied both. Every statement here is knowledge-graph&ndash;derived <span class="badge kg">SPOKE</span>.</p>
+<figure>
+  <img src="figures/fig_spoke.png" style="max-width:100%;height:auto" alt="Two-panel SPOKE figure: bacterial-sepsis therapeutic classes and lactic-acidosis gene programme by function">
+  <figcaption><b>Figure 2. SPOKE-derived biological &amp; therapeutic context <span class="badge kg">SPOKE</span></b> (knowledge-graph context, not evidence from this cohort).
+  <b>(a)</b> Therapeutic classes among the <b>42</b> compounds that <code>TREATS_CtD</code> bacterial sepsis (DOID:0040085): cephalosporins (9) and aminoglycosides (8) dominate, with nitroimidazoles (3), penicillins (2), and single-compound glycopeptide/lipopeptide/lincosamide and other classes; a compound may belong to more than one class.
+  <b>(b)</b> Functional grouping of the lactic-acidosis gene programme (DOID:3650): of <b>64</b> genes retrieved (subset of the 188 <code>ASSOCIATES_DaG</code>), 6 map to the pyruvate-dehydrogenase complex / pyruvate handling, 27 to oxidative phosphorylation (respiratory chain + coenzyme Q), and 31 to other mitochondrial/metabolic functions. By contrast the bacterial-sepsis node itself returned only 1 associated gene.</figcaption>
+</figure>
+
+<h3>4.1 Mechanism — why lactate rises <span class="badge kg">SPOKE</span></h3>
+<p>The physiological state behind an elevated blood lactate is <b>lactic acidosis</b> (DOID:3650), which SPOKE links to <b>188 genes</b> via <code>ASSOCIATES_DaG</code>. The gene set is dominated by the machinery of aerobic pyruvate oxidation and mitochondrial ATP production — exactly the pathway that fails in shock/hypoperfusion, forcing pyruvate&rarr;lactate:</p>
+<ul>
+<li><b>Pyruvate dehydrogenase complex</b> — PDHA1, PDHB, DLD, DLAT (the gate from pyruvate into the TCA cycle; when it stalls, lactate accumulates).</li>
+<li><b>Pyruvate handling</b> — PC (pyruvate carboxylase), MPC1 (mitochondrial pyruvate carrier).</li>
+<li><b>Oxidative phosphorylation</b> — cytochrome-c-oxidase / complex components (COX1/2/3, COX10, COX15, CYC1, CYTB) and ATP-synthase subunits (ATP5F1A/D/E).</li>
+<li><b>Gluconeogenesis / glycogen</b> — FBP1, G6PC1, ALDOB.</li>
+</ul>
+<p>By contrast, the specific node <b>bacterial sepsis</b> (DOID:0040085) carries only <b>1</b> associated gene (CTNNAL1) in this SPOKE build — a data-sparsity note, not biology (see &sect;5).</p>
+
+<h3>4.2 Therapeutics the EHR lactate value cannot suggest <span class="badge kg">SPOKE</span></h3>
+<p><b>(a) Treat the septic source.</b> <b>42</b> compounds <code>TREATS_CtD</code> bacterial sepsis — an antibiotic wall spanning cephalosporins (9), aminoglycosides (8), penicillins (2), nitroimidazoles (3), plus glycopeptide/lipoglycopeptide/lipopeptide agents and a lincosamide. Named examples: Vancomycin, Piperacillin, Ceftriaxone, Cefepime, Imipenem, Metronidazole, Gentamicin, Tobramycin, Amikacin, Daptomycin, Clindamycin. Source control lowers the driver of hyperlactatemia.</p>
+<p><b>(b) Lower the lactate directly.</b> <b>5</b> compounds <code>TREATS_CtD</code> lactic acidosis, and they map cleanly onto the mechanism in &sect;4.1: <b>Dichloroacetic acid</b> (activates pyruvate dehydrogenase &rarr; drives pyruvate into oxidation and lowers lactate), and the mitochondrial cofactors <b>Thiamine</b> (B1, PDH cofactor — thiamine deficiency itself causes lactic acidosis) and <b>Riboflavin</b> (B2). The list also flags <b>Stavudine</b> and <b>Abacavir</b> — NRTIs that <em>cause</em> mitochondrial lactic acidosis, a drug-safety signal the EHR lab value alone would never surface.</p>
+<p class="sub">Sepsis symptom edges (<code>PRESENTS_DpS</code>) returned empty for DOID:0040085 in this build, so the clinical-picture layer could not be added from SPOKE.</p>
+</div>
+<div class="ehrbox">
+<p><b>Kept separate (EHR-measured physiology) <span class="badge ehr">EHR</span>:</b> the cohort (n=83), all lactate values and their peak/last/clearance derivations, the 15 in-hospital deaths, and every statistic in &sect;2&ndash;&sect;3. SPOKE contributed <em>no</em> patient-level data and none of the effect estimates — only mechanism and therapeutic context.</p>
+</div>
+
+<h2>5. Limitations</h2>
+<h3>Data-availability limitations</h3>
+<ul>
+<li><b>Synthetic, single-center ICU demo.</b> 100-patient date-shifted MIMIC-IV subset; 15 deaths. Estimates are illustrative, not generalizable; calendar time is shifted.</li>
+<li><b>Lactate defines the cohort &rarr; selection toward severity.</b> Only patients sick enough to have an arterial/venous blood gas are included; the 17 lactate-free patients are excluded, and non-survivors had far more draws (median 15 vs 4), so measurement intensity is itself confounded with outcome.</li>
+<li><b>In-hospital death definition.</b> The <code>death</code> table flags 15 deaths; 8 occur during the index (first-lactate) hospitalization and 7 in a later admission (median +531 days). The binary association uses all 15; the KM time axis therefore mixes index-stay and subsequent-encounter mortality — addressed by the 28-day in-hospital landmark analysis, but the full-follow-up log-rank is diluted by the late deaths.</li>
+<li><b>SPOKE disease-gene sparsity.</b> Bacterial sepsis (DOID:0040085) has only 1 associated gene; the mechanistic gene programme had to be sourced from the <em>lactic acidosis</em> node (DOID:3650, 188 genes). Sepsis symptom edges were empty. The KG is a documented, knowledge-based context layer, not evidence from this cohort.</li>
+<li><b>No standard vocabulary in the demo <code>concept</code> table.</b> Only MIMIC-local concepts ship; linkage relied on <code>measurement_source_concept_id</code>.</li>
+</ul>
+<h3>Methodological limitations</h3>
+<ul>
+<li><b>No multivariable adjustment (by design).</b> 15 events cannot support a logistic or Cox model without overfitting; age, sex, and illness severity are unadjusted confounders. The reported association is crude.</li>
+<li><b>Underpowered time-to-event inference.</b> Minimum detectable Cohen's d &asymp; 0.80 and minimum detectable AUC &asymp; 0.73 at 80% power. The non-significant log-rank (p=0.21&ndash;0.67) is <b>compatible with</b> a true lactate&ndash;mortality effect, not a refutation of it; no "contradiction" is claimed.</li>
+<li><b>Follow-up / censoring assumptions.</b> Survivors censored at last hospital discharge; no loss-to-follow-up or competing-risk model. Time zero is the first lactate, so patients contribute follow-up from first measurement, not from a uniform clinical anchor (e.g., ICU admission).</li>
+<li><b>Diagnostics not applicable.</b> Standardized mean differences (matching) — not applicable, no matching. Proportional-hazards / Schoenfeld test — not applicable, no Cox model was fitted. These are omitted deliberately, not overlooked.</li>
+<li><b>Clearance is noisy.</b> First&rarr;last clearance ignores timing and draw count; with a median of 5 results it is an unstable summary and showed no signal.</li>
+</ul>
+
+<h2>6. Reproducibility</h2>
+<p class="sub">All data retrieved through MedCP (clinical SQL against the sham OMOP SQLite; SPOKE Cypher against the knowledge graph). Every query is in <code>study-C/queries.log</code>; raw extractions in <code>study-C/data/*.csv</code> and <code>study-C/kg/*.json</code>; all statistics in <code>study-C/analysis.py</code> (outputs <code>data/results.json</code>). Run:</p>
+<pre>uv run --with fastmcp --with neo4j python _harness/medcp_query.py --sql "&lt;SELECT&gt;" --out study-C/data/&lt;f&gt;.csv
+uv run --with fastmcp --with neo4j python _harness/medcp_query.py --cypher "&lt;MATCH&gt;" --out study-C/kg/&lt;f&gt;.json
+uv run --with pandas --with scipy --with scikit-learn --with lifelines python study-C/analysis.py</pre>
+<p class="sub">Key queries (full text in <code>queries.log</code>):</p>
+<pre>-- Cohort + lactate values (link via measurement_source_concept_id; 2 concept rows share the name)
+SELECT m.person_id, m.measurement_datetime, m.value_as_number, m.visit_occurrence_id
+FROM measurement m JOIN concept c ON c.concept_id = m.measurement_source_concept_id
+WHERE c.concept_name = 'Lactate|Blood|Blood Gas' AND m.value_as_number IS NOT NULL;
+-- Outcome
+SELECT person_id, death_datetime FROM death;
+-- SPOKE mechanism (lactic acidosis gene programme)
+MATCH (:Disease {identifier:'DOID:3650'})-[:ASSOCIATES_DaG]->(g:Gene) RETURN g.name;
+-- SPOKE therapeutics
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:0040085'}) RETURN c.name;   -- sepsis (42 abx)
+MATCH (c:Compound)-[:TREATS_CtD]->(:Disease {identifier:'DOID:3650'})    RETURN c.name;   -- lactic acidosis (DCA, thiamine…)</pre>
+
+<h2>Appendix — launching prompt (verbatim)</h2>
+<p class="sub">The exact prompt that produced this study:</p>
+<div class="prompt">Run an original observational study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, on the association between blood lactate and in-hospital mortality in a critical-care cohort. Follow the MedCP clinical study framework skill for the analysis and especially the report, treating this as an original study on a synthetic dataset rather than a replication: wherever the skill expects a source citation, an "Original Paper" column, a replication status, or a paper-versus-replication overlay, record "original study on Synthetic Dataset", and make the synthetic, date-shifted nature of the data explicit.
+
+Using MedCP's clinical-record tools, assemble every patient with at least one lactate measurement (measurement concept 'Lactate|Blood|Blood Gas', value_as_number in mmol/L) and, for each patient, derive peak lactate, last lactate and lactate clearance. Take in-hospital death from the death table as the outcome. Treat this as an association study, not a prediction model: compare peak lactate between survivors and non-survivors with Mann&ndash;Whitney, estimate Kaplan&ndash;Meier survival by lactate tertiles with a log-rank test, and report the discrimination of peak lactate for death as a descriptive ROC/AUC. Report the number of deaths and the person-time, and the minimum detectable effect at 80% power given the event count; do not fit any multivariate outcome model, because with only about fifteen deaths such a model would be overfit &mdash; say so.
+
+Then use MedCP's SPOKE knowledge graph to supply the pathophysiological and therapeutic context for elevated lactate in shock and sepsis, deciding the traversals yourself and attributing every knowledge-graph-derived claim so the report separates EHR-measured physiology from SPOKE-supplied biology. Include this launching prompt verbatim in the report.</div>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Study B — Atrial fibrillation and the anticoagulation gap
+
+*Original observational study · synthetic MIMIC-IV/OMOP demo · MedCP (EHR) + SPOKE (KG)*
+
+**Launching prompt** — paste as-is; the agent follows `../MedCP_Clinical_study_skill.md`.
+
+---
+
+Run an original observational study, on the synthetic MIMIC-IV/OMOP demo dataset served through MedCP, on documented anticoagulation among critically ill patients flagged with atrial fibrillation. Follow the MedCP clinical study framework skill end to end for the analysis and above all for the report, but treat this as an original study on a synthetic dataset, not a replication of a published paper: wherever the skill expects a source citation, an "Original Paper" result, a replication status, or a paper-versus-replication figure overlay, record "original study on Synthetic Dataset", and state plainly in the report that the data are synthetic and date-shifted.
+
+With MedCP's clinical-record tools, build the cohort of patients carrying at least one atrial-fibrillation rhythm annotation — condition_source_value equal to 'AF (Atrial Fibrillation)' — and divide it by whether the record contains any heparin exposure in drug_exposure. Describe the two groups by size, sex, age and heart rate, and by in-hospital death, and quantify the anticoagulation gap, i.e. the AF patients with no documented anticoagulant. Report exact group counts, compare groups with Fisher/χ² for categorical and Mann–Whitney for continuous variables, and give an effect size with a 95% confidence interval and the minimum detectable effect at 80% power for the primary contrast. State explicitly that rhythm-monitor labels are not formal AF diagnoses and that heparin is not equivalent to definitive oral anticoagulation, and carry both into the limitations.
+
+Then, through MedCP's SPOKE knowledge graph, bring in the biomedical context that makes the gap interpretable — the thromboembolic consequences of atrial fibrillation and the pharmacologic rationale for anticoagulation — choosing the graph traversals yourself rather than following a prescribed node map, and attributing every knowledge-graph-derived statement so the report shows exactly what SPOKE added beyond the EHR. Include this launching prompt verbatim in the report.
