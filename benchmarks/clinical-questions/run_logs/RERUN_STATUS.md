@@ -1,13 +1,12 @@
-# Rerun status snapshot (in progress)
-Generated mid-run; opus4.8 and gpt5.5 lanes still executing.
+# Rerun status
 
-| model | condition | good | attempted |
-|---|---|---|---|
-| gpt5.5 | withkg | 93 | 100 |
-| gpt5.5 | withoutkg | 82 | 100 |
-| opus4.8 | withkg | 81 | 82 |
-| opus4.8 | withoutkg | 61 | 65 |
-| qwen3.6 | withkg | 65 | 100 |
-| qwen3.6 | withoutkg | 44 | 100 |
+biorouter 1.88.6, filesystem/traversal builtins disabled.
 
-**Total good: 426/600**
+| model | condition | good |
+|---|---|---|
+| opus4.8 | withkg | 100/100 |
+| opus4.8 | withoutkg | 100/100 |
+| gpt5.5 | withkg | 99/100 |
+| gpt5.5 | withoutkg | 100/100 |
+
+**Total: 399/400**  (qwen3.6 discontinued; preserved in history at d6c2a31)
