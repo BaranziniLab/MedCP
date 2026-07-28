@@ -1,15 +1,9 @@
-The tool calling loop was interrupted. How would you like to proceed?
-  error: The error above was an exception we were not able to handle.
-These errors are often related to connection or authentication
-We've removed the conversation up to the most recent user message
-- depending on the error you may be able to continue
-
 {
   "messages": [
     {
       "id": null,
       "role": "user",
-      "created": 1784967569,
+      "created": 1785196077,
       "content": [
         {
           "type": "text",
@@ -22,17 +16,17 @@ We've removed the conversation up to the most recent user message
       }
     },
     {
-      "id": "789ab43e-bc1e-406c-8e48-be8ebdd9d6bf",
+      "id": "75b8c74b-55c8-4857-8ec3-b6f8b1d034b2",
       "role": "assistant",
-      "created": 1784967573,
+      "created": 1785196081,
       "content": [
         {
           "type": "text",
-          "text": "I'll query the clinical records. Let me first look at the schema and relevant concepts."
+          "text": "I'll query the clinical records. First, let me see the available tables and schema."
         },
         {
           "type": "toolRequest",
-          "id": "tooluse_CUXD12Vu7SKiKERadgPbmy",
+          "id": "tooluse_RJHHeTMuQbd6ePdy7AQ7hS",
           "toolCall": {
             "status": "success",
             "value": {
@@ -53,13 +47,13 @@ We've removed the conversation up to the most recent user message
       }
     },
     {
-      "id": "msg_20306fff-507b-4ee3-9e92-027e3ecb41d6",
+      "id": "msg_8959eef2-1e4e-4096-a71d-f4b772962c2a",
       "role": "user",
-      "created": 1784967573,
+      "created": 1785196081,
       "content": [
         {
           "type": "toolResponse",
-          "id": "tooluse_CUXD12Vu7SKiKERadgPbmy",
+          "id": "tooluse_RJHHeTMuQbd6ePdy7AQ7hS",
           "toolResult": {
             "status": "success",
             "value": {
@@ -80,23 +74,23 @@ We've removed the conversation up to the most recent user message
       }
     },
     {
-      "id": "a678b7c7-753c-41e9-95c7-13ea0c9ef482",
+      "id": "b39e60cf-561c-4c11-822c-211ea91f7f08",
       "role": "assistant",
-      "created": 1784967581,
+      "created": 1785196089,
       "content": [
         {
           "type": "text",
-          "text": "I need to identify TMP-SMX drug concepts and potassium measurement concepts. Let me find them."
+          "text": "This is a standard OMOP CDM. This is an incidence/new-user analysis. Let me identify the TMP-SMX drug concepts and the potassium measurement concept, then find new users and check for hyperkalemia within 30 days."
         },
         {
           "type": "toolRequest",
-          "id": "tooluse_4UjUqJnebQjemBvYxzVUXK",
+          "id": "tooluse_FSTG9euJlqYnAqst9gYwRu",
           "toolCall": {
             "status": "success",
             "value": {
               "name": "medcp__MedCP-query_clinical_records",
               "arguments": {
-                "sql_query": "SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept\nFROM omop.concept\nWHERE (LOWER(concept_name) LIKE '%sulfamethoxazole%' AND LOWER(concept_name) LIKE '%trimethoprim%')\n  AND domain_id = 'Drug' AND standard_concept = 'S'\nORDER BY concept_name\nLIMIT 50"
+                "sql_query": "SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept\nFROM omop.concept\nWHERE standard_concept = 'S'\nAND (\n  (domain_id = 'Drug' AND (lower(concept_name) LIKE '%sulfamethoxazole%' OR lower(concept_name) LIKE '%trimethoprim%'))\n  OR (domain_id = 'Measurement' AND lower(concept_name) LIKE '%potassium%')\n)\nORDER BY domain_id, concept_name\nLIMIT 200"
               }
             }
           },
@@ -113,13 +107,13 @@ We've removed the conversation up to the most recent user message
       }
     },
     {
-      "id": "msg_f50435ed-4431-4e74-9936-63d9ada7227b",
+      "id": "msg_012a3103-c9c6-49dc-b81f-10af9cb8a78e",
       "role": "user",
-      "created": 1784967581,
+      "created": 1785196089,
       "content": [
         {
           "type": "toolResponse",
-          "id": "tooluse_4UjUqJnebQjemBvYxzVUXK",
+          "id": "tooluse_FSTG9euJlqYnAqst9gYwRu",
           "toolResult": {
             "status": "success",
             "value": {
@@ -147,76 +141,193 @@ We've removed the conversation up to the most recent user message
       }
     },
     {
-      "id": "a678b7c7-753c-41e9-95c7-13ea0c9ef482",
+      "id": "d7eea406-70b9-4aaf-aadb-51b400f2af10",
       "role": "assistant",
-      "created": 1784967582,
-      "content": [
-        {
-          "type": "toolRequest",
-          "id": "tooluse_ccSu9yurxls4gKVsBrNzrD",
-          "toolCall": {
-            "status": "success",
-            "value": {
-              "name": "medcp__MedCP-query_clinical_records",
-              "arguments": {
-                "sql_query": "SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept\nFROM omop.concept\nWHERE LOWER(concept_name) LIKE '%potassium%'\n  AND domain_id = 'Measurement' AND standard_concept = 'S'\n  AND (LOWER(concept_name) LIKE '%serum%' OR LOWER(concept_name) LIKE '%plasma%' OR LOWER(concept_name) LIKE '%blood%')\nORDER BY concept_name\nLIMIT 50"
-              }
-            }
-          },
-          "_meta": {
-            "fastmcp": {
-              "tags": []
-            }
-          }
-        }
-      ],
-      "metadata": {
-        "userVisible": true,
-        "agentVisible": true
-      }
-    },
-    {
-      "id": "msg_bd8b2593-8ebd-4ef9-8e0b-fe33279069aa",
-      "role": "user",
-      "created": 1784967582,
-      "content": [
-        {
-          "type": "toolResponse",
-          "id": "tooluse_ccSu9yurxls4gKVsBrNzrD",
-          "toolResult": {
-            "status": "success",
-            "value": {
-              "content": [
-                {
-                  "type": "text",
-                  "text": "[tool_error kind=tool_failure retryable=false] The tool ran and reported a failure. Read the message and address its cause.\nElectronic health records error: (102, b\"Incorrect syntax near 'LIMIT'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
-                }
-              ],
-              "structuredContent": {
-                "error": {
-                  "kind": "tool_failure",
-                  "retryable": false,
-                  "message": "Electronic health records error: (102, b\"Incorrect syntax near 'LIMIT'.DB-Lib error message 20018, severity 15:\\nGeneral SQL Server error: Check messages from the SQL Server\\n\")"
-                }
-              },
-              "isError": true
-            }
-          }
-        }
-      ],
-      "metadata": {
-        "userVisible": true,
-        "agentVisible": true
-      }
-    },
-    {
-      "id": null,
-      "role": "assistant",
-      "created": 1784967582,
+      "created": 1785196096,
       "content": [
         {
           "type": "text",
-          "text": "The tool calling loop was interrupted. How would you like to proceed?"
+          "text": "SQL Server backend — need `TOP` instead of `LIMIT`."
+        },
+        {
+          "type": "toolRequest",
+          "id": "tooluse_YFsnaJYojYNbMq5dLoRvgq",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT TOP 200 concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept\nFROM omop.concept\nWHERE standard_concept = 'S'\nAND (\n  (domain_id = 'Drug' AND lower(concept_name) LIKE '%sulfamethoxazole%' AND lower(concept_name) LIKE '%trimethoprim%')\n  OR (domain_id = 'Measurement' AND lower(concept_name) LIKE '%potassium%' AND lower(concept_name) LIKE '%serum%plasma%')\n)\nORDER BY domain_id, concept_name"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_c6a0dd87-2a68-4146-88f2-6ae1fcb98b47",
+      "role": "user",
+      "created": 1785196096,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "tooluse_YFsnaJYojYNbMq5dLoRvgq",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,domain_id,vocabulary_id,concept_class_id,standard_concept\n2031815,1 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension,Drug,RxNorm Extension,Quant Clinical Drug,S\n2031812,1 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [Septrin],Drug,RxNorm Extension,Quant Branded Drug,S\n2031813,1 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [Septrin] by Samil,Drug,RxNorm Extension,Marketed Product,S\n2031816,1 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [SINOTRIM],Drug,RxNorm Extension,Quant Branded Drug,S\n2031817,1 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [SINOTRIM] by Ildong,Drug,RxNorm Extension,Marketed Product,S\n40715505,10 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Injectable Solution,Drug,RxNorm Extension,Quant Clinical Drug,S\n40715503,10 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Injectable Solution [Co Trimoxazol],Drug,RxNorm Extension,Quant Branded Drug,S\n40715501,10 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Injectable Solution [Co Trimoxazol] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n40715500,10 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Injectable Solution [Co Trimoxazol] Box of 5 by Hospira,Drug,RxNorm Extension,Marketed Product,S\n40715502,10 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Injectable Solution [Co Trimoxazol] by Hospira,Drug,RxNorm Extension,Marketed Product,S\n40715504,10 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Injectable Solution Box of 5,Drug,RxNorm Extension,Quant Clinical Box,S\n36053465,10 ML sulfamethoxazole 80 MG/ML / trimethoprim 16 MG/ML Injectable Solution Box of 5 by Hospira,Drug,RxNorm Extension,Marketed Product,S\n36053466,10 ML sulfamethoxazole 80 MG/ML / trimethoprim 16 MG/ML Injectable Solution by Hospira,Drug,RxNorm Extension,Marketed Product,S\n41421619,100 ML Sulfamethoxazole 160 MG/ML / Trimethoprim 32 MG/ML Oral Solution,Drug,RxNorm Extension,Quant Clinical Drug,S\n41421926,100 ML Sulfamethoxazole 160 MG/ML / Trimethoprim 32 MG/ML Oral Solution [Co Trimoxazol],Drug,RxNorm Extension,Quant Branded Drug,S\n41423661,100 ML Sulfamethoxazole 160 MG/ML / Trimethoprim 32 MG/ML Oral Solution [Co Trimoxazol] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41420786,100 ML Sulfamethoxazole 160 MG/ML / Trimethoprim 32 MG/ML Oral Solution Box of 1,Drug,RxNorm Extension,Quant Clinical Box,S\n41413919,100 ML Sulfamethoxazole 20 MG/ML / Trimethoprim 4 MG/ML Oral Solution,Drug,RxNorm Extension,Quant Clinical Drug,S\n41415896,100 ML Sulfamethoxazole 20 MG/ML / Trimethoprim 4 MG/ML Oral Solution [Sigaprim],Drug,RxNorm Extension,Quant Branded Drug,S\n41425353,100 ML Sulfamethoxazole 20 MG/ML / Trimethoprim 4 MG/ML Oral Solution [Sigaprim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41421496,100 ML Sulfamethoxazole 20 MG/ML / Trimethoprim 4 MG/ML Oral Solution [Sigaprim] Box of 1 by Sigapharm,Drug,RxNorm Extension,Marketed Product,S\n41418501,100 ML Sulfamethoxazole 20 MG/ML / Trimethoprim 4 MG/ML Oral Solution [Sigaprim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41417304,100 ML Sulfamethoxazole 20 MG/ML / Trimethoprim 4 MG/ML Oral Solution Box of 1,Drug,RxNorm Extension,Quant Clinical Box,S\n41419926,100 ML Sulfamethoxazole 20 MG/ML / Trimethoprim 4 MG/ML Oral Solution Box of 5,Drug,RxNorm Extension,Quant Clinical Box,S\n41426700,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution,Drug,RxNorm Extension,Quant Clinical Drug,S\n41418511,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactoreduct],Drug,RxNorm Extension,Quant Branded Drug,S\n41422822,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactoreduct] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41415905,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim],Drug,RxNorm Extension,Quant Branded Drug,S\n41418510,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41422351,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 1 by Aca Mueller,Drug,RxNorm Extension,Marketed Product,S\n44198064,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 1 by Ae-Media,Drug,RxNorm Extension,Marketed Product,S\n41415452,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 1 by Ae-Media,Drug,RxNorm Extension,Marketed Product,S\n41425787,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 1 by Beragena,Drug,RxNorm Extension,Marketed Product,S\n41416296,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 1 by Emra-Med,Drug,RxNorm Extension,Marketed Product,S\n41414621,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 1 by Eurim-Pharm,Drug,RxNorm Extension,Marketed Product,S\n41418509,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 25,Drug,RxNorm Extension,Quant Branded Box,S\n41421075,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Bactrim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41416738,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Berlocid],Drug,RxNorm Extension,Quant Branded Drug,S\n41421925,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Berlocid] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41419380,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Co Trimoxazol],Drug,RxNorm Extension,Quant Branded Drug,S\n41414243,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Co Trimoxazol] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41425355,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Co Trimoxazol] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41421074,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Dio],Drug,RxNorm Extension,Quant Branded Drug,S\n41421922,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Dio] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41417138,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Dio] Box of 1 by Brahms-Apotheke Hellmut Kiderlen,Drug,RxNorm Extension,Marketed Product,S\n41420216,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Holsten],Drug,RxNorm Extension,Quant Branded Drug,S\n41418513,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Holsten] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41421500,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Holsten] Box of 1 by Holsten,Drug,RxNorm Extension,Marketed Product,S\n41418512,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Ratiopharm],Drug,RxNorm Extension,Quant Branded Drug,S\n41423660,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Ratiopharm] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41423234,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Ratiopharm] Box of 1 by Ratiopharm,Drug,RxNorm Extension,Marketed Product,S\n41421073,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Sandoz],Drug,RxNorm Extension,Quant Branded Drug,S\n41415041,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Sandoz] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41420642,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim Sandoz] Box of 1 by Novartis,Drug,RxNorm Extension,Marketed Product,S\n41422821,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim],Drug,RxNorm Extension,Quant Branded Drug,S\n41413876,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41421498,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim] Box of 1 by Engelhard,Drug,RxNorm Extension,Marketed Product,S\n41418040,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrim] Box of 1 by Riemser,Drug,RxNorm Extension,Marketed Product,S\n41424470,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrimox Wolff],Drug,RxNorm Extension,Quant Branded Drug,S\n41422820,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrimox Wolff] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41426555,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrimox Wolff] Box of 1 by Wolff Bielefeld,Drug,RxNorm Extension,Marketed Product,S\n41416741,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrimstada],Drug,RxNorm Extension,Quant Branded Drug,S\n41416740,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrimstada] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41417139,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Cotrimstada] Box of 1 by Stada,Drug,RxNorm Extension,Marketed Product,S\n41415901,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Duobiocin],Drug,RxNorm Extension,Quant Branded Drug,S\n41419379,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Duobiocin] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41421920,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eltrianyl],Drug,RxNorm Extension,Quant Branded Drug,S\n41420215,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eltrianyl] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41426206,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eusaprim],Drug,RxNorm Extension,Quant Branded Drug,S\n41426205,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eusaprim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41421499,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eusaprim] Box of 1 by Repa,Drug,RxNorm Extension,Marketed Product,S\n41418506,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eusaprim] Box of 25,Drug,RxNorm Extension,Quant Branded Box,S\n41418505,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eusaprim] Box of 30,Drug,RxNorm Extension,Quant Branded Box,S\n41419378,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Eusaprim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41418504,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Kepinol],Drug,RxNorm Extension,Quant Branded Drug,S\n41414239,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Kepinol] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41422350,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Kepinol] Box of 1 by Dr R Pfleger,Drug,RxNorm Extension,Marketed Product,S\n41421071,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Kepinol] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41414237,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Omsat],Drug,RxNorm Extension,Quant Branded Drug,S\n41423659,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Omsat] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41417609,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Omsat] Box of 10,Drug,RxNorm Extension,Quant Branded Box,S\n41415899,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Omsat] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n35787159,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Septrin Paediatric],Drug,RxNorm Extension,Quant Branded Drug,S\n35787470,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Septrin Paediatric] by Aspen,Drug,RxNorm Extension,Marketed Product,S\n41425354,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Sigaprim],Drug,RxNorm Extension,Quant Branded Drug,S\n41423658,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Sigaprim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41416297,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Sigaprim] Box of 1 by Pfizer,Drug,RxNorm Extension,Marketed Product,S\n41426554,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Sigaprim] Box of 1 by Puren,Drug,RxNorm Extension,Marketed Product,S\n41420214,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Sigaprim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41421070,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Sulfotrimin],Drug,RxNorm Extension,Quant Branded Drug,S\n41426203,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Sulfotrimin] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41418503,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Supracombin],Drug,RxNorm Extension,Quant Branded Drug,S\n41414234,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Supracombin] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41417607,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Supracombin] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41423656,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution [Supracombin] Box of 50,Drug,RxNorm Extension,Quant Branded Box,S\n41417307,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution Box of 1,Drug,RxNorm Extension,Quant Clinical Box,S\n41424199,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution Box of 10,Drug,RxNorm Extension,Quant Clinical Box,S\n41425917,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution Box of 25,Drug,RxNorm Extension,Quant Clinical Box,S\n41424198,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution Box of 30,Drug,RxNorm Extension,Quant Clinical Box,S\n41424200,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution Box of 5,Drug,RxNorm Extension,Quant Clinical Box,S\n41425915,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Solution Box of 50,Drug,RxNorm Extension,Quant Clinical Box,S\n21108410,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension,Drug,RxNorm Extension,Quant Clinical Drug,S\n41426985,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactoreduct],Drug,RxNorm Extension,Quant Branded Drug,S\n41416739,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactoreduct] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n43154177,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim],Drug,RxNorm Extension,Quant Branded Drug,S\n43043021,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim],Drug,RxNorm Extension,Quant Branded Drug,S\n41426212,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41424044,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] Box of 1 by Aca Mueller,Drug,RxNorm Extension,Marketed Product,S\n41423233,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] Box of 1 by Beragena,Drug,RxNorm Extension,Marketed Product,S\n41426556,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] Box of 1 by Eurim-Pharm,Drug,RxNorm Extension,Marketed Product,S\n43198122,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] Box of 1 by Roche,Drug,RxNorm Extension,Marketed Product,S\n41426210,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] Box of 25,Drug,RxNorm Extension,Quant Branded Box,S\n41426211,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n43043022,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Bactrim] by Roche,Drug,RxNorm Extension,Marketed Product,S\n41418508,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Berlocid],Drug,RxNorm Extension,Quant Branded Drug,S\n41415904,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Berlocid] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41414244,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol],Drug,RxNorm Extension,Quant Branded Drug,S\n41421924,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41415903,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n40713144,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] by A A H,Drug,RxNorm Extension,Marketed Product,S\n40713145,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] by Alliance,Drug,RxNorm Extension,Marketed Product,S\n40713143,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] by Aspen,Drug,RxNorm Extension,Marketed Product,S\n36930722,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] by CST,Drug,RxNorm Extension,Marketed Product,S\n36958557,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] by DE,Drug,RxNorm Extension,Marketed Product,S\n36937665,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] by Medihealth,Drug,RxNorm Extension,Marketed Product,S\n36960107,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension [Co Trimoxazol] by Pilsco,Drug,RxNorm Extension,Marketed Product,S\n41426209,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Dio],Drug,RxNorm Extension,Quant Branded Drug,S\n41421921,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Dio] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41418041,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Dio] Box of 1 by Brahms-Apotheke Hellmut Kiderlen,Drug,RxNorm Extension,Marketed Product,S\n41424471,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Ratiopharm],Drug,RxNorm Extension,Quant Branded Drug,S\n41426208,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Ratiopharm] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41415902,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Sandoz],Drug,RxNorm Extension,Quant Branded Drug,S\n41415040,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Sandoz] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41418928,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim Sandoz] Box of 1 by Novartis,Drug,RxNorm Extension,Marketed Product,S\n41418507,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim],Drug,RxNorm Extension,Quant Branded Drug,S\n41421923,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41415453,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrim] Box of 1 by Riemser,Drug,RxNorm Extension,Marketed Product,S\n41421072,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrimox Wolff],Drug,RxNorm Extension,Quant Branded Drug,S\n41426984,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrimox Wolff] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41427383,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Cotrimox Wolff] Box of 1 by Wolff Bielefeld,Drug,RxNorm Extension,Marketed Product,S\n41414242,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Duobiocin],Drug,RxNorm Extension,Quant Branded Drug,S\n41414241,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Duobiocin] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41414240,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eltrianyl],Drug,RxNorm Extension,Quant Branded Drug,S\n41426207,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eltrianyl] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41421919,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim],Drug,RxNorm Extension,Quant Branded Drug,S\n41424469,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n36778802,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim] Box of 1 by Aspen,Drug,RxNorm Extension,Marketed Product,S\n41417137,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim] Box of 1 by Repa,Drug,RxNorm Extension,Marketed Product,S\n41416737,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim] Box of 25,Drug,RxNorm Extension,Quant Branded Box,S\n41419377,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim] Box of 30,Drug,RxNorm Extension,Quant Branded Box,S\n41424468,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n36281518,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Eusaprim] by Aspen,Drug,RxNorm Extension,Marketed Product,S\n41424467,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Kepinol],Drug,RxNorm Extension,Quant Branded Drug,S\n41415900,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Kepinol] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41423232,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Kepinol] Box of 1 by Dr R Pfleger,Drug,RxNorm Extension,Marketed Product,S\n41414238,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Kepinol] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41414236,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Omsat],Drug,RxNorm Extension,Quant Branded Drug,S\n41419376,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Omsat] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41414235,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Omsat] Box of 10,Drug,RxNorm Extension,Quant Branded Box,S\n41417610,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Omsat] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n43264985,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Resprim],Drug,RxNorm Extension,Quant Branded Drug,S\n21118179,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Septrin Paediatric],Drug,RxNorm Extension,Quant Branded Drug,S\n21137788,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Septrin Paediatric] by Aspen,Drug,RxNorm Extension,Marketed Product,S\n43292210,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Septrin],Drug,RxNorm Extension,Quant Branded Drug,S\n40713146,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Septrin] by Aspen,Drug,RxNorm Extension,Marketed Product,S\n41426204,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Sigaprim],Drug,RxNorm Extension,Quant Branded Drug,S\n41421918,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Sigaprim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41418927,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Sigaprim] Box of 1 by Puren,Drug,RxNorm Extension,Marketed Product,S\n41417608,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Sigaprim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41422819,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Sulfotrimin],Drug,RxNorm Extension,Quant Branded Drug,S\n41423657,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Sulfotrimin] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41420213,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Supracombin],Drug,RxNorm Extension,Quant Branded Drug,S\n41426202,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Supracombin] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n41422818,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Supracombin] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41416736,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension [Supracombin] Box of 50,Drug,RxNorm Extension,Quant Branded Box,S\n43143006,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension Box of 1,Drug,RxNorm Extension,Quant Clinical Box,S\n41425918,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension Box of 10,Drug,RxNorm Extension,Quant Clinical Box,S\n41423379,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension Box of 25,Drug,RxNorm Extension,Quant Clinical Box,S\n41425916,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension Box of 30,Drug,RxNorm Extension,Quant Clinical Box,S\n41414765,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension Box of 5,Drug,RxNorm Extension,Quant Clinical Box,S\n41414764,100 ML Sulfamethoxazole 40 MG/ML / Trimethoprim 8 MG/ML Oral Suspension Box of 50,Drug,RxNorm Extension,Quant Clinical Box,S\n840019,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by A A H,Drug,RxNorm Extension,Marketed Product,S\n840020,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by Alliance,Drug,RxNorm Extension,Marketed Product,S\n840017,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by Aspen,Drug,RxNorm Extension,Marketed Product,S\n36053187,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by CST,Drug,RxNorm Extension,Marketed Product,S\n36053185,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by DE,Drug,RxNorm Extension,Marketed Product,S\n840021,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by Drugsrus,Drug,RxNorm Extension,Marketed Product,S\n35884964,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by Medihealth,Drug,RxNorm Extension,Marketed Product,S\n840018,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by Necessity Supplies,Drug,RxNorm Extension,Marketed Product,S\n36053188,100 ML sulfamethoxazole 40 MG/ML / trimethoprim 8 MG/ML Oral Suspension by Pilsco,Drug,RxNorm Extension,Marketed Product,S\n43703617,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution,Drug,RxNorm Extension,Quant Clinical Drug,S\n41421069,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Bactrim],Drug,RxNorm Extension,Quant Branded Drug,S\n41418502,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Bactrim] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S\n44198421,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Bactrim] Box of 1 by Ae-Media,Drug,RxNorm Extension,Marketed Product,S\n41418039,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Bactrim] Box of 1 by Ae-Media,Drug,RxNorm Extension,Marketed Product,S\n41420640,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Bactrim] Box of 1 by Orifarm Leverkus,Drug,RxNorm Extension,Marketed Product,S\n41423655,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Bactrim] Box of 25,Drug,RxNorm Extension,Quant Branded Box,S\n41414232,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Bactrim] Box of 5,Drug,RxNorm Extension,Quant Branded Box,S\n41422817,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Berlocid],Drug,RxNorm Extension,Quant Branded Drug,S\n41423654,100 ML Sulfamethoxazole 80 MG/ML / Trimethoprim 16 MG/ML Oral Solution [Berlocid] Box of 1,Drug,RxNorm Extension,Quant Branded Box,S"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "7967a571-21b5-4e81-ae2a-63ea148ec423",
+      "role": "assistant",
+      "created": 1785196105,
+      "content": [
+        {
+          "type": "text",
+          "text": "The individual product concepts are too granular. I'll use the RxNorm Ingredient concepts and `concept_ancestor` to catch all TMP-SMX descendants, and use ancestor rollups for the potassium lab. Let me get the ingredient-level drug concept and the potassium measurement concept, plus check the measurement table structure."
+        },
+        {
+          "type": "toolRequest",
+          "id": "tooluse_ev7XAzICzMOUkmtSems6Na",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id\nFROM omop.concept\nWHERE standard_concept = 'S'\nAND (\n  (domain_id='Drug' AND concept_class_id='Ingredient' AND lower(concept_name) IN ('sulfamethoxazole','trimethoprim'))\n  OR (domain_id='Measurement' AND vocabulary_id='LOINC' AND lower(concept_name) LIKE 'potassium %' AND (lower(concept_name) LIKE '%serum%' OR lower(concept_name) LIKE '%plasma%' OR lower(concept_name) LIKE '%blood%'))\n)\nORDER BY domain_id, concept_name"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_50ed25f0-21bf-4143-b587-49a95f1cae38",
+      "role": "user",
+      "created": 1785196105,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "tooluse_ev7XAzICzMOUkmtSems6Na",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "concept_id,concept_name,domain_id,vocabulary_id,concept_class_id\n1836430,sulfamethoxazole,Drug,RxNorm,Ingredient\n1705674,trimethoprim,Drug,RxNorm,Ingredient\n21490733,Potassium [Mass/volume] in Blood,Measurement,LOINC,Lab Test\n42528882,Potassium [Mass/volume] in Red Blood Cells,Measurement,LOINC,Lab Test\n3043409,Potassium [Moles/volume] in Arterial blood,Measurement,LOINC,Lab Test\n3005456,Potassium [Moles/volume] in Blood,Measurement,LOINC,Lab Test\n3040893,Potassium [Moles/volume] in Capillary blood,Measurement,LOINC,Lab Test\n3031219,Potassium [Moles/volume] in Mixed venous blood,Measurement,LOINC,Lab Test\n3013823,Potassium [Moles/volume] in Red Blood Cells,Measurement,LOINC,Lab Test\n3023103,Potassium [Moles/volume] in Serum or Plasma,Measurement,LOINC,Lab Test\n1001658,Potassium [Moles/volume] in Serum or Plasma --1 hour post dose vasopressin,Measurement,LOINC,Lab Test\n1002312,Potassium [Moles/volume] in Serum or Plasma --2 hours post dose vasopressin,Measurement,LOINC,Lab Test\n3024380,Potassium [Moles/volume] in Serum or Plasma --2nd specimen,Measurement,LOINC,Lab Test\n3024920,Potassium [Moles/volume] in Serum or Plasma --3rd specimen,Measurement,LOINC,Lab Test\n3015066,Potassium [Moles/volume] in Serum or Plasma --post dialysis,Measurement,LOINC,Lab Test\n3039651,Potassium [Moles/volume] in Serum or Plasma --pre dialysis,Measurement,LOINC,Lab Test\n46235078,Potassium [Moles/volume] in Serum, Plasma or Blood,Measurement,LOINC,Lab Test\n3041354,Potassium [Moles/volume] in Venous blood,Measurement,LOINC,Lab Test\n36305238,Potassium goal [Moles/volume] Serum or Plasma,Measurement,LOINC,Clinical Observation\n3009244,Potassium renal clearance in 24 hour Urine and Serum or Plasma,Measurement,LOINC,Lab Test"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "43ca7211-25d6-4ec2-9ad6-46458430992f",
+      "role": "assistant",
+      "created": 1785196118,
+      "content": [
+        {
+          "type": "text",
+          "text": "I'll compute the incidence. Plan: new users = first-ever TMP-SMX exposure (both ingredients tend to co-occur; I'll define exposure as any descendant of either ingredient, taking each person's first exposure date). Then check for any potassium (serum/plasma/blood, moles/volume) measurement > 5.0 mmol/L within 0–30 days after that first exposure, requiring the value units to be mmol/L (or unit-agnostic value_as_number for molar assays)."
+        },
+        {
+          "type": "toolRequest",
+          "id": "tooluse_e5oqcAl8ATgQuLdrlNbVl1",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "medcp__MedCP-query_clinical_records",
+              "arguments": {
+                "sql_query": "WITH tmp_smx_concepts AS (\n    SELECT DISTINCT ca.descendant_concept_id AS concept_id\n    FROM omop.concept_ancestor ca\n    WHERE ca.ancestor_concept_id IN (1836430, 1705674)  -- sulfamethoxazole, trimethoprim\n),\nfirst_exposure AS (\n    SELECT de.person_id, MIN(de.drug_exposure_start_date) AS first_dt\n    FROM omop.drug_exposure de\n    JOIN tmp_smx_concepts c ON c.concept_id = de.drug_concept_id\n    GROUP BY de.person_id\n),\nk_concepts AS (\n    -- serum/plasma/blood potassium in molar units (mmol/L)\n    SELECT concept_id FROM (VALUES\n        (3023103),(46235078),(3005456),(3041354),(3043409),(3040893),(3031219),\n        (3024380),(3024920),(3015066),(3039651)) v(concept_id)\n),\nhyperk AS (\n    SELECT DISTINCT fe.person_id\n    FROM first_exposure fe\n    JOIN omop.measurement m\n        ON m.person_id = fe.person_id\n       AND m.measurement_concept_id IN (SELECT concept_id FROM k_concepts)\n       AND m.value_as_number > 5.0\n       AND m.measurement_date >= fe.first_dt\n       AND m.measurement_date <= DATEADD(day, 30, fe.first_dt)\n)\nSELECT\n    (SELECT COUNT(*) FROM first_exposure) AS new_users,\n    (SELECT COUNT(*) FROM hyperk) AS users_with_k_gt_5_within_30d"
+              }
+            }
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_6423425b-a5ce-4c71-b839-a756c6ab4277",
+      "role": "user",
+      "created": 1785196118,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "tooluse_e5oqcAl8ATgQuLdrlNbVl1",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "new_users,users_with_k_gt_5_within_30d\n105546,8041"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "9db04387-a3a9-43fc-a845-1ef6682e0f12",
+      "role": "assistant",
+      "created": 1785196270,
+      "content": [
+        {
+          "type": "text",
+          "text": "Among new trimethoprim-sulfamethoxazole (TMP-SMX) users, hyperkalemia (serum/plasma/blood potassium > 5.0 mmol/L) is recorded within 30 days in about **7.6%** of patients.\n\n- **New users** (first-ever TMP-SMX exposure): 105,546\n- **With ≥1 potassium > 5.0 mmol/L in the 30 days after first exposure:** 8,041\n- **Incidence:** 8,041 / 105,546 = **7.62%**\n\nNotes on the definition used:\n- New user = each person's earliest `drug_exposure` to any RxNorm descendant of the ingredients trimethoprim (1705674) or sulfamethoxazole (1836430).\n- Outcome = any serum/plasma/blood potassium lab (molar LOINC concepts, e.g. 3023103, 46235078, 3005456) with `value_as_number > 5.0`, on or within 30 days after the index date. This counts patients with ≥1 elevated value, not lab-test-level frequency.\n\nCaveats: this is a recorded-measurement rate, so it's conditioned on a potassium being drawn (informative sampling — sicker patients get tested more); it doesn't require the lab unit to be mmol/L (molar LOINC assays are assumed mmol/L), doesn't establish causality or a prior-clean baseline, and I used a 0–30 day window inclusive of the index date. Want me to refine it — e.g. require a clean baseline (no prior hyperkalemia / require a normal baseline K), add a minimum prior observation period for true incident users, restrict to serum/plasma only, or break it out by severity thresholds (>5.5, >6.0)?"
         }
       ],
       "metadata": {
@@ -226,7 +337,7 @@ We've removed the conversation up to the most recent user message
     }
   ],
   "metadata": {
-    "total_tokens": 69063,
+    "total_tokens": 88136,
     "status": "completed"
   }
 }
