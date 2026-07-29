@@ -4,7 +4,7 @@ Build MedCP's official integration artifacts from the shared core.
 
 Single source of truth is ``src/medcp/``. This script copies that core into the
 targets that need a self-contained package, then zips each artifact into
-``releases/MedCP v<major.minor>/``:
+``releases/MedCP v<version>/``:
 
   * MedCP.brxt                       Biorouter extension
   * medcp-claude-code-plugin.zip     Claude Code plugin
@@ -21,9 +21,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import shutil
 import subprocess
 import sys
+import tomllib
 import zipfile
 from pathlib import Path
 
@@ -37,14 +39,63 @@ def _version() -> str:
     for line in text.splitlines():
         if line.strip().startswith("__version__"):
             return line.split("=", 1)[1].strip().strip('"').strip("'")
-    raise SystemExit("could not determine __version__ from src/medcp/__init__.py")
+    raise SystemExit("could not determine __version__ from src/medcp/_version.py")
 
 
 VERSION = _version()
-RELEASE_DIR = REPO / "releases" / f"MedCP v{'.'.join(VERSION.split('.')[:2])}"
+RELEASE_DIR = REPO / "releases" / f"MedCP v{VERSION}"
+
+RELEASE_ARTIFACT_NAMES = (
+    "MedCP.brxt",
+    "medcp-claude-code-plugin.zip",
+    "medcp-codex.zip",
+    "MedCP.mcpb",
+)
 
 EXCLUDE_DIRS = {".venv", "__pycache__", ".git", ".mypy_cache", ".pytest_cache"}
 EXCLUDE_SUFFIXES = {".pyc"}
+
+
+def _project_version(path: Path) -> str:
+    try:
+        value = tomllib.loads(path.read_text())["project"]["version"]
+    except (OSError, KeyError, tomllib.TOMLDecodeError) as exc:
+        raise SystemExit(f"could not read project.version from {path.relative_to(REPO)}: {exc}") from exc
+    if not isinstance(value, str):
+        raise SystemExit(f"project.version in {path.relative_to(REPO)} must be a string")
+    return value
+
+
+def _manifest_version(path: Path) -> str:
+    try:
+        value = json.loads(path.read_text())["version"]
+    except (OSError, KeyError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"could not read version from {path.relative_to(REPO)}: {exc}") from exc
+    if not isinstance(value, str):
+        raise SystemExit(f"version in {path.relative_to(REPO)} must be a string")
+    return value
+
+
+def validate_version_consistency() -> None:
+    sources = {
+        CORE / "_version.py": VERSION,
+        REPO / "pyproject.toml": _project_version(REPO / "pyproject.toml"),
+        INTEGRATIONS / "biorouter" / "pyproject.toml": _project_version(
+            INTEGRATIONS / "biorouter" / "pyproject.toml"
+        ),
+        REPO / "manifest.json": _manifest_version(REPO / "manifest.json"),
+        INTEGRATIONS / "biorouter" / "manifest.json": _manifest_version(
+            INTEGRATIONS / "biorouter" / "manifest.json"
+        ),
+    }
+    mismatches = {path: value for path, value in sources.items() if value != VERSION}
+    if mismatches:
+        details = "\n".join(
+            f"  {path.relative_to(REPO)}: {value!r}" for path, value in mismatches.items()
+        )
+        raise SystemExit(
+            f"version mismatch: expected {VERSION!r} from src/medcp/_version.py, found:\n{details}"
+        )
 
 
 def _iter_files(root: Path):
@@ -146,13 +197,17 @@ def build_codex() -> Path:
     return out
 
 
-def write_checksums(artifacts) -> None:
+def write_checksums() -> None:
+    artifacts = [
+        RELEASE_DIR / name
+        for name in RELEASE_ARTIFACT_NAMES
+        if (RELEASE_DIR / name).is_file()
+    ]
     lines = []
     for art in artifacts:
-        if art and art.exists():
-            digest = hashlib.sha256(art.read_bytes()).hexdigest()
-            size_mb = art.stat().st_size / 1_048_576
-            lines.append(f"{digest}  {art.name}  ({size_mb:.2f} MiB)")
+        digest = hashlib.sha256(art.read_bytes()).hexdigest()
+        size_mb = art.stat().st_size / 1_048_576
+        lines.append(f"{digest}  {art.name}  ({size_mb:.2f} MiB)")
     (RELEASE_DIR / "checksums.txt").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
 
@@ -167,22 +222,22 @@ def main() -> int:
     ap.add_argument("--skip-lock", action="store_true", help="skip `uv lock` for the brxt")
     args = ap.parse_args()
 
+    validate_version_consistency()
     RELEASE_DIR.mkdir(parents=True, exist_ok=True)
     print(f"Building MedCP v{VERSION} artifacts into: {RELEASE_DIR}\n")
 
     # Always keep the Claude Desktop bundle's server/main.py in sync with the core.
     sync_claude_desktop_server()
 
-    artifacts = []
     if args.only in ("all", "biorouter"):
-        artifacts.append(build_biorouter(args.skip_lock))
+        build_biorouter(args.skip_lock)
     if args.only in ("all", "claude-code"):
-        artifacts.append(build_claude_code())
+        build_claude_code()
     if args.only in ("all", "codex"):
-        artifacts.append(build_codex())
+        build_codex()
 
     print("\nchecksums:")
-    write_checksums(artifacts)
+    write_checksums()
     print(f"\nDone. Artifacts in: {RELEASE_DIR}")
     return 0
 
