@@ -1,0 +1,57 @@
+# MedCP
+
+MedCP is a local, stdio-only Model Context Protocol server for read-only clinical
+and biomedical research. It can expose OMOP clinical-record tools, SPOKE
+knowledge-graph tools, or both.
+
+Canonical source:
+https://github.com/BaranziniLab/MedCP
+
+Human documentation:
+https://baranzinilab.github.io/MedCP/docs/
+
+## Reliable source setup
+
+git clone https://github.com/BaranziniLab/MedCP.git
+cd MedCP
+uv sync --locked
+uv run --locked medcp
+
+With no CLINICAL_RECORDS_* variables set, MedCP starts in SPOKE-only mode.
+
+## SQLite setup
+
+export CLINICAL_RECORDS_BACKEND=sqlite
+export CLINICAL_RECORDS_SQLITE_PATH=/absolute/path/database.sqlite
+uv run --locked medcp
+
+## Tools
+
+- MedCP-list_clinical_tables
+- MedCP-query_clinical_records
+- MedCP-get_knowledge_graph_schema
+- MedCP-query_knowledge_graph
+
+Only tools for configured data sources are advertised.
+
+## Safety boundary
+
+- Use a dedicated database identity with SELECT and no write-capable grants.
+- Begin with aggregate validation queries.
+- Do not return patient-level records in public demonstrations.
+- MedCP rejects write-capable SQL and Cypher, but read-only is not a disclosure
+  control.
+- MedCP does not make an AI host or model provider HIPAA compliant.
+- Use PHI only when the institution has approved the complete database, host,
+  model, network, logging, retention, access-control, and contractual path.
+- The bundled MIMIC-IV OMOP demo is the correct public backend fixture.
+
+## Current release state
+
+For published versions, see the GitHub Releases page. If v0.10.0 is unavailable,
+use the source setup above for Codex CLI and Claude Code.
+
+## License
+
+MedCP software is MIT licensed and provided without warranty. It is research
+software only and is not for patient-care decisions.
