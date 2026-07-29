@@ -308,10 +308,11 @@ def write_checksums() -> None:
     lines = []
     for art in artifacts:
         digest = hashlib.sha256(art.read_bytes()).hexdigest()
-        size_mb = art.stat().st_size / 1_048_576
-        lines.append(f"{digest}  {art.name}  ({size_mb:.2f} MiB)")
+        lines.append(f"{digest}  {art.name}")
     (RELEASE_DIR / "checksums.txt").write_text("\n".join(lines) + "\n")
-    print("\n".join(lines))
+    for line, art in zip(lines, artifacts):
+        size_mb = art.stat().st_size / 1_048_576
+        print(f"{line}  ({size_mb:.2f} MiB)")
 
 
 def main() -> int:
