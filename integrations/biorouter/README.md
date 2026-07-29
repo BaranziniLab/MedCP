@@ -74,22 +74,39 @@ Remove the extension with `biorouter extension remove medcp`.
 
 ## Safe checkout canary
 
-Use an ephemeral extension and a distinct namespace before replacing an
-installed bundle. This leaves the existing `medcp` extension registration and
-configuration untouched:
+BioRouter 1.88.6 can match a dynamically loaded tool to an existing extension's
+shorter prefix. If `medcp` is already enabled, a distinct MCP namespace alone
+does not isolate an ephemeral canary: the call can reach the installed
+extension and fail tool-name validation.
 
-```bash
-biorouter run --no-session --debug \
-  --with-extension 'CLINICAL_RECORDS_BACKEND=sqlite CLINICAL_RECORDS_SQLITE_PATH=/path/to/MedCP-next/benchmarks/sham-dataset/sqlite/sham_mimic_omop.sqlite MEDCP_DISABLE_KNOWLEDGE_GRAPH=1 MEDCP_NAMESPACE=MedCPNext uv run --directory /path/to/MedCP-next --locked medcp' \
-  --text 'Use only tools whose names contain MedCPNext. List the clinical tables and count rows in person.'
+Run the canary with a workflow that disables installed extensions:
+
+```yaml
+# /tmp/medcp-canary.yaml
+version: 1.0.0
+title: MedCP isolated canary
+description: Load only the MedCP checkout supplied on the command line.
+instructions: Use only the MedCPNext tools requested by the user.
+prompt: |-
+  Call MedCPNext-list_clinical_tables, then MedCPNext-query_clinical_records
+  with sql_query SELECT COUNT(*) AS n FROM person.
+extensions: []
+parameters: []
 ```
 
-Omit `MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` only when the canary is intentionally
-testing the default SPOKE connection. `MEDCP_NAMESPACE=MedCPNext` separates tool
-names, but it does not change a `.brxt` bundle's installation identity. A
-persistently installed side-by-side artifact must also use a distinct manifest
-`name` such as `medcp-next`; installing another bundle named `medcp` targets the
-existing extension.
+Then load the checkout as the workflow's only extension:
+
+```bash
+biorouter run --workflow /tmp/medcp-canary.yaml --no-session --debug \
+  --with-extension 'CLINICAL_RECORDS_BACKEND=sqlite CLINICAL_RECORDS_SQLITE_PATH=/path/to/MedCP-next/benchmarks/sham-dataset/sqlite/sham_mimic_omop.sqlite MEDCP_DISABLE_KNOWLEDGE_GRAPH=1 MEDCP_NAMESPACE=MedCPNext uv run --directory /path/to/MedCP-next --locked medcp'
+```
+
+The `extensions: []` workflow setting prevents the installed `medcp` extension
+from entering this run; it does not remove or reconfigure that installation.
+Omit `MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` only when the canary intentionally tests
+the default SPOKE connection. A persistently installed side-by-side artifact
+must also use a distinct manifest `name` such as `medcp-next`; installing
+another bundle named `medcp` targets the existing extension.
 
 ## Use
 

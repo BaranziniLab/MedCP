@@ -2,23 +2,70 @@
 
 <br>
 
-**Contents:** [Overview](#overview) · [Integrations](#integrations) · [Installation](#installation) · [Configuration](#configuration) · [Usage](#usage-examples) · [Testing](#testing) · [Troubleshooting](#troubleshooting) · [Legal](#data-privacy-and-legal-disclaimer)
+**Contents:** [Overview](#overview) · [MCP compatibility](#mcp-compatibility) · [Integrations](#integrations) · [Installation](#installation) · [Configuration](#configuration) · [Usage](#usage-examples) · [Testing](#testing) · [Release build](#release-build) · [Troubleshooting](#troubleshooting) · [Legal](#data-privacy-and-legal-disclaimer)
 
 ## Overview
 
-**MedCP** gives your AI agent **secure, local access** to electronic health records and biomedical knowledge graphs. Sensitive health data is processed entirely on your machine, and one shared core is packaged for **Claude Code**, **Codex CLI**, **BioRouter**, and **Claude Desktop**. If a plain Python function-calling version of this software is of interest, please check out [fMedCP](https://github.com/BaranziniLab/fMedCP), which can be run directly from the terminal.
+**MedCP** gives an AI agent read-only tools for electronic health records and
+biomedical knowledge graphs. The MCP server runs on your machine; database
+queries execute against the local file or remote database endpoints you
+configure, and tool results are returned to the host agent. One shared core is
+packaged for **Claude Code**, **Codex CLI**, **BioRouter**, and **Claude
+Desktop**. If a plain Python function-calling version is of interest, see
+[fMedCP](https://github.com/BaranziniLab/fMedCP).
 
 ![MedCP architecture schematic](assets/schematics.png)
 
 ### Key Features
 
-- **Local Processing** - All data processing happens on your machine
+- **Local MCP server** - The tool process runs on your machine over stdio
 - **EHR Integration** - Query electronic health records with natural language
 - **Pluggable SQL backend** - Point MedCP at **SQL Server**, **MySQL/MariaDB**, or a **local SQLite** file
 - **Runs in your agent** - One shared core, packaged for **Claude Code**, **Codex CLI**, **BioRouter**, and **Claude Desktop**
 - **Biomedical Knowledge** - Access comprehensive drug-disease associations and protein interactions
 - **Real-time Analysis** - Instant clinical decision support
-- **Secure Storage** - Credentials encrypted in OS keychain
+- **Read-only guards** - SQLite is opened read-only, and SQL/Cypher mutation statements are rejected
+
+## MCP compatibility
+
+MedCP v0.10.0 uses the official Python SDK `mcp==2.0.0` and implements the
+[MCP 2026-07-28 revision](https://blog.modelcontextprotocol.io/posts/2026-07-28/).
+The release supports:
+
+- sessionless modern requests with `server/discover`;
+- required modern request metadata and protocol-version validation;
+- `resultType` on complete modern results;
+- private five-minute cache hints on `server/discover` and `tools/list`;
+- snake-case tool annotations from the 2026 schema; and
+- the SDK's legacy initialization path for current hosts that still negotiate an
+  older MCP revision.
+
+The production entry point is deliberately **stdio-only**. HTTP deployment of
+clinical-data tools requires a separate authentication, origin-validation, and
+data-governance review. Optional 2026 capabilities such as tasks, elicitation,
+and extension-specific transports are not advertised.
+
+Current Codex and BioRouter releases may still use legacy `initialize` /
+`notifications/initialized`. Their host smoke tests therefore prove backward
+interoperability; the modern sessionless path is covered separately by raw-wire
+tests that exercise `server/discover`, discovery metadata, caching fields, tool
+calls, error codes, and stdout purity.
+
+### What changed in v0.10.0
+
+- Replaced the FastMCP compatibility layer with the official `MCPServer` API
+  from `mcp==2.0.0`.
+- Converted tool returns to typed `CallToolResult` / `TextContent` responses and
+  updated annotations to the 2026 snake-case schema.
+- Added modern discovery and caching metadata while retaining the SDK's
+  legacy-client path for currently released hosts.
+- Kept the deployable server stdio-only and removed dormant network-listener
+  arguments.
+- Added modern/legacy raw-wire tests, cross-platform CI, namespace validation,
+  version-consistency gates, a locked embedded runtime, reproducible MCPB
+  packaging, and full-patch release directories.
+- Added backend-specific MySQL and SQL Server benchmark variables so both AWS
+  fixtures can be validated in the same run.
 
 ### Integrations
 
@@ -33,10 +80,10 @@ same shared core in [`src/medcp/`](src/medcp):
 | **BioRouter** | [`integrations/biorouter`](integrations/biorouter) (`.brxt` extension) | `MedCP.brxt` |
 | **Claude Desktop** | root [`manifest.json`](manifest.json) (`.mcpb`) | `MedCP.mcpb` |
 
-Built artifacts and per-OS install steps live in the latest
+Built artifacts and install steps live in the latest
 [`releases/`](releases) folder (see `INSTALL.md` there). Rebuild the Claude Code,
-Codex, and BioRouter artifacts with `python3 scripts/build_releases.py`; the
-Claude Desktop `MedCP.mcpb` is packaged separately with `mcpb pack`.
+Codex, BioRouter, and Claude Desktop artifacts with
+`python3 scripts/build_releases.py`.
 
 ## Prerequisites
 
@@ -45,11 +92,13 @@ Requirements depend on how you run MedCP.
 ### For the Claude Desktop extension
 
 - **Claude Desktop** 1.0.0+ with MCPB extension support
-- **Operating system**: macOS 11+ or Windows 10+
+- **Operating system**: macOS on Apple silicon for the bundled v0.10.0 runtime
 - **Python**: included (standalone runtime bundled with the extension)
 - **Memory**: 8 GB RAM minimum, 16 GB recommended
 
-Python and all dependencies ship inside the extension — just install Claude Desktop from [claude.ai/download](https://claude.ai/download).
+Python and all dependencies ship inside the extension. Windows, Linux, and
+Intel-macOS MCPB artifacts require separately built native runtimes; the v0.10.0
+bundle does not claim compatibility with those platforms.
 
 ### For uvx and the agent integrations
 
@@ -60,7 +109,7 @@ Python and all dependencies ship inside the extension — just install Claude De
 ### Option 1: Quick Install (Claude Desktop Extension)
 
 1. **Download the Extension**
-   - Go to [Releases](../../releases)
+   - Go to [`releases/`](releases)
    - Download the latest `MedCP.mcpb` file
 
 2. **Install in Claude Desktop**
@@ -68,40 +117,37 @@ Python and all dependencies ship inside the extension — just install Claude De
    - Claude Desktop will open the installation dialog
    - Click **"Install"**
 
-3. **Configure Databases**
+3. **Configure MedCP**
    - Complete the configuration wizard that appears
-   - Enter your database credentials (details below)
+   - Leave all database fields blank for the bundled read-only SPOKE graph, or
+     configure one EHR backend as described below
 
 That's it!
 
 ### Option 2: Run with uvx (Universal)
 
-Run MedCP directly from the repository using `uvx` without installation:
+Run MedCP from the pinned release using `uvx`. No configuration is required for
+knowledge-graph-only use because the bundled read-only SPOKE connection is the
+default.
 
 ```bash
-# Required: Set your credentials as environment variables
-# At least ONE of the following database configurations must be provided:
-
-# Option A: Knowledge Graph only (biomedical knowledge inference)
-export KNOWLEDGE_GRAPH_URI="bolt://your-neo4j-server:7687"
-export KNOWLEDGE_GRAPH_USERNAME="your_username"
-export KNOWLEDGE_GRAPH_PASSWORD="your_password"
-export KNOWLEDGE_GRAPH_DATABASE="neo4j"
-
-# Option B: Clinical Records only (EHR queries)
-export CLINICAL_RECORDS_SERVER="your-server.hospital.org"
-export CLINICAL_RECORDS_DATABASE="your_database"
-export CLINICAL_RECORDS_USERNAME="your_username"
-export CLINICAL_RECORDS_PASSWORD="your_password"
-
-# Option C: Both (for integrated medical analysis)
-# Set all environment variables above
-
-# Run from GitHub (pinned to the v0.9.0 release)
-uvx --from git+https://github.com/BaranziniLab/MedCP@v0.9.0 medcp
+# Knowledge graph only: no environment variables needed
+uvx --from git+https://github.com/BaranziniLab/MedCP@v0.10.0 medcp
 ```
 
-**Important Notes:** tool names are prefixed with the `MEDCP_NAMESPACE` (default `MedCP`).
+To add a local SQLite EHR:
+
+```bash
+export CLINICAL_RECORDS_BACKEND=sqlite
+export CLINICAL_RECORDS_SQLITE_PATH=/absolute/path/to/database.sqlite
+uvx --from git+https://github.com/BaranziniLab/MedCP@v0.10.0 medcp
+```
+
+For MySQL or SQL Server, set `CLINICAL_RECORDS_BACKEND` to `mysql` or
+`mssql`, then provide the server, database, username, password, and optional
+port variables from the [configuration table](#electronic-health-records-optional).
+
+Tool names are prefixed with `MEDCP_NAMESPACE` (default `MedCP`).
 
 - If only Knowledge Graph is configured, you'll have access to:
   - `MedCP-get_knowledge_graph_schema` - List all biomedical entities and relationships
@@ -113,19 +159,13 @@ uvx --from git+https://github.com/BaranziniLab/MedCP@v0.9.0 medcp
 
 - If both are configured, you'll have access to all tools for integrated analysis
 
-Or run from a local clone:
+Or run the exact locked environment from a local clone:
 
 ```bash
-# Clone the repository
 git clone https://github.com/BaranziniLab/MedCP.git
 cd MedCP
-
-# Set environment variables (see .env.example)
-export KNOWLEDGE_GRAPH_URI="bolt://localhost:7687"
-# ... set other variables ...
-
-# Run with uvx
-uvx --from . medcp
+uv sync --locked
+uv run --locked medcp
 ```
 
 
@@ -191,10 +231,26 @@ credentials — ideal for local testing (e.g. the OMOP dataset in
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| **MedCP Namespace** | Tool prefix for organization | `MedCP` |
-| **Log Level** | Logging verbosity | `INFO` |
+| **`MEDCP_DISABLE_KNOWLEDGE_GRAPH`** | Set to `1` for EHR-only mode | `0` |
+| **`MEDCP_NAMESPACE`** | Tool-name prefix | `MedCP` |
+| **`MEDCP_LOG_LEVEL`** | `DEBUG`, `INFO`, `WARNING`, or `ERROR` | `INFO` |
 
-**Security Note**: All sensitive credentials are automatically encrypted and stored in your operating system's secure keychain.
+### Credential handling
+
+Credential storage is controlled by the host, not by the MedCP server:
+
+- Claude Desktop stores manifest fields marked sensitive using its protected
+  configuration mechanism.
+- BioRouter can store values supplied with its secret-setting flow in its
+  configured keyring.
+- Codex, Claude Code, and direct shell launches pass configuration through the
+  process environment or host configuration. A `.env` file or TOML entry is
+  plaintext at rest unless you protect it separately.
+
+Never commit credentials, paste them into agent prompts, or include literal
+passwords in reusable shell commands. Restrict any local environment file to
+its owner (for example, `chmod 600 file`) and use institution-approved,
+least-privilege, read-only database accounts.
 
 ## Usage Examples
 
@@ -220,38 +276,134 @@ credentials — ideal for local testing (e.g. the OMOP dataset in
 
 ## Testing
 
-A synthetic OMOP dataset and ready-to-run tests live in
-[`benchmarks/sham-dataset`](benchmarks/sham-dataset) — no real patient data.
-
-**SQLite only (no setup):**
+The network-free protocol and SQLite suite covers modern and legacy MCP modes,
+tool discovery metadata, cache hints, version errors, namespace validation,
+read-only enforcement, real stdio framing, and stdout purity:
 
 ```bash
-uv run --with fastmcp --with neo4j python benchmarks/sham-dataset/test_backends.py
+uv sync --locked
+uv run --locked pytest tests
 ```
 
-This verifies the SQLite backend (32 tables, 100 patients, writes blocked) and
-the default SPOKE knowledge graph.
+A synthetic OMOP dataset and the live backend harness live in
+[`benchmarks/sham-dataset`](benchmarks/sham-dataset); they contain no real
+patient data. SQLite needs no setup:
 
-**Against hosted MySQL / SQL Server:** the dataset is organized into
-[`sqlite/`](benchmarks/sham-dataset/sqlite),
-[`mysql/`](benchmarks/sham-dataset/mysql), and
-[`mssql/`](benchmarks/sham-dataset/mssql). The `mysql/` and `mssql/` folders each
-ship a `provision.sh` that stands up an AWS RDS instance, loads the dataset, and
-writes a git-ignored `.dbenv` you can `source` before running the tests:
+```bash
+uv run --locked python benchmarks/sham-dataset/test_backends.py
+```
+
+The live harness expects 32 tables and 100 people, attempts a forbidden write,
+and also queries the default SPOKE graph. It discovers hosted backends from
+backend-specific variables:
+
+| Backend | Variables |
+| --- | --- |
+| MySQL | `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` |
+| SQL Server | `MSSQL_HOST`, `MSSQL_PORT`, `MSSQL_USER`, `MSSQL_PASSWORD`, `MSSQL_DATABASE` |
+
+Backend-specific names take precedence over the deprecated shared `DB_*`
+fallbacks, so both hosted databases can be tested in one process:
+
+```bash
+source benchmarks/sham-dataset/mysql/.dbenv
+source benchmarks/sham-dataset/mssql/.dbenv
+uv run --locked python benchmarks/sham-dataset/test_backends.py
+```
+
+The `mysql/` and `mssql/` directories include provisioning and teardown scripts
+for disposable AWS RDS fixtures. Provisioning writes a git-ignored, mode-0600
+`.dbenv` containing **plaintext** benchmark credentials. Use short-lived test
+credentials, do not reuse production secrets, and delete fixtures you created
+when validation is complete:
 
 ```bash
 cd benchmarks/sham-dataset/mysql
-export DB_PASSWORD='SomeStrongPassword123'   # RDS master password
-./provision.sh                                # create RDS MySQL + load ~468K rows
+read -rsp 'Temporary RDS password: ' DB_PASSWORD
+export DB_PASSWORD
+./provision.sh
 source ./.dbenv
-python ../test_backends.py                     # sqlite + mysql + SPOKE
-./teardown.sh                                  # delete the instance when done
+uv run --directory ../../.. --locked python benchmarks/sham-dataset/test_backends.py
+./teardown.sh
 ```
 
-`test_backends.py` includes MySQL and/or SQL Server automatically once their
-connection variables are set. See
-[`benchmarks/sham-dataset/README.md`](benchmarks/sham-dataset/README.md) for
-details. All three backends have been verified to return identical results.
+Do not run a teardown script against a shared or pre-existing database. See the
+[benchmark README](benchmarks/sham-dataset/README.md) for the full AWS workflow.
+
+### Host MCP smoke tests
+
+Use a temporary registration name and namespace so validation does not replace
+an existing MedCP integration. Pass `CLINICAL_RECORDS_*`,
+`KNOWLEDGE_GRAPH_*`, and `MEDCP_NAMESPACE` explicitly through the host's MCP
+configuration or a mode-0700 launcher; do not assume the host forwards its
+parent shell environment.
+
+For Codex, create the `medcp-next` checkout registration described in
+[`integrations/codex`](integrations/codex), then run an ephemeral, read-only
+turn:
+
+```bash
+codex exec --ephemeral --json -C /absolute/path/to/MedCP -s read-only \
+  'Use only medcp-next. List clinical tables, run SELECT COUNT(*) AS n FROM person, and query MATCH (d:Disease) RETURN count(d) AS n with empty parameters. Return exact tool names and raw outputs.'
+```
+
+For BioRouter, follow the isolated-workflow canary in
+[`integrations/biorouter`](integrations/biorouter). BioRouter 1.88.6 can
+otherwise route an ephemeral `medcp`-prefixed tool to an already enabled
+`medcp` extension even when the MCP namespaces differ.
+
+For AWS MySQL or SQL Server, map the corresponding backend-specific values from
+the protected `.dbenv` into `CLINICAL_RECORDS_*` before starting the host. Do
+not put literal passwords in the command line or prompt.
+
+### Verified release matrix
+
+The v0.10.0 release candidate was verified on 2026-07-29 with synthetic OMOP
+data and aggregate read-only queries:
+
+| Client path | SQLite EHR | AWS MySQL EHR | AWS SQL Server EHR | SPOKE knowledge graph |
+| --- | --- | --- | --- | --- |
+| Direct MCP harness | 32 tables; 100 people; write blocked | 32 tables; 100 people; write blocked | 32 tables; 100 people; write blocked | 117 schema entities; 12,275 Disease nodes |
+| Codex CLI 0.145.0 | 32 tables; 100 people | 32 tables; 100 people | 32 tables; 100 people | 12,275 Disease nodes |
+| BioRouter 1.88.6 | 32 tables; 100 people | 32 tables; 100 people | 32 tables; 100 people | 12,275 Disease nodes |
+
+Codex called `MedCPNext-list_clinical_tables`,
+`MedCPNext-query_clinical_records`, and
+`MedCPNext-query_knowledge_graph`. BioRouter called the same MCP tools through
+its `medcp__MedCPNext-*` host prefix. Both released hosts negotiated the legacy
+MCP initialization fallback; raw-stdio tests separately verified the modern
+2026-07-28 `server/discover` path.
+
+The existing `medcp-mysql` and `medcp-mssql` fixtures were confirmed
+`available` in AWS `us-west-2` and reused for this read-only validation. They
+were not created or torn down by the release test.
+
+## Release build
+
+The release builder verifies every version-bearing manifest, regenerates the
+standalone server mirror, resolves BioRouter's lock, synchronizes the MCPB
+runtime from the root production lock, validates and inspects the MCPB, writes
+the install guide, and hashes every artifact:
+
+```bash
+python3 scripts/build_releases.py
+```
+
+Artifacts are written to `releases/MedCP v0.10.0/`. The MCPB build requires
+`uv`, `mcpb`, and macOS on Apple silicon. Targeted rebuilds are available with
+`--only biorouter`, `--only claude-code`, `--only codex`, or `--only mcpb`;
+checksums for existing artifacts are preserved during a targeted rebuild.
+
+Before publishing a release, run:
+
+```bash
+uv run --locked pytest tests
+mcpb validate manifest.json
+mcpb info 'releases/MedCP v0.10.0/MedCP.mcpb'
+```
+
+The repository CI repeats the network-free test suite on Python 3.11, 3.12, and
+3.13 across Linux, macOS, and Windows.
 
 ## Troubleshooting
 
