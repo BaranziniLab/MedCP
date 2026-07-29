@@ -6,6 +6,7 @@ from mcp import Client
 
 from medcp._version import __version__
 from medcp.server import (
+    ClinicalQueryValidator,
     LONGEST_TOOL_NAME,
     MAX_TOOL_NAME_LENGTH,
     _format_namespace,
@@ -141,3 +142,36 @@ def test_namespace_length_reserves_room_for_longest_tool_name() -> None:
 
     with pytest.raises(ValueError):
         _format_namespace(f"{namespace}n")
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "SELECT COUNT(*) FROM person",
+        "SELECT 'DELETE; UPDATE' AS example_text;",
+        'SELECT "INTO" AS "quoted_identifier"',
+        "SELECT [INTO] AS [quoted_identifier]",
+        "WITH people AS (SELECT person_id FROM person) SELECT * FROM people",
+    ],
+)
+def test_clinical_query_validator_accepts_read_only_sql(query: str) -> None:
+    assert ClinicalQueryValidator.is_read_only_clinical_query(query)
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "",
+        "DECLARE @answer INT",
+        "SELECT * INTO copied_person FROM person",
+        "SELECT * FROM person INTO OUTFILE '/tmp/person.csv'",
+        "SELECT * FROM person FOR UPDATE",
+        "SELECT * FROM OPENROWSET(BULK 'records.csv', SINGLE_CLOB) AS records",
+        "SELECT 1; SELECT 2",
+        "SELECT * FROM person -- hidden statement",
+        "SELECT 'unterminated",
+        "WITH changed AS (DELETE FROM person RETURNING *) SELECT * FROM changed",
+    ],
+)
+def test_clinical_query_validator_rejects_write_capable_sql(query: str) -> None:
+    assert not ClinicalQueryValidator.is_read_only_clinical_query(query)
