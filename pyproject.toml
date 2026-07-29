@@ -31,7 +31,12 @@ keywords = [
     "clinical-informatics"
 ]
 dependencies = [
-    "fastmcp>=2.11.2",
+    # Exact pre-MCP-2026 rollback baseline. The protocol migration replaces
+    # this with the official MCP SDK v2 in the next commit; keeping this commit
+    # independently revertible prevents a future FastMCP major from being
+    # selected by existing MedCP installations.
+    "fastmcp==3.4.4",
+    "mcp==1.29.0",
     "neo4j>=5.28.2",
     "pydantic>=2.11.7",
     "pymssql>=2.3.7",      # Microsoft SQL Server backend
