@@ -11,8 +11,10 @@ biomedical knowledge graphs. The MCP server runs on your machine; database
 queries execute against the local file or remote database endpoints you
 configure, and tool results are returned to the host agent. One shared core is
 packaged for **Claude Code**, **Codex CLI**, **BioRouter**, and **Claude
-Desktop**. If a plain Python function-calling version is of interest, see
-[fMedCP](https://github.com/BaranziniLab/fMedCP).
+Desktop**. **BioRouter is the canonical orchestration harness for agent-driven
+analyses and benchmark runs.** Results produced with retired harnesses are
+historical and should be rerun through BioRouter before they are treated as
+current benchmark evidence.
 
 ![MedCP architecture schematic](assets/schematics.png)
 
