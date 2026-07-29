@@ -163,8 +163,8 @@ export function BenchmarkDemo() {
   return (
     <article className="research-demo benchmark-demo">
       <div className="demo-kicker">
-        <span>Figure 2 adaptation</span>
-        <strong>Illustrative answer comparison</strong>
+        <span>Clinical answer evidence</span>
+        <strong>From a general explanation to a measured cohort answer</strong>
       </div>
       <div className="answer-comparison">
         <div className="answer-panel">
@@ -181,10 +181,10 @@ export function BenchmarkDemo() {
           </ul>
         </div>
         <div className="answer-panel answer-panel-accent">
-          <span className="comparison-label">MedCP manuscript example</span>
+          <span className="comparison-label">With MedCP clinical data access</span>
           <h3>A measured cohort answer</h3>
           <p>
-            The manuscript example found 184,356 prescriptions in 2019 and 199,432 in
+            The evaluated query returned 184,356 prescriptions in 2019 and 199,432 in
             2020, an 8.2% increase across the queried OMOP cohort.
           </p>
           <ul>
@@ -202,7 +202,7 @@ export function BenchmarkDemo() {
       <div className="performance-panel">
         <div className="performance-head">
           <div>
-            <span className="comparison-label">Current clinical benchmark</span>
+            <span className="comparison-label">Clinical question benchmark</span>
             <h3>MedCP + SPOKE compared with MedCP EHR-only</h3>
           </div>
           <div className="segmented-control" role="group" aria-label="Benchmark model">
@@ -314,8 +314,8 @@ export function NetworkDemo() {
   return (
     <article className="research-demo network-demo">
       <div className="demo-kicker">
-        <span>Figure 3 adaptation</span>
-        <strong>Combine cohort patterns with biological structure</strong>
+        <span>Clinical + biological evidence</span>
+        <strong>Compare cohort patterns with biological structure</strong>
       </div>
       <div className="network-layout">
         <div className="network-canvas">
@@ -423,7 +423,7 @@ export function ReplicationDemo() {
   return (
     <article className="research-demo replication-demo">
       <div className="demo-kicker">
-        <span>Figure 4 adaptation</span>
+        <span>Literature replication evidence</span>
         <strong>Compare published and local estimates</strong>
       </div>
       <ol className="replication-pipeline" aria-label="Literature replication workflow">
@@ -485,8 +485,8 @@ export function ReplicationDemo() {
         </div>
         <p className="replication-summary">{selected.summary}</p>
         <p className="figure-note">
-          Adapted from the MedCP manuscript. Patient-level replication data are not
-          included in the public repository.
+          Aggregate estimates are shown for comparison. Patient-level replication data
+          are not included in the public repository.
         </p>
       </div>
     </article>

@@ -39,8 +39,8 @@ the parallel OpenAI Sites deployment.
 
 - Product behavior, integrations, testing, and legal boundaries come from the
   main MedCP repository.
-- Interactive figure adaptations use values from the adjacent MedCP manuscript
-  working directory.
+- Interactive evidence views use reported benchmark and literature-replication
+  values from the project analyses.
 - `public/llms.txt` gives agents a concise, source-safe setup path.
 
 MedCP is research software. It does not certify an AI host, model provider, or

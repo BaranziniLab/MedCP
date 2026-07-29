@@ -345,7 +345,7 @@ uv run --locked pytest tests`}</code>
                   <strong>BioRouter</strong>
                   <p>
                     BioRouter can store values entered through its secret-setting flow
-                    in the configured OS keyring. In the manuscript benchmark harness,
+                    in the configured OS keyring. In the evaluated benchmark harness,
                     limited prompt-injection and PHI patterns were annotated for review,
                     not blocked.
                   </p>

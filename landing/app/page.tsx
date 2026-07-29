@@ -114,7 +114,7 @@ export default function Home() {
           <div className="content-shell">
             <div className="section-heading split-heading">
               <div>
-                <p className="eyebrow">Figure 1 · Infrastructure</p>
+                <p className="eyebrow">System architecture</p>
                 <h2>A local bridge, with explicit data boundaries.</h2>
               </div>
               <p>
@@ -123,15 +123,15 @@ export default function Home() {
               </p>
             </div>
             <ArchitectureDemo />
-            <details className="manuscript-figure">
-              <summary>View the complete manuscript Figure 1</summary>
+            <details className="architecture-figure">
+              <summary>View the complete clinical and biological workflow</summary>
               <a
                 href={sitePath("/media/figure-1.webp")}
                 aria-label="Open the full MedCP infrastructure figure"
               >
                 <Image
                   src={sitePath("/media/figure-1.webp")}
-                  alt="Full MedCP infrastructure and research workflow diagram from manuscript Figure 1"
+                  alt="MedCP infrastructure diagram connecting an agent host, local stdio server, clinical records, and a biomedical knowledge graph"
                   width="1100"
                   height="1271"
                   loading="lazy"
@@ -139,8 +139,9 @@ export default function Home() {
                 />
               </a>
               <p>
-                Figure 1 separates the local researcher, host agent, stdio MedCP process,
-                and the clinical and biological databases that may be local or remote.
+                The architecture separates the researcher, host agent, local MedCP
+                process, and the clinical and biological databases that may be local or
+                remote.
               </p>
             </details>
           </div>
@@ -199,11 +200,12 @@ export default function Home() {
           <div className="content-shell">
             <div className="section-heading split-heading">
               <div>
-                <p className="eyebrow">Figures 2-4 · Evidence</p>
+                <p className="eyebrow">Measured evidence</p>
                 <h2>Benchmark and replication results.</h2>
               </div>
               <p>
-                Interactive summaries of Figures 2-4 from the MedCP manuscript.
+                Compare cohort-grounded answers, explore clinical and biological
+                associations, and review local estimates beside published results.
               </p>
             </div>
             <BenchmarkDemo />
