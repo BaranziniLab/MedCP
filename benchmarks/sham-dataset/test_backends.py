@@ -21,6 +21,7 @@ Run it with MedCP's locked environment from the repo root:
 import asyncio
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -77,7 +78,97 @@ def _text(result):
     return result.content[0].text
 
 
+def verify_reader_permissions(name, cfgdict):
+    """Confirm hosted fixture credentials are database-enforced read-only."""
+    if name == "sqlite":
+        return
+
+    if name == "mysql":
+        import pymysql
+
+        conn = pymysql.connect(
+            host=cfgdict["server"],
+            user=cfgdict["username"],
+            password=cfgdict["password"],
+            database=cfgdict["database"],
+            port=cfgdict["port"],
+            autocommit=False,
+        )
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SHOW GRANTS FOR CURRENT_USER")
+            grant_lines = [str(row[0]).upper() for row in cursor.fetchall()]
+        finally:
+            cursor.close()
+            conn.close()
+
+        granted = set()
+        for line in grant_lines:
+            match = re.fullmatch(r"GRANT (.+?) ON .+ TO .+", line)
+            assert match, f"mysql: unexpected grant form for benchmark reader"
+            granted.update(part.strip() for part in match.group(1).split(","))
+        assert "SELECT" in granted, "mysql: benchmark reader lacks SELECT"
+        assert granted <= {"SELECT", "USAGE"}, (
+            f"mysql: benchmark reader has non-read grants: "
+            f"{sorted(granted - {'SELECT', 'USAGE'})}"
+        )
+        return
+
+    import pymssql
+
+    conn = pymssql.connect(
+        server=cfgdict["server"],
+        user=cfgdict["username"],
+        password=cfgdict["password"],
+        database=cfgdict["database"],
+        port=str(cfgdict["port"]),
+        autocommit=False,
+    )
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "SELECT permission_name FROM fn_my_permissions(NULL, 'DATABASE')"
+        )
+        permissions = {str(row[0]).upper() for row in cursor.fetchall()}
+        cursor.execute(
+            "SELECT roles.name "
+            "FROM sys.database_role_members AS memberships "
+            "JOIN sys.database_principals AS roles "
+            "ON roles.principal_id = memberships.role_principal_id "
+            "JOIN sys.database_principals AS members "
+            "ON members.principal_id = memberships.member_principal_id "
+            "WHERE members.name = USER_NAME()"
+        )
+        roles = {str(row[0]).lower() for row in cursor.fetchall()}
+    finally:
+        cursor.close()
+        conn.close()
+
+    write_permissions = {
+        "ADMINISTER DATABASE BULK OPERATIONS",
+        "ALTER",
+        "BACKUP DATABASE",
+        "BACKUP LOG",
+        "CONTROL",
+        "CREATE TABLE",
+        "DELETE",
+        "EXECUTE",
+        "INSERT",
+        "TAKE OWNERSHIP",
+        "UPDATE",
+    }
+    assert "SELECT" in permissions, "mssql: benchmark reader lacks SELECT"
+    assert not permissions & write_permissions, (
+        f"mssql: benchmark reader has write-capable permissions: "
+        f"{sorted(permissions & write_permissions)}"
+    )
+    assert roles <= {"db_datareader"}, (
+        f"mssql: unexpected benchmark reader roles: {sorted(roles)}"
+    )
+
+
 async def test_clinical(name, cfgdict):
+    verify_reader_permissions(name, cfgdict)
     mcp = create_medcp_server(MedCPConfig(clinical_records=cfgdict, namespace="MedCP", log_level="WARNING"))
     async with Client(mcp, mode="2026-07-28") as c:
         listing = await c.list_tools()
@@ -97,7 +188,10 @@ async def test_clinical(name, cfgdict):
     assert ntab == EXPECTED_TABLES, f"{name}: expected {EXPECTED_TABLES} tables, got {ntab}"
     assert npers == EXPECTED_PERSONS, f"{name}: expected {EXPECTED_PERSONS} persons, got {npers}"
     assert guard_result.is_error, f"{name}: write query was not blocked"
-    print(f"  [{name:6s}] tables={ntab:<4} persons={npers:<5} write=blocked")
+    print(
+        f"  [{name:6s}] tables={ntab:<4} persons={npers:<5} "
+        f"validator=blocked permissions=read-only"
+    )
     return ntab, npers
 
 

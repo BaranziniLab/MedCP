@@ -33,16 +33,18 @@ mode, so it exercises the modern in-process protocol path.
 
 Each backend has a self-contained hosting script under [`mysql/`](mysql) and
 [`mssql/`](mssql). They provision an AWS RDS instance, load the dataset, and
-write a git-ignored `.dbenv` you can `source` before running
-[`test_backends.py`](test_backends.py). See those folders' READMEs. For example:
+create a dedicated SELECT-only reader. Only that reader is written to the
+git-ignored `.dbenv` you can `source` before running
+[`test_backends.py`](test_backends.py); the RDS admin credential is not retained
+there. See those folders' READMEs. For example:
 
 ```bash
 cd mysql
-read -rsp 'RDS master password: ' DB_PASSWORD
+read -rsp 'RDS master password: ' DB_ADMIN_PASSWORD
 echo
-export DB_PASSWORD
+export DB_ADMIN_PASSWORD
 ./provision.sh                                   # create RDS MySQL + load data
-unset DB_PASSWORD
+unset DB_ADMIN_PASSWORD
 source ./.dbenv
 uv run --directory ../../.. --locked \
   python benchmarks/sham-dataset/test_backends.py # sqlite + mysql + SPOKE
@@ -58,9 +60,36 @@ backend-specific variables are present:
   `MSSQL_DATABASE`
 
 The generated `.dbenv` files also export legacy `DB_USER`, `DB_PASSWORD`, and
-`DB_NAME` aliases for compatibility. Backend-specific values take precedence,
-which makes it safe to load both families without sharing one backend's
-credentials with the other.
+`DB_NAME` aliases for compatibility. Those aliases identify the same SELECT-only
+reader, not the RDS admin. Backend-specific values take precedence, which makes
+it safe to load both families without sharing one backend's credentials with
+the other.
+
+The provisioners accept `DB_ADMIN_USER` and `DB_ADMIN_PASSWORD` for the RDS
+administrator. The older `DB_USER` and `DB_PASSWORD` input names remain
+supported in a clean shell, but the explicit admin names avoid ambiguity after
+sourcing a reader `.dbenv`. By default, provisioning creates `medcpreader` with
+a generated password; set `DB_READER_USER` and/or `DB_READER_PASSWORD` before
+provisioning to override them. Database and account names used in generated SQL
+must contain only ASCII letters, digits, and underscores and may not start with
+a digit.
+
+To migrate an instance created by the older scripts without reloading its
+tables, run its provisioner with `MIGRATE_EXISTING=1`. The provisioner locates
+the existing `DB_IDENTIFIER`, creates or rotates the reader, and atomically
+replaces `.dbenv` with reader credentials:
+
+```bash
+cd mysql # repeat from ../mssql for medcp-mssql
+read -rsp 'Existing RDS master password: ' DB_ADMIN_PASSWORD
+echo
+export DB_ADMIN_PASSWORD
+MIGRATE_EXISTING=1 ./provision.sh
+unset DB_ADMIN_PASSWORD
+```
+
+No password appears in the command arguments or output. Use `DB_ADMIN_USER` if
+the existing master username is not `medcpadmin`.
 
 These variables configure the benchmark harness. A MedCP server launch instead
 uses `CLINICAL_RECORDS_BACKEND` and the corresponding
@@ -81,8 +110,11 @@ harness's explicit SPOKE test.
   library.
 
 > Security: the hosting scripts take the RDS master password from
-> `DB_PASSWORD`; it is not hardcoded or printed. AWS and the loader still receive
-> it as a process argument, and each generated `.dbenv` contains the password in
-> plaintext. The scripts shell-escape the values and restrict the file to mode
+> `DB_ADMIN_PASSWORD`; it is not hardcoded, printed, passed in a child process
+> argument, or written to `.dbenv`. The loader receives both passwords through
+> its environment. The AWS CLI reads the master password from a transient
+> mode-`0600` JSON file that the script removes immediately and on abnormal
+> exit. The generated `.dbenv` contains only the SELECT-only reader password in
+> plaintext. The scripts shell-escape its values and restrict the file to mode
 > `0600`, but git-ignore is not encryption. Never commit, print, or share the
 > file, and delete it after teardown.
