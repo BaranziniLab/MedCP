@@ -9,12 +9,14 @@ targets that need a self-contained package, then zips each artifact into
   * MedCP.brxt                       Biorouter extension
   * medcp-claude-code-plugin.zip     Claude Code plugin
   * medcp-codex.zip                  Codex CLI MCP server (config + installer)
+  * MedCP.mcpb                       Claude Desktop bundle (macOS arm64)
   * INSTALL.md                       per-OS install instructions
   * checksums.txt                    sha256 of the artifacts above
 
 Usage:
     python3 scripts/build_releases.py                # build everything
     python3 scripts/build_releases.py --only biorouter
+    python3 scripts/build_releases.py --only mcpb
     python3 scripts/build_releases.py --skip-lock    # don't run `uv lock`
 """
 from __future__ import annotations
@@ -22,9 +24,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import platform
 import shutil
 import subprocess
 import sys
+import tempfile
 import tomllib
 import zipfile
 from pathlib import Path
@@ -32,6 +36,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 CORE = REPO / "src" / "medcp"
 INTEGRATIONS = REPO / "integrations"
+INSTALL_TEMPLATE = REPO / "scripts" / "INSTALL.md.in"
+MCPB_PYTHON = REPO / ".python" / "bin" / "python3.12"
 
 # Read the version from the core package so it stays in lock-step.
 def _version() -> str:
@@ -66,10 +72,12 @@ def _project_version(path: Path) -> str:
     return value
 
 
-def _manifest_version(path: Path) -> str:
+def _json_version(path: Path, *keys: str | int) -> str:
     try:
-        value = json.loads(path.read_text())["version"]
-    except (OSError, KeyError, json.JSONDecodeError) as exc:
+        value = json.loads(path.read_text())
+        for key in keys:
+            value = value[key]
+    except (OSError, KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
         raise SystemExit(f"could not read version from {path.relative_to(REPO)}: {exc}") from exc
     if not isinstance(value, str):
         raise SystemExit(f"version in {path.relative_to(REPO)} must be a string")
@@ -83,9 +91,19 @@ def validate_version_consistency() -> None:
         INTEGRATIONS / "biorouter" / "pyproject.toml": _project_version(
             INTEGRATIONS / "biorouter" / "pyproject.toml"
         ),
-        REPO / "manifest.json": _manifest_version(REPO / "manifest.json"),
-        INTEGRATIONS / "biorouter" / "manifest.json": _manifest_version(
-            INTEGRATIONS / "biorouter" / "manifest.json"
+        REPO / "manifest.json": _json_version(REPO / "manifest.json", "version"),
+        INTEGRATIONS / "biorouter" / "manifest.json": _json_version(
+            INTEGRATIONS / "biorouter" / "manifest.json", "version"
+        ),
+        INTEGRATIONS / "claude-code" / ".claude-plugin" / "plugin.json": _json_version(
+            INTEGRATIONS / "claude-code" / ".claude-plugin" / "plugin.json",
+            "version",
+        ),
+        INTEGRATIONS / ".claude-plugin" / "marketplace.json": _json_version(
+            INTEGRATIONS / ".claude-plugin" / "marketplace.json",
+            "plugins",
+            0,
+            "version",
         ),
     }
     mismatches = {path: value for path, value in sources.items() if value != VERSION}
@@ -197,6 +215,90 @@ def build_codex() -> Path:
     return out
 
 
+def build_mcpb() -> Path:
+    """Synchronize the embedded runtime and build the Claude Desktop bundle.
+
+    The checked-in runtime is intentionally a macOS Apple-silicon CPython
+    distribution. Other platforms must build and publish their own native MCPB
+    artifact instead of relabeling this one.
+    """
+    if sys.platform != "darwin" or platform.machine() != "arm64":
+        raise SystemExit(
+            "MedCP.mcpb must be built on macOS arm64 for the bundled runtime"
+        )
+    if not MCPB_PYTHON.is_file():
+        raise SystemExit(f"embedded Python not found: {MCPB_PYTHON.relative_to(REPO)}")
+    for command in ("uv", "mcpb"):
+        if not shutil.which(command):
+            raise SystemExit(f"{command!r} is required to build MedCP.mcpb")
+
+    with tempfile.TemporaryDirectory(prefix="medcp-mcpb-") as temp_dir:
+        requirements = Path(temp_dir) / "requirements.txt"
+        print("[claude-desktop] exporting locked production dependencies…")
+        subprocess.run(
+            [
+                "uv",
+                "export",
+                "--quiet",
+                "--frozen",
+                "--no-dev",
+                "--no-emit-project",
+                "--no-header",
+                "--no-annotate",
+                "--format",
+                "requirements.txt",
+                "--output-file",
+                str(requirements),
+            ],
+            cwd=REPO,
+            check=True,
+        )
+        print("[claude-desktop] synchronizing embedded Python runtime…")
+        subprocess.run(
+            [
+                "uv",
+                "pip",
+                "sync",
+                "--python",
+                str(MCPB_PYTHON),
+                str(requirements),
+            ],
+            cwd=REPO,
+            check=True,
+        )
+
+    subprocess.run(
+        [
+            str(MCPB_PYTHON),
+            "-c",
+            (
+                "import importlib.util; "
+                "from mcp.server import MCPServer; "
+                "from mcp.types import CallToolResult; "
+                "assert importlib.util.find_spec('fastmcp') is None"
+            ),
+        ],
+        cwd=REPO,
+        check=True,
+    )
+    subprocess.run(["mcpb", "validate", "manifest.json"], cwd=REPO, check=True)
+
+    out = RELEASE_DIR / "MedCP.mcpb"
+    if out.exists():
+        out.unlink()
+    subprocess.run(["mcpb", "pack", ".", str(out)], cwd=REPO, check=True)
+    subprocess.run(["mcpb", "info", str(out)], cwd=REPO, check=True)
+    print(f"[claude-desktop] → {out}")
+    return out
+
+
+def write_install_guide() -> None:
+    if not INSTALL_TEMPLATE.is_file():
+        raise SystemExit(f"install guide template not found: {INSTALL_TEMPLATE.relative_to(REPO)}")
+    text = INSTALL_TEMPLATE.read_text().replace("@VERSION@", VERSION)
+    (RELEASE_DIR / "INSTALL.md").write_text(text)
+
+
 def write_checksums() -> None:
     artifacts = [
         RELEASE_DIR / name
@@ -216,7 +318,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--only",
-        choices=["biorouter", "claude-code", "codex", "all"],
+        choices=["biorouter", "claude-code", "codex", "mcpb", "all"],
         default="all",
     )
     ap.add_argument("--skip-lock", action="store_true", help="skip `uv lock` for the brxt")
@@ -235,7 +337,10 @@ def main() -> int:
         build_claude_code()
     if args.only in ("all", "codex"):
         build_codex()
+    if args.only in ("all", "mcpb"):
+        build_mcpb()
 
+    write_install_guide()
     print("\nchecksums:")
     write_checksums()
     print(f"\nDone. Artifacts in: {RELEASE_DIR}")
