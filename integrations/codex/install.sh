@@ -9,11 +9,12 @@
 #   ./install.sh                          # use env vars already exported
 #   ./install.sh --env-file ../../.env    # load them from a .env file first
 #   MEDCP_SOURCE=/path/to/MedCP ./install.sh   # run a local core instead of the pinned release
+#   MEDCP_NAME=medcp-next ./install.sh         # register a side-by-side canary
 #
 set -euo pipefail
 
-NAME="medcp"
-SOURCE="${MEDCP_SOURCE:-git+https://github.com/BaranziniLab/MedCP@v0.9.0}"
+NAME="${MEDCP_NAME:-medcp}"
+SOURCE="${MEDCP_SOURCE:-git+https://github.com/BaranziniLab/MedCP@v0.10.0}"
 
 # Optionally load a .env file.
 if [[ "${1:-}" == "--env-file" && -n "${2:-}" ]]; then
@@ -40,7 +41,7 @@ for key in \
   CLINICAL_RECORDS_SERVER CLINICAL_RECORDS_DATABASE \
   CLINICAL_RECORDS_USERNAME CLINICAL_RECORDS_PASSWORD CLINICAL_RECORDS_PORT \
   KNOWLEDGE_GRAPH_URI KNOWLEDGE_GRAPH_USERNAME KNOWLEDGE_GRAPH_PASSWORD KNOWLEDGE_GRAPH_DATABASE \
-  MEDCP_NAMESPACE MEDCP_LOG_LEVEL
+  MEDCP_DISABLE_KNOWLEDGE_GRAPH MEDCP_NAMESPACE MEDCP_LOG_LEVEL
 do
   if [[ -n "${!key:-}" ]]; then
     ENV_FLAGS+=(--env "${key}=${!key}")

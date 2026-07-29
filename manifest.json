@@ -1,9 +1,9 @@
 {
   "manifest_version": "0.2",
   "name": "MedCP",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Medical Model Context Protocol Server for Claude Desktop",
-  "long_description": "MedCP is a specialized medical AI extension that integrates electronic health record databases and large-scale biomedical knowledge graphs directly into Claude Desktop. It enables natural language querying of clinical data (SQL Server, MySQL/MariaDB, or a local SQLite file — e.g. OMOP CDM), exploration of the SPOKE biomedical knowledge graph (Neo4j), and comprehensive analysis combining patient records with drug-disease associations, protein interactions, and biological pathways. The extension provides secure, local processing of sensitive health data with credentials encrypted in OS keychain, making it ideal for clinical decision support, medical research, and healthcare analytics.",
+  "long_description": "MedCP is a specialized medical AI extension that integrates electronic health record databases and large-scale biomedical knowledge graphs directly into Claude Desktop. It enables natural language querying of clinical data (SQL Server, MySQL/MariaDB, or a local SQLite file — e.g. OMOP CDM), exploration of the SPOKE biomedical knowledge graph (Neo4j), and comprehensive analysis combining patient records with drug-disease associations, protein interactions, and biological pathways. Claude Desktop stores configuration values marked sensitive in the operating-system keychain; database queries still travel to the database endpoints you configure.",
   "author": {
     "name": "Wanjun Gu",
     "email": "wanjun.gu@ucsf.edu"
@@ -24,6 +24,7 @@
         "KNOWLEDGE_GRAPH_USERNAME":  "${user_config.KNOWLEDGE_GRAPH_USERNAME}",
         "KNOWLEDGE_GRAPH_PASSWORD":  "${user_config.KNOWLEDGE_GRAPH_PASSWORD}",
         "KNOWLEDGE_GRAPH_DATABASE":  "${user_config.KNOWLEDGE_GRAPH_DATABASE}",
+        "MEDCP_DISABLE_KNOWLEDGE_GRAPH": "${user_config.MEDCP_DISABLE_KNOWLEDGE_GRAPH}",
         "CLINICAL_RECORDS_BACKEND":  "${user_config.CLINICAL_RECORDS_BACKEND}",
         "CLINICAL_RECORDS_SERVER":   "${user_config.CLINICAL_RECORDS_SERVER}",
         "CLINICAL_RECORDS_DATABASE": "${user_config.CLINICAL_RECORDS_DATABASE}",
@@ -100,6 +101,14 @@
       "default": "",
       "sensitive": false
     },
+    "MEDCP_DISABLE_KNOWLEDGE_GRAPH": {
+      "type": "boolean",
+      "title": "Disable Knowledge Graph",
+      "description": "Disable the bundled SPOKE graph and expose EHR tools only.",
+      "required": false,
+      "default": false,
+      "sensitive": false
+    },
     "CLINICAL_RECORDS_BACKEND": {
       "type": "string",
       "title": "EHR Backend (optional)",
@@ -171,9 +180,7 @@
   },
   "compatibility": {
     "platforms": [
-      "darwin",
-      "win32",
-      "linux"
+      "darwin"
     ],
     "runtimes": {
       "node": ">=18.0.0"

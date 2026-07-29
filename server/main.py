@@ -28,7 +28,7 @@ from neo4j import GraphDatabase, Result, Transaction
 from neo4j.exceptions import ClientError, Neo4jError
 from pydantic import BaseModel, Field, model_validator
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 logger = logging.getLogger("MedCP")
 
