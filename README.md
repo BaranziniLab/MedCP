@@ -384,6 +384,10 @@ its `medcp__MedCPNext-*` host prefix. Both released hosts negotiated the legacy
 MCP initialization fallback; raw-stdio tests separately verified the modern
 2026-07-28 `server/discover` path.
 
+After the final release build, both hosts repeated the EHR and knowledge-graph
+queries by launching the exact source and lock extracted from the generated
+`MedCP.brxt`, rather than an older installed extension.
+
 The existing `medcp-mysql` and `medcp-mssql` fixtures were confirmed
 `available` in AWS `us-west-2`, migrated from administrator-bearing test
 configuration to generated SELECT-only readers, and reused for this validation.
