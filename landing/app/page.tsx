@@ -77,34 +77,40 @@ export default function Home() {
           <div className="content-shell overview-grid">
             <div className="section-heading">
               <p className="eyebrow">Overview</p>
-              <h2>One interface for two evidence systems.</h2>
+              <h2>One interface. Two key components.</h2>
             </div>
             <div className="prose">
               <p className="lead">
-                MedCP runs on your machine and exposes up to four tools. The databases
-                can be local or remote. Results return to the host agent that you choose.
+                MedCP brings two key components into one local interface: an OMOP EHR
+                queried with SQL and a biomedical knowledge graph queried with Cypher.
+                Results return to the host agent that you choose.
               </p>
-              <div className="tool-grid">
-                <div>
-                  <span className="tool-index">EHR 01</span>
-                  <code>MedCP-list_clinical_tables</code>
-                  <p>Inspect the available OMOP tables before writing a query.</p>
-                </div>
-                <div>
-                  <span className="tool-index">EHR 02</span>
-                  <code>MedCP-query_clinical_records</code>
-                  <p>Run validated read-only SQL against SQLite, MySQL, or SQL Server.</p>
-                </div>
-                <div>
-                  <span className="tool-index">KG 01</span>
-                  <code>MedCP-get_knowledge_graph_schema</code>
-                  <p>Discover the node labels, properties, and relationships.</p>
-                </div>
-                <div>
-                  <span className="tool-index">KG 02</span>
-                  <code>MedCP-query_knowledge_graph</code>
-                  <p>Run read-only Cypher against SPOKE or another Neo4j graph.</p>
-                </div>
+              <div className="evidence-grid">
+                <article className="evidence-card evidence-card-ehr">
+                  <span className="component-index">Key component 01</span>
+                  <div className="evidence-title">
+                    <strong>EHR</strong>
+                    <span>SQL</span>
+                  </div>
+                  <h3>Clinical records</h3>
+                  <p>
+                    Query OMOP-format health records with validated, read-only SQL.
+                  </p>
+                  <small>Preconfigured for OMOP EHRs on SQLite, MySQL, and SQL Server</small>
+                </article>
+                <article className="evidence-card evidence-card-kg">
+                  <span className="component-index">Key component 02</span>
+                  <div className="evidence-title">
+                    <strong>Knowledge graph</strong>
+                    <span>Cypher</span>
+                  </div>
+                  <h3>Biomedical context</h3>
+                  <p>
+                    Connect diseases with genes, pathways, drugs, and other biological
+                    relationships through read-only graph queries.
+                  </p>
+                  <small>Preconfigured for the SPOKE knowledge graph</small>
+                </article>
               </div>
             </div>
           </div>

@@ -29,10 +29,15 @@ test("server-renders the MedCP landing page", async () => {
 
   const html = await response.text();
   assert.match(html, /The private data port for medical AI/);
+  assert.match(html, /One interface\. Two key components\./);
+  assert.match(html, /Preconfigured for the SPOKE knowledge graph/);
   assert.match(html, /MedCP \+ SPOKE compared with MedCP EHR-only/);
+  assert.match(html, /How MedCP links EHR comorbidity to SPOKE biology/);
+  assert.match(html, /Read-only Cypher/);
   assert.match(html, /Control the full data path/);
   assert.match(html, /BioRouter/);
   assert.match(html, /Codex CLI/);
+  assert.doesNotMatch(html, /MedCP-(?:list|query|get)_/);
   assert.doesNotMatch(html, /react-loading-skeleton|Your site is taking shape/i);
   assert.doesNotMatch(html, /\u2014/);
 });

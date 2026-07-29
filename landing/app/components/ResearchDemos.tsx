@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ArchitectureStep = "question" | "host" | "medcp" | "ehr" | "kg";
 
@@ -282,112 +282,224 @@ function ScoreBar({
   );
 }
 
-type NetworkNode = "disease" | "gene" | "drug" | "pathway" | "ehr";
+const studySteps = [
+  {
+    label: "Ask",
+    title: "Define the clinical question",
+    short: "Comorbidity question",
+    body:
+      "A researcher asks MedCP to map comorbidity among common autoimmune and neurodegenerative diseases.",
+    tags: ["Research protocol", "Disease set"],
+  },
+  {
+    label: "EHR",
+    title: "Measure disease pairs in the EHR",
+    short: "Read-only SQL",
+    body:
+      "MedCP uses validated SQL to identify aggregate disease co-occurrence patterns in the OMOP clinical database.",
+    tags: ["OMOP EHR", "SQL", "Aggregate results"],
+  },
+  {
+    label: "SPOKE",
+    title: "Map biological relationships",
+    short: "Read-only Cypher",
+    body:
+      "MedCP uses Cypher to measure how the same diseases connect through genes, variants, symptoms, anatomy, compounds, pathways, and curated disease-disease relationships in SPOKE.",
+    tags: ["SPOKE", "Cypher", "Seven dimensions"],
+  },
+  {
+    label: "Align",
+    title: "Join the two evidence systems",
+    short: "Matched disease pairs",
+    body:
+      "Disease pairs from the EHR are matched to their biological similarity in the knowledge graph, creating one comparison table.",
+    tags: ["Clinical patterns", "Biological similarity"],
+  },
+  {
+    label: "Test",
+    title: "Test the association",
+    short: "Spearman rank correlation",
+    body:
+      "EHR co-occurrence was adjusted for age, sex, follow-up duration, and visit-days, then compared with SPOKE similarity using Spearman rank correlation.",
+    tags: ["Adjusted model", "Auditable result"],
+  },
+] as const;
 
-const networkDetails: Record<NetworkNode, { label: string; body: string }> = {
-  disease: {
-    label: "Disease",
-    body: "The common anchor used to compare clinical co-occurrence with graph connectivity.",
-  },
-  gene: {
-    label: "Genes",
-    body: "Known disease-gene relationships help organize mechanistic hypotheses.",
-  },
-  drug: {
-    label: "Drugs",
-    body: "Drug and target relationships add pharmacologic context to cohort patterns.",
-  },
-  pathway: {
-    label: "Pathways",
-    body: "Pathway links place individual genes into broader biological processes.",
-  },
-  ehr: {
-    label: "EHR co-occurrence",
-    body: "Adjusted clinical co-occurrence is compared with graph structure, not treated as causation.",
-  },
-};
+const biologicalDimensions = [
+  "Genes",
+  "Variants",
+  "Symptoms",
+  "Anatomy",
+  "Compounds",
+  "Pathways",
+  "Curated disease relationships",
+] as const;
 
 export function NetworkDemo() {
-  const [active, setActive] = useState<NetworkNode>("disease");
-  const detail = networkDetails[active];
+  const [activeStep, setActiveStep] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const active = studySteps[activeStep];
+  const progress = (activeStep / (studySteps.length - 1)) * 100;
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncMotionPreference = () => {
+      setReducedMotion(media.matches);
+      if (media.matches) {
+        setIsPlaying(false);
+      }
+    };
+
+    syncMotionPreference();
+    media.addEventListener("change", syncMotionPreference);
+    return () => media.removeEventListener("change", syncMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || reducedMotion) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setActiveStep((current) => (current + 1) % studySteps.length);
+    }, 2400);
+
+    return () => window.clearInterval(timer);
+  }, [isPlaying, reducedMotion]);
 
   return (
-    <article className="research-demo network-demo">
+    <article id="study-walkthrough" className="research-demo study-demo">
       <div className="demo-kicker">
-        <span>Clinical + biological evidence</span>
-        <strong>Compare cohort patterns with biological structure</strong>
+        <span>Study walkthrough</span>
+        <strong>How MedCP links EHR comorbidity to SPOKE biology</strong>
       </div>
-      <div className="network-layout">
-        <div className="network-canvas">
-          <svg viewBox="0 0 680 360" role="img" aria-labelledby="network-title network-desc">
-            <title id="network-title">Clinical and biological evidence network</title>
-            <desc id="network-desc">
-              A disease node connects to genes, drugs, pathways, and adjusted EHR
-              co-occurrence. Select a node to read its role.
-            </desc>
-            <g className={`network-edges active-${active}`} aria-hidden="true">
-              <line x1="340" y1="180" x2="116" y2="86" />
-              <line x1="340" y1="180" x2="555" y2="72" />
-              <line x1="340" y1="180" x2="566" y2="278" />
-              <line x1="340" y1="180" x2="116" y2="276" />
-              <line x1="116" y1="86" x2="116" y2="276" />
-              <line x1="555" y1="72" x2="566" y2="278" />
-            </g>
-          </svg>
-          <NetworkButton id="disease" label="Disease" x="50%" y="50%" active={active} setActive={setActive} />
-          <NetworkButton id="gene" label="Genes" x="17%" y="24%" active={active} setActive={setActive} />
-          <NetworkButton id="drug" label="Drugs" x="82%" y="20%" active={active} setActive={setActive} />
-          <NetworkButton id="pathway" label="Pathways" x="83%" y="77%" active={active} setActive={setActive} />
-          <NetworkButton id="ehr" label="EHR" x="17%" y="77%" active={active} setActive={setActive} />
-        </div>
-        <div className="network-detail" aria-live="polite">
-          <span>Selected evidence layer</span>
-          <strong>{detail.label}</strong>
-          <p>{detail.body}</p>
-          <div className="stat-lockup">
-            <strong>ρ 0.580</strong>
-            <span>
-              Adjusted association across 208 co-occurrence patterns and seven
-              biological dimensions
-            </span>
-          </div>
-          <p className="figure-note">
-            Hypothesis-generating association after adjustment for age, sex, follow-up,
-            and visit days. It is not a causal estimate.
+      <div className="study-walkthrough">
+        <div className="study-intro">
+          <p>
+            The same disease pairs are measured in the EHR and SPOKE, then compared in
+            an adjusted analysis.
           </p>
+          <button
+            type="button"
+            className="study-playback"
+            aria-label={
+              reducedMotion
+                ? "Motion disabled by system preference"
+                : isPlaying
+                  ? "Pause animation"
+                  : "Play animation"
+            }
+            disabled={reducedMotion}
+            onClick={() => setIsPlaying((current) => !current)}
+          >
+            <span aria-hidden="true">{reducedMotion ? "•" : isPlaying ? "Ⅱ" : "▶"}</span>
+            {reducedMotion ? "Motion off" : isPlaying ? "Pause" : "Play"}
+          </button>
+        </div>
+
+        <div className="study-flow">
+          <svg
+            className="study-flow-svg"
+            viewBox="0 0 1000 72"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            <path className="study-track" pathLength="100" d="M 100 36 H 900" />
+            <path
+              className="study-progress"
+              pathLength="100"
+              d="M 100 36 H 900"
+              style={{ strokeDashoffset: 100 - progress }}
+            />
+            {[100, 300, 500, 700, 900].map((x, index) => (
+              <circle
+                key={x}
+                className={index <= activeStep ? "is-reached" : ""}
+                cx={x}
+                cy="36"
+                r={index === activeStep ? "9" : "6"}
+              />
+            ))}
+            <circle
+              className="study-pulse"
+              cx={[100, 300, 500, 700, 900][activeStep]}
+              cy="36"
+              r="15"
+            />
+          </svg>
+          <ol className="study-steps" aria-label="MedCP study workflow">
+            {studySteps.map((step, index) => (
+              <li key={step.label}>
+                <button
+                  type="button"
+                  className={index === activeStep ? "is-active" : ""}
+                  aria-current={index === activeStep ? "step" : undefined}
+                  onClick={() => {
+                    setActiveStep(index);
+                    setIsPlaying(false);
+                  }}
+                  onFocus={() => {
+                    setActiveStep(index);
+                    setIsPlaying(false);
+                  }}
+                >
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{step.label}</strong>
+                  <small>{step.short}</small>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="study-detail-grid">
+          <div className="study-detail" aria-live={isPlaying ? "off" : "polite"}>
+            <span>
+              Step {String(activeStep + 1).padStart(2, "0")} of{" "}
+              {String(studySteps.length).padStart(2, "0")}
+            </span>
+            <h3>{active.title}</h3>
+            <p>{active.body}</p>
+            <div className="study-tags" aria-label="Data and method">
+              {active.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+          </div>
+          <aside className="study-result">
+            <span>Cross-source association</span>
+            <div>
+              <strong>ρ 0.58</strong>
+              <em>p &lt; 0.0001</em>
+            </div>
+            <p>
+              Biological similarity in SPOKE tracked adjusted comorbidity patterns in
+              the EHR.
+            </p>
+            <small>Hypothesis-generating association, not a causal estimate.</small>
+          </aside>
+        </div>
+
+        <div className="study-dimensions">
+          <span>Biological dimensions measured in SPOKE</span>
+          <ul>
+            {biologicalDimensions.map((dimension, index) => (
+              <li
+                key={dimension}
+                className={
+                  activeStep >= 2 && index <= (activeStep - 2) * 3 + 1
+                    ? "is-highlighted"
+                    : ""
+                }
+              >
+                {dimension}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </article>
-  );
-}
-
-function NetworkButton({
-  id,
-  label,
-  x,
-  y,
-  active,
-  setActive,
-}: {
-  id: NetworkNode;
-  label: string;
-  x: string;
-  y: string;
-  active: NetworkNode;
-  setActive: (value: NetworkNode) => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`network-node network-node-${id}${active === id ? " is-active" : ""}`}
-      style={{ left: x, top: y }}
-      aria-pressed={active === id}
-      onClick={() => setActive(id)}
-      onPointerEnter={() => setActive(id)}
-      onFocus={() => setActive(id)}
-    >
-      {label}
-    </button>
   );
 }
 
