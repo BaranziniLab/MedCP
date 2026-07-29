@@ -21,17 +21,20 @@ import re
 from typing import Any, Literal, Optional
 
 import anyio
-from fastmcp.exceptions import ToolError
-from fastmcp.server import FastMCP
-from fastmcp.tools.tool import ToolResult, TextContent
-from mcp.types import ToolAnnotations
+from mcp.server import CacheHint, MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult, TextContent, ToolAnnotations
 from neo4j import GraphDatabase, Result, Transaction
 from neo4j.exceptions import ClientError, Neo4jError
 from pydantic import BaseModel, Field, model_validator
 
+__version__ = "0.9.0"
+
 logger = logging.getLogger("MedCP")
 
 SQLBackend = Literal["mssql", "mysql", "sqlite"]
+MAX_TOOL_NAME_LENGTH = 128
+LONGEST_TOOL_NAME = "get_knowledge_graph_schema"
 
 
 def _load_spoke_defaults() -> dict:
@@ -121,10 +124,21 @@ class MedCPConfig(BaseModel):
 
 
 def _format_namespace(namespace: str) -> str:
-    """Format namespace with trailing dash if needed"""
-    if namespace:
-        return namespace if namespace.endswith("-") else namespace + "-"
-    return ""
+    """Validate a tool namespace and format it with a trailing dash."""
+    if not namespace:
+        return ""
+
+    prefix = namespace if namespace.endswith("-") else namespace + "-"
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", prefix):
+        raise ValueError(
+            "MEDCP_NAMESPACE may contain only ASCII letters, digits, '_', '-', and '.'"
+        )
+    if len(prefix) + len(LONGEST_TOOL_NAME) > MAX_TOOL_NAME_LENGTH:
+        raise ValueError(
+            f"MEDCP_NAMESPACE is too long; generated tool names must be at most "
+            f"{MAX_TOOL_NAME_LENGTH} characters"
+        )
+    return prefix
 
 
 def _read_knowledge_graph(tx: Transaction, cypher_query: str, params: dict[str, Any]) -> str:
@@ -171,13 +185,24 @@ class ClinicalQueryValidator:
         return True
 
 
-def create_medcp_server(config: MedCPConfig) -> FastMCP:
+def create_medcp_server(config: MedCPConfig) -> MCPServer:
     """Create MedCP server with configured biomedical database tools"""
 
     # Set up logging
     logging.basicConfig(level=getattr(logging, config.log_level.upper()))
 
-    mcp = FastMCP("MedCP")
+    private_catalog_cache = CacheHint(ttl_ms=300_000, scope="private")
+    mcp = MCPServer(
+        "MedCP",
+        description=(
+            "Read-only electronic health record and biomedical knowledge graph tools"
+        ),
+        version=__version__,
+        cache_hints={
+            "server/discover": private_catalog_cache,
+            "tools/list": private_catalog_cache,
+        },
+    )
     namespace_prefix = _format_namespace(config.namespace)
 
     # Knowledge graph driver initialization
@@ -252,7 +277,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
     # Knowledge Graph Tools
     if kg_driver:
 
-        def _get_knowledge_graph_schema_impl() -> ToolResult:
+        def _get_knowledge_graph_schema_impl() -> CallToolResult:
             """Blocking schema fetch (apoc.meta.schema); run off the event loop via anyio.to_thread."""
 
             def clean_schema(schema: dict) -> dict:
@@ -322,7 +347,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
                     schema = json.loads(results_json_str)[0].get('value')
                     schema_clean = clean_schema(schema)
 
-                    return ToolResult(content=[TextContent(type="text", text=json.dumps(schema_clean))])
+                    return CallToolResult(content=[TextContent(type="text", text=json.dumps(schema_clean))])
 
             except ClientError as e:
                 if "Neo.ClientError.Procedure.ProcedureNotFound" in str(e):
@@ -339,13 +364,13 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
             name=f"{namespace_prefix}get_knowledge_graph_schema",
             annotations=ToolAnnotations(
                 title="Get Knowledge Graph Schema",
-                readOnlyHint=True,
-                destructiveHint=False,
-                idempotentHint=True,
-                openWorldHint=True
+                read_only_hint=True,
+                destructive_hint=False,
+                idempotent_hint=True,
+                open_world_hint=True
             )
         )
-        async def get_knowledge_graph_schema() -> ToolResult:
+        async def get_knowledge_graph_schema() -> CallToolResult:
             """
             List all nodes, their attributes and their relationships in the biomedical knowledge graph.
             This provides the schema for drug-disease associations, protein interactions, pathways,
@@ -355,7 +380,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
             """
             return await anyio.to_thread.run_sync(_get_knowledge_graph_schema_impl)
 
-        def _query_knowledge_graph_impl(cypher_query: str, parameters: dict) -> ToolResult:
+        def _query_knowledge_graph_impl(cypher_query: str, parameters: dict) -> CallToolResult:
             """Blocking Cypher query; run off the event loop via anyio.to_thread."""
             try:
                 with kg_driver.session(database=config.knowledge_graph.database) as session:
@@ -363,7 +388,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
 
                     logger.debug(f"Knowledge graph query returned {len(results_json_str)} characters")
 
-                    return ToolResult(content=[TextContent(type="text", text=results_json_str)])
+                    return CallToolResult(content=[TextContent(type="text", text=results_json_str)])
 
             except Neo4jError as e:
                 logger.error(f"Knowledge graph error executing query: {e}")
@@ -376,16 +401,16 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
             name=f"{namespace_prefix}query_knowledge_graph",
             annotations=ToolAnnotations(
                 title="Query Biomedical Knowledge Graph",
-                readOnlyHint=True,
-                destructiveHint=False,
-                idempotentHint=True,
-                openWorldHint=True
+                read_only_hint=True,
+                destructive_hint=False,
+                idempotent_hint=True,
+                open_world_hint=True
             )
         )
         async def query_knowledge_graph(
             cypher_query: str = Field(..., description="The Cypher query for biomedical knowledge inference (e.g., drug-disease associations, protein interactions)"),
             parameters: dict[str, Any] = Field(default_factory=dict, description="Parameters to pass to the knowledge graph query")
-        ) -> ToolResult:
+        ) -> CallToolResult:
             """Execute a read-only Cypher query on the biomedical knowledge graph for fast knowledge inference.
 
             The blocking Neo4j session runs in a worker thread (anyio.to_thread) so
@@ -399,7 +424,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
     # Clinical Records Tools
     if clinical_config:
 
-        def _query_clinical_records_impl(sql_query: str) -> ToolResult:
+        def _query_clinical_records_impl(sql_query: str) -> CallToolResult:
             """Blocking clinical query; run off the event loop via anyio.to_thread."""
             conn = None
             try:
@@ -425,7 +450,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
 
                 logger.debug(f"Clinical records query returned {len(rows) if rows else 0} rows")
 
-                return ToolResult(content=[TextContent(type="text", text=result_text)])
+                return CallToolResult(content=[TextContent(type="text", text=result_text)])
 
             except ToolError:
                 raise
@@ -443,15 +468,15 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
             name=f"{namespace_prefix}query_clinical_records",
             annotations=ToolAnnotations(
                 title="Query Electronic Health Records",
-                readOnlyHint=True,
-                destructiveHint=False,
-                idempotentHint=True,
-                openWorldHint=False
+                read_only_hint=True,
+                destructive_hint=False,
+                idempotent_hint=True,
+                open_world_hint=False
             )
         )
         async def query_clinical_records(
             sql_query: str = Field(..., description="SQL SELECT query for rapid clinical record retrieval (read-only)")
-        ) -> ToolResult:
+        ) -> CallToolResult:
             """Execute a READ-ONLY SQL query on electronic health records for rapid clinical data retrieval.
 
             Works against the configured backend (SQL Server, MySQL, or a local SQLite file).
@@ -465,7 +490,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
 
             return await anyio.to_thread.run_sync(_query_clinical_records_impl, sql_query)
 
-        def _list_clinical_tables_impl() -> ToolResult:
+        def _list_clinical_tables_impl() -> CallToolResult:
             """Blocking table listing; run off the event loop via anyio.to_thread."""
             if clinical_config.backend == "sqlite":
                 query = (
@@ -513,7 +538,7 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
 
                 cursor.close()
 
-                return ToolResult(content=[TextContent(type="text", text=json.dumps(table_list, indent=2))])
+                return CallToolResult(content=[TextContent(type="text", text=json.dumps(table_list, indent=2))])
 
             except ToolError:
                 raise
@@ -531,13 +556,13 @@ def create_medcp_server(config: MedCPConfig) -> FastMCP:
             name=f"{namespace_prefix}list_clinical_tables",
             annotations=ToolAnnotations(
                 title="List Clinical Data Tables",
-                readOnlyHint=True,
-                destructiveHint=False,
-                idempotentHint=True,
-                openWorldHint=False
+                read_only_hint=True,
+                destructive_hint=False,
+                idempotent_hint=True,
+                open_world_hint=False
             )
         )
-        async def list_clinical_tables() -> ToolResult:
+        async def list_clinical_tables() -> CallToolResult:
             """List all available clinical data tables in the electronic health records database.
 
             The blocking database call runs in a worker thread (anyio.to_thread).
@@ -563,7 +588,6 @@ def _env_bool(value: Optional[str]) -> bool:
 
 
 def main(
-    transport: Literal["stdio", "sse", "http"] = "stdio",
     knowledge_graph_uri: Optional[str] = None,
     knowledge_graph_username: Optional[str] = None,
     knowledge_graph_password: Optional[str] = None,
@@ -578,11 +602,13 @@ def main(
     disable_knowledge_graph: bool = False,
     namespace: str = "",
     log_level: str = "INFO",
-    host: str = "127.0.0.1",
-    port: int = 8000,
-    path: str = "/mcp/",
 ) -> None:
-    """Main entry point for the MedCP server"""
+    """Run the MedCP server over stdio.
+
+    Network transports are intentionally not exposed by this entry point.
+    Deploying clinical-data tools over HTTP requires a separate authentication,
+    origin-validation, and data-governance review.
+    """
 
     # Build configuration
     config_dict: dict[str, Any] = {"namespace": namespace, "log_level": log_level}

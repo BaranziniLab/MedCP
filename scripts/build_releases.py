@@ -33,7 +33,7 @@ INTEGRATIONS = REPO / "integrations"
 
 # Read the version from the core package so it stays in lock-step.
 def _version() -> str:
-    text = (CORE / "__init__.py").read_text()
+    text = (CORE / "_version.py").read_text()
     for line in text.splitlines():
         if line.strip().startswith("__version__"):
             return line.split("=", 1)[1].strip().strip('"').strip("'")
@@ -89,7 +89,15 @@ def sync_claude_desktop_server() -> None:
     """
     dest = REPO / "server" / "main.py"
     dest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(CORE / "server.py", dest)
+    source = (CORE / "server.py").read_text()
+    version_import = "from medcp._version import __version__"
+    if version_import not in source:
+        raise SystemExit("could not find MedCP version import in src/medcp/server.py")
+    # The MCPB runs server/main.py as a standalone module and deliberately does
+    # not install the MedCP package. Embed the same single-source version literal
+    # while generating that mirror.
+    source = source.replace(version_import, f'__version__ = "{VERSION}"', 1)
+    dest.write_text(source)
     print(f"[claude-desktop] synced {dest.relative_to(REPO)} from core")
 
 
