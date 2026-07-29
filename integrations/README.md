@@ -97,5 +97,6 @@ Plain `.env`, TOML, JSON, YAML, and generated `.dbenv` files are not encrypted:
 restrict their permissions and never commit, log, or paste live credentials into
 prompts.
 
-See [`../releases`](../releases) for the built artifacts and per-OS install
-instructions.
+See the [current release directory](../releases/MedCP%20v0.10.0) for the built
+artifacts and per-OS install instructions. The [`releases/`](../releases) index
+documents how superseded artifacts are retained in Git history.

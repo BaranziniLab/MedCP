@@ -86,9 +86,10 @@ same shared core in [`src/medcp/`](src/medcp):
 | **BioRouter** | [`integrations/biorouter`](integrations/biorouter) (`.brxt` extension) | `MedCP.brxt` |
 | **Claude Desktop** | root [`manifest.json`](manifest.json) (`.mcpb`) | `MedCP.mcpb` |
 
-Built artifacts and install steps live in the latest
-[`releases/`](releases) folder (see `INSTALL.md` there). Rebuild the Claude Code,
-Codex, BioRouter, and Claude Desktop artifacts with
+Built artifacts and install steps live in the
+[current release directory](releases/MedCP%20v0.10.0). The
+[`releases/`](releases) index explains the current-tree retention policy.
+Rebuild the Claude Code, Codex, BioRouter, and Claude Desktop artifacts with
 `python3 scripts/build_releases.py`.
 
 ## Prerequisites
@@ -115,7 +116,7 @@ bundle does not claim compatibility with those platforms.
 ### Option 1: Quick Install (Claude Desktop Extension)
 
 1. **Download the Extension**
-   - Go to [`releases/`](releases)
+   - Go to the [current release directory](releases/MedCP%20v0.10.0)
    - Download the latest `MedCP.mcpb` file
 
 2. **Install in Claude Desktop**
