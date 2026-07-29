@@ -32,7 +32,11 @@ For EHR access, choose one backend:
 - SQL Server: use the same variables with
   `CLINICAL_RECORDS_BACKEND=mssql`.
 
-All EHR and knowledge-graph query tools enforce read-only operations.
+MedCP validates EHR queries before execution, opens SQLite read-only, starts
+MySQL queries in a read-only transaction, and rolls remote connections back.
+For defense in depth, configure MySQL and SQL Server with a dedicated account
+that has `SELECT` and no write-capable grants; never use an administrator
+credential for an agent-facing server.
 
 ## BioRouter
 

@@ -66,6 +66,12 @@ calls, error codes, and stdout purity.
   packaging, and full-patch release directories.
 - Added backend-specific MySQL and SQL Server benchmark variables so both AWS
   fixtures can be validated in the same run.
+- Hardened clinical SQL validation against comments, stacked statements, and
+  read-prefixed write forms; MySQL calls also run in an explicit read-only
+  transaction and every remote connection is rolled back before close.
+- Changed AWS fixture provisioning to retain the RDS administrator only for
+  setup and load, create a dedicated SELECT-only reader for MedCP, and verify
+  effective reader permissions in the live backend gate.
 
 ### Integrations
 
@@ -293,9 +299,10 @@ patient data. SQLite needs no setup:
 uv run --locked python benchmarks/sham-dataset/test_backends.py
 ```
 
-The live harness expects 32 tables and 100 people, attempts a forbidden write,
-and also queries the default SPOKE graph. It discovers hosted backends from
-backend-specific variables:
+The live harness expects 32 tables and 100 people, verifies that the MedCP
+validator rejects a forbidden statement, checks that hosted identities have
+SELECT but no write-capable database grants, and queries the default SPOKE
+graph. It discovers hosted backends from backend-specific variables:
 
 | Backend | Variables |
 | --- | --- |
@@ -312,16 +319,19 @@ uv run --locked python benchmarks/sham-dataset/test_backends.py
 ```
 
 The `mysql/` and `mssql/` directories include provisioning and teardown scripts
-for disposable AWS RDS fixtures. Provisioning writes a git-ignored, mode-0600
-`.dbenv` containing **plaintext** benchmark credentials. Use short-lived test
-credentials, do not reuse production secrets, and delete fixtures you created
-when validation is complete:
+for disposable AWS RDS fixtures. Provisioning loads data with the administrator,
+then creates a dedicated SELECT-only `medcpreader`. The git-ignored, mode-0600
+`.dbenv` contains only that reader's **plaintext** benchmark credential, never
+the administrator password. Use short-lived test credentials, do not reuse
+production secrets, and delete fixtures you created when validation is
+complete:
 
 ```bash
 cd benchmarks/sham-dataset/mysql
-read -rsp 'Temporary RDS password: ' DB_PASSWORD
-export DB_PASSWORD
+read -rsp 'Temporary RDS admin password: ' DB_ADMIN_PASSWORD
+export DB_ADMIN_PASSWORD
 ./provision.sh
+unset DB_ADMIN_PASSWORD
 source ./.dbenv
 uv run --directory ../../.. --locked python benchmarks/sham-dataset/test_backends.py
 ./teardown.sh
@@ -363,9 +373,9 @@ data and aggregate read-only queries:
 
 | Client path | SQLite EHR | AWS MySQL EHR | AWS SQL Server EHR | SPOKE knowledge graph |
 | --- | --- | --- | --- | --- |
-| Direct MCP harness | 32 tables; 100 people; write blocked | 32 tables; 100 people; write blocked | 32 tables; 100 people; write blocked | 117 schema entities; 12,275 Disease nodes |
-| Codex CLI 0.145.0 | 32 tables; 100 people | 32 tables; 100 people | 32 tables; 100 people | 12,275 Disease nodes |
-| BioRouter 1.88.6 | 32 tables; 100 people | 32 tables; 100 people | 32 tables; 100 people | 12,275 Disease nodes |
+| Direct MCP harness | 32 tables; 100 people; file and validator read-only | 32 tables; 100 people; validator and SELECT-only grants verified | 32 tables; 100 people; validator and SELECT-only grants verified | 117 schema entities; 12,275 Disease nodes |
+| Codex CLI 0.145.0 | 32 tables; 100 people | 32 tables; 100 people via SELECT-only reader | 32 tables; 100 people via SELECT-only reader | 12,275 Disease nodes |
+| BioRouter 1.88.6 | 32 tables; 100 people | 32 tables; 100 people via SELECT-only reader | 32 tables; 100 people via SELECT-only reader | 12,275 Disease nodes |
 
 Codex called `MedCPNext-list_clinical_tables`,
 `MedCPNext-query_clinical_records`, and
@@ -375,8 +385,9 @@ MCP initialization fallback; raw-stdio tests separately verified the modern
 2026-07-28 `server/discover` path.
 
 The existing `medcp-mysql` and `medcp-mssql` fixtures were confirmed
-`available` in AWS `us-west-2` and reused for this read-only validation. They
-were not created or torn down by the release test.
+`available` in AWS `us-west-2`, migrated from administrator-bearing test
+configuration to generated SELECT-only readers, and reused for this validation.
+They were not created or torn down by the release test.
 
 ## Release build
 
