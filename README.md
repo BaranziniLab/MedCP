@@ -2,6 +2,8 @@
 
 <br>
 
+**Website:** [baranzinilab.github.io/MedCP](https://baranzinilab.github.io/MedCP/) · [Documentation](https://baranzinilab.github.io/MedCP/docs/)
+
 **Contents:** [Overview](#overview) · [MCP compatibility](#mcp-compatibility) · [Integrations](#integrations) · [Installation](#installation) · [Configuration](#configuration) · [Usage](#usage-examples) · [Testing](#testing) · [Release build](#release-build) · [Troubleshooting](#troubleshooting) · [Legal](#data-privacy-and-legal-disclaimer)
 
 ## Overview
