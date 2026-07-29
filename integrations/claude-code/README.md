@@ -24,11 +24,16 @@ claude-code/
 - Claude Code (`claude`) 2.x or newer
 - [`uv`](https://docs.astral.sh/uv/) on your `PATH` (provides `uvx`)
 
+MedCP implements sessionless MCP 2026-07-28 and retains the SDK's legacy
+initialization fallback. A Claude Code release that still uses the legacy
+lifecycle validates fallback interoperability only; the modern SDK tests and
+raw-stdio tests are what prove the 2026-07-28 path.
+
 ## Configuration
 
-The plugin passes MedCP's environment variables through to the server. Set the
-ones you need in your shell (or a project `.env` you `source`) before starting
-Claude Code.
+The plugin passes the MedCP variables listed in its `.mcp.json` through to the
+server. Set the ones you need in your shell (or a project `.env` you `source`)
+before starting Claude Code.
 
 ```bash
 # Local SQLite EHR (e.g. the bundled sham OMOP dataset)
@@ -59,6 +64,17 @@ credentials. Set `KNOWLEDGE_GRAPH_URI` / `_USERNAME` / `_PASSWORD` / `_DATABASE`
 only to use your own Neo4j graph instead (or `MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` to
 turn it off).
 
+The packaged `.mcp.json` forwards the disable flag, namespace, and log level in
+addition to the backend and graph settings.
+
+The plugin's `.mcp.json` contains environment-variable references, not the
+credential values themselves. The values still live in the launching process
+environment or in whatever file you source. A `.env` file is plaintext, and a
+literal value supplied with `claude mcp add -e` is persisted in Claude Code's
+MCP configuration and passed to the registration command as a process argument;
+neither is keyring-backed by this integration. Restrict file permissions and
+never commit, log, or paste live credentials into prompts.
+
 `MEDCP_SOURCE` controls which build of the core is launched. It defaults to the
 pinned GitHub release; point it at a local checkout for development:
 
@@ -85,8 +101,29 @@ The marketplace manifest is [`../.claude-plugin/marketplace.json`](../.claude-pl
 You can also register the same server directly:
 
 ```bash
-claude mcp add medcp -- uvx --from git+https://github.com/BaranziniLab/MedCP@v0.9.0 medcp
+claude mcp add medcp -- uvx --from git+https://github.com/BaranziniLab/MedCP@v0.10.0 medcp
 ```
+
+## Safe side-by-side canary
+
+Use a separate local-scope registration and namespace for a checkout canary.
+The sham SQLite database avoids production credentials, and `--locked` prevents
+dependency drift:
+
+```bash
+claude mcp add --scope local medcp-next \
+  -e CLINICAL_RECORDS_BACKEND=sqlite \
+  -e CLINICAL_RECORDS_SQLITE_PATH=/path/to/MedCP-next/benchmarks/sham-dataset/sqlite/sham_mimic_omop.sqlite \
+  -e MEDCP_DISABLE_KNOWLEDGE_GRAPH=1 \
+  -e MEDCP_NAMESPACE=MedCPNext \
+  -- uv run --directory /path/to/MedCP-next --locked medcp
+```
+
+Ask Claude to use only tools whose names contain `MedCPNext`. Omit
+`MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` only for an intentional default-SPOKE test,
+and remove the local canary after validation. Do not use real database
+credentials in the command because literal `-e` values are stored in Claude
+Code's MCP configuration.
 
 ## Use
 

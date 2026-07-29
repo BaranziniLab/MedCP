@@ -27,7 +27,7 @@ time — do not edit it here. That script also generates the `uv.lock`. Both
 
 ```bash
 python3 ../../scripts/build_releases.py --only biorouter
-# → releases/MedCP v0.9/MedCP.brxt
+# → releases/MedCP v0.10.0/MedCP.brxt
 ```
 
 The script copies the core into `src/`, runs `uv lock` (verifying cross-platform
@@ -35,27 +35,61 @@ wheel resolution, including Intel macOS), and zips the required entries:
 `manifest.json`, `README.md`, `pyproject.toml`, `src/`, `skills/`, and the
 generated `uv.lock`.
 
+The bundled server supports sessionless MCP 2026-07-28 and the SDK's legacy
+initialization fallback. A BioRouter version that still initializes a legacy
+session tests the fallback path, not the modern wire path; keep the modern
+in-process and raw-stdio tests in the release gate.
+
 ## Install
 
 Requires [`uv`](https://docs.astral.sh/uv/) — BioRouter runs `uv sync` on install.
 
 ```bash
 # SQLite EHR (e.g. the sham OMOP dataset)
-biorouter extension install "releases/MedCP v0.9/MedCP.brxt" \
+biorouter extension install "releases/MedCP v0.10.0/MedCP.brxt" \
   --env CLINICAL_RECORDS_BACKEND=sqlite \
   --env CLINICAL_RECORDS_SQLITE_PATH=/absolute/path/to/database.sqlite
 
 # MySQL / SQL Server: pass server/database/username + a secret password
-biorouter extension install "releases/MedCP v0.9/MedCP.brxt" \
+biorouter extension install "releases/MedCP v0.10.0/MedCP.brxt" \
   --env CLINICAL_RECORDS_BACKEND=mysql \
   --env CLINICAL_RECORDS_SERVER=db.example.org \
   --env CLINICAL_RECORDS_DATABASE=omop \
-  --env CLINICAL_RECORDS_USERNAME=reader \
-  --secret CLINICAL_RECORDS_PASSWORD=•••••
+  --env CLINICAL_RECORDS_USERNAME=reader
 ```
 
-`--env` sets a plain variable; `--secret` stores the value in the OS keyring.
+`--env` values are ordinary configuration. Store
+`CLINICAL_RECORDS_PASSWORD` with BioRouter's secret field in the desktop UI
+whenever possible. The CLI's `--secret KEY=value` also stores the value in the
+OS keyring, but supplying a literal value can expose it through shell history or
+process inspection. The keyring protects the value at rest after installation;
+it does not make the command line secret.
+
+The knowledge graph is optional. Leave every `KNOWLEDGE_GRAPH_*` variable unset
+to use the bundled read-only SPOKE production graph, set those variables only
+for your own Neo4j graph, or pass
+`--env MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` for an EHR-only server.
+
 Remove the extension with `biorouter extension remove medcp`.
+
+## Safe checkout canary
+
+Use an ephemeral extension and a distinct namespace before replacing an
+installed bundle. This leaves the existing `medcp` extension registration and
+configuration untouched:
+
+```bash
+biorouter run --no-session --debug \
+  --with-extension 'CLINICAL_RECORDS_BACKEND=sqlite CLINICAL_RECORDS_SQLITE_PATH=/path/to/MedCP-next/benchmarks/sham-dataset/sqlite/sham_mimic_omop.sqlite MEDCP_DISABLE_KNOWLEDGE_GRAPH=1 MEDCP_NAMESPACE=MedCPNext uv run --directory /path/to/MedCP-next --locked medcp' \
+  --text 'Use only tools whose names contain MedCPNext. List the clinical tables and count rows in person.'
+```
+
+Omit `MEDCP_DISABLE_KNOWLEDGE_GRAPH=1` only when the canary is intentionally
+testing the default SPOKE connection. `MEDCP_NAMESPACE=MedCPNext` separates tool
+names, but it does not change a `.brxt` bundle's installation identity. A
+persistently installed side-by-side artifact must also use a distinct manifest
+`name` such as `medcp-next`; installing another bundle named `medcp` targets the
+existing extension.
 
 ## Use
 

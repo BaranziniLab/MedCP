@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Provision an AWS RDS SQL Server (Express) instance, load the sham OMOP dataset
 # into it, and write a local .dbenv (git-ignored) for
-# benchmarks/sham-dataset/test_backends.py.
+# benchmarks/sham-dataset/test_backends.py. The file contains both MSSQL_* names
+# and legacy DB_* compatibility aliases.
 #
-# Requires: aws CLI (configured), uv. Set the master password first:
-#     export DB_PASSWORD='SomeStrongPassword123'
+# Requires: aws CLI (configured), uv. Read the master password without echoing:
+#     read -rsp 'RDS master password: ' DB_PASSWORD; echo; export DB_PASSWORD
 #     ./provision.sh
 #
 # Override any of: AWS_REGION, DB_IDENTIFIER, DB_USER, DB_NAME, DB_CLASS.
@@ -17,6 +18,7 @@ DB_NAME="${DB_NAME:-omop}"
 CLASS="${DB_CLASS:-db.t3.small}"
 : "${DB_PASSWORD:?Set DB_PASSWORD (RDS master password, 8+ chars) before running}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
 export AWS_PAGER=""
 
 echo "==> Networking (default VPC + security group open to your IP on 1433)"
@@ -40,16 +42,32 @@ EP=$(aws rds describe-db-instances --region "$REGION" --db-instance-identifier "
 echo "    endpoint: $EP"
 
 echo "==> Loading sham OMOP dataset into SQL Server (creates database '$DB_NAME')"
-uv run --no-project --with pymssql python3 "$HERE/../load_omop.py" mssql "$EP" "$DB_USER" "$DB_PASSWORD" "$DB_NAME" 1433
+uv run --directory "$REPO_ROOT" --locked \
+  python "$HERE/../load_omop.py" mssql "$EP" "$DB_USER" "$DB_PASSWORD" "$DB_NAME" 1433
 
-cat > "$HERE/.dbenv" <<EOF
-export MSSQL_HOST=$EP
-export MSSQL_PORT=1433
-export DB_USER=$DB_USER
-export DB_PASSWORD=$DB_PASSWORD
-export DB_NAME=$DB_NAME
-EOF
-echo "==> Wrote $HERE/.dbenv (git-ignored)."
-echo "    Test:  source $HERE/.dbenv && python benchmarks/sham-dataset/test_backends.py"
-echo "    MedCP: CLINICAL_RECORDS_BACKEND=mssql CLINICAL_RECORDS_SERVER=$EP \\"
-echo "           CLINICAL_RECORDS_DATABASE=$DB_NAME CLINICAL_RECORDS_USERNAME=$DB_USER CLINICAL_RECORDS_PASSWORD=***"
+write_export() {
+  printf 'export %s=%q\n' "$1" "$2"
+}
+
+umask 077
+DENV_TMP="$(mktemp "$HERE/.dbenv.tmp.XXXXXX")"
+trap 'rm -f "$DENV_TMP"' EXIT
+{
+  printf '%s\n' "# SQL Server benchmark connection (plaintext; keep this file private)"
+  write_export MSSQL_HOST "$EP"
+  write_export MSSQL_PORT "1433"
+  write_export MSSQL_USER "$DB_USER"
+  write_export MSSQL_PASSWORD "$DB_PASSWORD"
+  write_export MSSQL_DATABASE "$DB_NAME"
+  printf '%s\n' "# Legacy compatibility aliases"
+  write_export DB_USER "$DB_USER"
+  write_export DB_PASSWORD "$DB_PASSWORD"
+  write_export DB_NAME "$DB_NAME"
+} > "$DENV_TMP"
+chmod 600 "$DENV_TMP"
+mv "$DENV_TMP" "$HERE/.dbenv"
+trap - EXIT
+
+echo "==> Wrote $HERE/.dbenv (git-ignored, mode 0600; contains plaintext credentials)."
+echo "    Test: source \"$HERE/.dbenv\" && uv run --directory \"$REPO_ROOT\" --locked python benchmarks/sham-dataset/test_backends.py"
+echo "    MedCP: map MSSQL_* to CLINICAL_RECORDS_* as shown in README; password not printed."
