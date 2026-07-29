@@ -1,5 +1,7 @@
 import json
 import sqlite3
+import sys
+from types import SimpleNamespace
 
 import pytest
 from mcp import Client
@@ -9,6 +11,8 @@ from medcp.server import (
     ClinicalQueryValidator,
     LONGEST_TOOL_NAME,
     MAX_TOOL_NAME_LENGTH,
+    MedCPConfig,
+    create_medcp_server,
     _format_namespace,
 )
 
@@ -175,3 +179,73 @@ def test_clinical_query_validator_accepts_read_only_sql(query: str) -> None:
 )
 def test_clinical_query_validator_rejects_write_capable_sql(query: str) -> None:
     assert not ClinicalQueryValidator.is_read_only_clinical_query(query)
+
+
+@pytest.mark.anyio
+async def test_mysql_queries_use_read_only_transaction_and_rollback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    executed: list[str] = []
+    connect_kwargs: dict = {}
+
+    class FakeCursor:
+        description = [("answer",)]
+
+        def execute(self, query: str) -> None:
+            executed.append(query)
+
+        def fetchall(self) -> list[tuple[int]]:
+            return [(1,)]
+
+        def close(self) -> None:
+            pass
+
+    class FakeConnection:
+        rollback_called = False
+        close_called = False
+
+        def cursor(self) -> FakeCursor:
+            return FakeCursor()
+
+        def rollback(self) -> None:
+            self.rollback_called = True
+
+        def close(self) -> None:
+            self.close_called = True
+
+    connection = FakeConnection()
+
+    def fake_connect(**kwargs):
+        connect_kwargs.update(kwargs)
+        return connection
+
+    monkeypatch.setitem(
+        sys.modules,
+        "pymysql",
+        SimpleNamespace(connect=fake_connect),
+    )
+    server = create_medcp_server(
+        MedCPConfig(
+            clinical_records={
+                "backend": "mysql",
+                "server": "db.invalid",
+                "database": "omop",
+                "username": "reader",
+                "password": "not-a-real-secret",
+            },
+            namespace="MedCP",
+            log_level="WARNING",
+        )
+    )
+
+    async with Client(server, mode="2026-07-28") as client:
+        result = await client.call_tool(
+            "MedCP-query_clinical_records",
+            {"sql_query": "SELECT 1 AS answer"},
+        )
+
+    assert result.is_error is False
+    assert executed == ["START TRANSACTION READ ONLY", "SELECT 1 AS answer"]
+    assert connect_kwargs["autocommit"] is False
+    assert connection.rollback_called is True
+    assert connection.close_called is True
