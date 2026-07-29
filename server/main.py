@@ -158,28 +158,141 @@ def _is_write_query(query: str) -> bool:
     return re.search(r"\b(MERGE|CREATE|SET|DELETE|REMOVE|ADD|INSERT|UPDATE|DROP|ALTER|TRUNCATE|GRANT|REVOKE|EXEC|EXECUTE|SP_|ATTACH|DETACH|PRAGMA|REINDEX|VACUUM|REPLACE)\b", query, re.IGNORECASE) is not None
 
 
+_FORBIDDEN_SQL_TOKENS = frozenset(
+    {
+        "ADD",
+        "ALTER",
+        "ANALYZE",
+        "ATTACH",
+        "BACKUP",
+        "BENCHMARK",
+        "BULK",
+        "CALL",
+        "COPY",
+        "CREATE",
+        "DBCC",
+        "DECLARE",
+        "DELETE",
+        "DETACH",
+        "DO",
+        "DROP",
+        "DUMPFILE",
+        "EXEC",
+        "EXECUTE",
+        "FLUSH",
+        "GRANT",
+        "HANDLER",
+        "INSERT",
+        "INSTALL",
+        "INTO",
+        "KILL",
+        "LOAD",
+        "LOAD_FILE",
+        "LOCK",
+        "MERGE",
+        "OPENQUERY",
+        "OPENDATASOURCE",
+        "OPENROWSET",
+        "OPTIMIZE",
+        "OUTFILE",
+        "PRAGMA",
+        "REINDEX",
+        "REMOVE",
+        "REPAIR",
+        "REPLACE",
+        "RESET",
+        "RESTORE",
+        "REVOKE",
+        "SET",
+        "SHUTDOWN",
+        "SLEEP",
+        "TRUNCATE",
+        "UNINSTALL",
+        "UNLOCK",
+        "UPDATE",
+        "USE",
+        "VACUUM",
+        "WAITFOR",
+    }
+)
+
+
+def _sql_code_without_literals(query: str) -> Optional[str]:
+    """Mask quoted SQL text and reject comments or unterminated quoting.
+
+    The validator deliberately rejects comments. Supporting every backend's
+    comment grammar would create opportunities to hide statement boundaries or
+    write-capable tokens. Quoted strings and identifiers are masked so harmless
+    data containing words such as ``DELETE`` does not trigger the keyword gate.
+    """
+    masked: list[str] = []
+    i = 0
+    quote_end: Optional[str] = None
+
+    while i < len(query):
+        char = query[i]
+
+        if quote_end is not None:
+            masked.append(" ")
+            if char == "\\" and quote_end != "]" and i + 1 < len(query):
+                masked.append(" ")
+                i += 2
+                continue
+            if char == quote_end:
+                if i + 1 < len(query) and query[i + 1] == quote_end:
+                    masked.append(" ")
+                    i += 2
+                    continue
+                quote_end = None
+            i += 1
+            continue
+
+        if query.startswith("--", i) or query.startswith("/*", i) or char == "#":
+            return None
+        if char in ("'", '"', "`"):
+            quote_end = char
+            masked.append(" ")
+            i += 1
+            continue
+        if char == "[":
+            quote_end = "]"
+            masked.append(" ")
+            i += 1
+            continue
+
+        masked.append(char)
+        i += 1
+
+    if quote_end is not None:
+        return None
+    return "".join(masked)
+
+
 class ClinicalQueryValidator:
     """Clinical record query validator for read-only operations"""
 
     @staticmethod
     def is_read_only_clinical_query(query: str) -> bool:
-        clean_query = query.strip().upper()
-
-        # Allowed statements for clinical record queries
-        allowed_statements = ['SELECT', 'WITH', 'DECLARE']
-
-        # Check if starts with allowed statement
-        starts_with_allowed = any(clean_query.startswith(stmt) for stmt in allowed_statements)
-        if not starts_with_allowed:
+        code = _sql_code_without_literals(query)
+        if code is None:
             return False
 
-        # Check for forbidden statements
-        if _is_write_query(query):
+        clean_query = code.strip()
+        if clean_query.endswith(";"):
+            clean_query = clean_query[:-1].rstrip()
+        if not clean_query or ";" in clean_query:
             return False
 
-        # Check for SQL injection / statement-stacking patterns
-        has_dangerous_chars = re.search(r';\s*\w+', clean_query)
-        if has_dangerous_chars:
+        tokens = re.findall(r"[A-Z_][A-Z0-9_$#@]*", clean_query.upper())
+        if not tokens or tokens[0] not in {"SELECT", "WITH"}:
+            return False
+        if tokens[0] == "WITH" and "SELECT" not in tokens:
+            return False
+        if any(token in _FORBIDDEN_SQL_TOKENS for token in tokens):
+            return False
+        if any(token.startswith(("SP_", "XP_")) for token in tokens):
+            return False
+        if any(pair == ("FOR", "SHARE") for pair in zip(tokens, tokens[1:])):
             return False
 
         return True
@@ -250,6 +363,7 @@ def create_medcp_server(config: MedCPConfig) -> MCPServer:
                     database=clinical_config.database,
                     port=clinical_config.port or 3306,
                     read_default_group=None,
+                    autocommit=False,
                 )
 
             # default: mssql
@@ -262,7 +376,7 @@ def create_medcp_server(config: MedCPConfig) -> MCPServer:
             )
             if clinical_config.port:
                 kwargs["port"] = str(clinical_config.port)
-            return pymssql.connect(**kwargs)
+            return pymssql.connect(**kwargs, autocommit=False)
         except ToolError:
             raise
         except ImportError as e:
@@ -430,6 +544,8 @@ def create_medcp_server(config: MedCPConfig) -> MCPServer:
             try:
                 conn = get_clinical_records_connection()
                 cursor = conn.cursor()
+                if clinical_config.backend == "mysql":
+                    cursor.execute("START TRANSACTION READ ONLY")
                 cursor.execute(sql_query)
 
                 # Get column names
@@ -459,6 +575,10 @@ def create_medcp_server(config: MedCPConfig) -> MCPServer:
                 raise ToolError(f"Electronic health records error: {e}")
             finally:
                 if conn is not None:
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        pass
                     try:
                         conn.close()
                     except Exception:
@@ -521,6 +641,8 @@ def create_medcp_server(config: MedCPConfig) -> MCPServer:
             try:
                 conn = get_clinical_records_connection()
                 cursor = conn.cursor()
+                if clinical_config.backend == "mysql":
+                    cursor.execute("START TRANSACTION READ ONLY")
                 cursor.execute(query)
 
                 tables = cursor.fetchall()
@@ -547,6 +669,10 @@ def create_medcp_server(config: MedCPConfig) -> MCPServer:
                 raise ToolError(f"Error listing clinical data tables: {e}")
             finally:
                 if conn is not None:
+                    try:
+                        conn.rollback()
+                    except Exception:
+                        pass
                     try:
                         conn.close()
                     except Exception:
