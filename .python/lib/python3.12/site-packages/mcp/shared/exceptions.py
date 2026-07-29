@@ -2,57 +2,105 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from mcp.types import URL_ELICITATION_REQUIRED, ElicitRequestURLParams, ErrorData
+from mcp_types import INVALID_REQUEST, URL_ELICITATION_REQUIRED, ElicitRequestURLParams, ErrorData, JSONRPCError
 
 
-class McpError(Exception):
+class MCPDeprecationWarning(UserWarning):
+    """A custom deprecation warning for the MCP SDK.
+
+    Unlike the built-in `DeprecationWarning`, this inherits from `UserWarning` so
+    it is shown by default, helping users discover deprecated features without
+    enabling warnings explicitly.
+
+    Reference: https://sethmlarson.dev/deprecations-via-warnings-dont-work-for-python-libraries
     """
-    Exception type raised when an error arrives over an MCP connection.
-    """
+
+
+class MCPError(Exception):
+    """Exception type raised when an error arrives over an MCP connection."""
 
     error: ErrorData
 
-    def __init__(self, error: ErrorData):
-        """Initialize McpError."""
-        super().__init__(error.message)
-        self.error = error
+    def __init__(self, code: int, message: str, data: Any = None):
+        super().__init__(code, message, data)
+        if data is not None:
+            self.error = ErrorData(code=code, message=message, data=data)
+        else:
+            self.error = ErrorData(code=code, message=message)
+
+    @property
+    def code(self) -> int:
+        return self.error.code
+
+    @property
+    def message(self) -> str:
+        return self.error.message
+
+    @property
+    def data(self) -> Any:
+        return self.error.data
+
+    @classmethod
+    def from_jsonrpc_error(cls, error: JSONRPCError) -> MCPError:
+        return cls.from_error_data(error.error)
+
+    @classmethod
+    def from_error_data(cls, error: ErrorData) -> MCPError:
+        return cls(code=error.code, message=error.message, data=error.data)
+
+    def __str__(self) -> str:
+        return self.message
 
 
-class UrlElicitationRequiredError(McpError):
+class NoBackChannelError(MCPError):
+    """Raised when a server-initiated request has no channel that can deliver it.
+
+    Raised by `DispatchContext.send_raw_request` when its request-scoped channel
+    reports `TransportContext.can_send_request` as `False` (the cases are
+    documented on that field), and by a connection's standalone channel when it
+    has none; serializes to an `INVALID_REQUEST` error response.
     """
-    Specialized error for when a tool requires URL mode elicitation(s) before proceeding.
+
+    def __init__(self, method: str):
+        super().__init__(
+            code=INVALID_REQUEST,
+            message=(
+                f"Cannot send {method!r}: this transport context has no back-channel for server-initiated requests."
+            ),
+        )
+        self.method = method
+
+
+class UrlElicitationRequiredError(MCPError):
+    """Specialized error for when a tool requires URL mode elicitation(s) before proceeding.
 
     Servers can raise this error from tool handlers to indicate that the client
     must complete one or more URL elicitations before the request can be processed.
 
     Example:
+        ```python
         raise UrlElicitationRequiredError([
             ElicitRequestURLParams(
-                mode="url",
                 message="Authorization required for your files",
                 url="https://example.com/oauth/authorize",
-                elicitationId="auth-001"
+                elicitation_id="auth-001"
             )
         ])
+        ```
     """
 
-    def __init__(
-        self,
-        elicitations: list[ElicitRequestURLParams],
-        message: str | None = None,
-    ):
+    def __init__(self, elicitations: list[ElicitRequestURLParams], message: str | None = None):
         """Initialize UrlElicitationRequiredError."""
         if message is None:
             message = f"URL elicitation{'s' if len(elicitations) > 1 else ''} required"
 
         self._elicitations = elicitations
 
-        error = ErrorData(
+        super().__init__(
             code=URL_ELICITATION_REQUIRED,
             message=message,
             data={"elicitations": [e.model_dump(by_alias=True, exclude_none=True) for e in elicitations]},
         )
-        super().__init__(error)
 
     @property
     def elicitations(self) -> list[ElicitRequestURLParams]:

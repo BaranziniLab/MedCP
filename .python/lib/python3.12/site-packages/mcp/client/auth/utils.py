@@ -1,12 +1,13 @@
-import logging
 import re
+from typing import Any, cast
 from urllib.parse import urljoin, urlparse
 
-from httpx import Request, Response
+from httpx2 import Request, Response
+from mcp_types import LATEST_PROTOCOL_VERSION
 from pydantic import AnyUrl, ValidationError
+from pydantic_core import from_json
 
-from mcp.client.auth import OAuthRegistrationError, OAuthTokenError
-from mcp.client.streamable_http import MCP_PROTOCOL_VERSION
+from mcp.client.auth import OAuthFlowError, OAuthRegistrationError, OAuthTokenError
 from mcp.shared.auth import (
     OAuthClientInformationFull,
     OAuthClientMetadata,
@@ -14,14 +15,11 @@ from mcp.shared.auth import (
     OAuthToken,
     ProtectedResourceMetadata,
 )
-from mcp.types import LATEST_PROTOCOL_VERSION
-
-logger = logging.getLogger(__name__)
+from mcp.shared.inbound import MCP_PROTOCOL_VERSION_HEADER
 
 
 def extract_field_from_www_auth(response: Response, field_name: str) -> str | None:
-    """
-    Extract field from WWW-Authenticate header.
+    """Extract field from WWW-Authenticate header.
 
     Returns:
         Field value if found in WWW-Authenticate header, None otherwise
@@ -42,8 +40,7 @@ def extract_field_from_www_auth(response: Response, field_name: str) -> str | No
 
 
 def extract_scope_from_www_auth(response: Response) -> str | None:
-    """
-    Extract scope parameter from WWW-Authenticate header as per RFC6750.
+    """Extract scope parameter from WWW-Authenticate header as per RFC 6750.
 
     Returns:
         Scope string if found in WWW-Authenticate header, None otherwise
@@ -52,8 +49,7 @@ def extract_scope_from_www_auth(response: Response) -> str | None:
 
 
 def extract_resource_metadata_from_www_auth(response: Response) -> str | None:
-    """
-    Extract protected resource metadata URL from WWW-Authenticate header as per RFC9728.
+    """Extract protected resource metadata URL from WWW-Authenticate header as per RFC 9728.
 
     Returns:
         Resource metadata URL if found in WWW-Authenticate header, None otherwise
@@ -65,8 +61,7 @@ def extract_resource_metadata_from_www_auth(response: Response) -> str | None:
 
 
 def build_protected_resource_metadata_discovery_urls(www_auth_url: str | None, server_url: str) -> list[str]:
-    """
-    Build ordered list of URLs to try for protected resource metadata discovery.
+    """Build ordered list of URLs to try for protected resource metadata discovery.
 
     Per SEP-985, the client MUST:
     1. Try resource_metadata from WWW-Authenticate header (if present)
@@ -74,8 +69,8 @@ def build_protected_resource_metadata_discovery_urls(www_auth_url: str | None, s
     3. Fall back to root-based well-known URI: /.well-known/oauth-protected-resource
 
     Args:
-        www_auth_url: optional resource_metadata url extracted from the WWW-Authenticate header
-        server_url: server url
+        www_auth_url: Optional resource_metadata URL extracted from the WWW-Authenticate header
+        server_url: Server URL
 
     Returns:
         Ordered list of URLs to try for discovery
@@ -106,32 +101,65 @@ def get_client_metadata_scopes(
     www_authenticate_scope: str | None,
     protected_resource_metadata: ProtectedResourceMetadata | None,
     authorization_server_metadata: OAuthMetadata | None = None,
+    client_grant_types: list[str] | None = None,
 ) -> str | None:
-    """Select scopes as outlined in the 'Scope Selection Strategy' in the MCP spec."""
-    # Per MCP spec, scope selection priority order:
-    # 1. Use scope from WWW-Authenticate header (if provided)
-    # 2. Use all scopes from PRM scopes_supported (if available)
-    # 3. Omit scope parameter if neither is available
+    """Select effective scopes and augment for refresh token support."""
+    selected_scope: str | None = None
 
+    # MCP spec scope selection priority:
+    #   1. WWW-Authenticate header scope
+    #   2. PRM scopes_supported
+    #   3. AS scopes_supported (SDK fallback)
+    #   4. Omit scope parameter
     if www_authenticate_scope is not None:
-        # Priority 1: WWW-Authenticate header scope
-        return www_authenticate_scope
+        selected_scope = www_authenticate_scope
     elif protected_resource_metadata is not None and protected_resource_metadata.scopes_supported is not None:
-        # Priority 2: PRM scopes_supported
-        return " ".join(protected_resource_metadata.scopes_supported)
+        selected_scope = " ".join(protected_resource_metadata.scopes_supported)
     elif authorization_server_metadata is not None and authorization_server_metadata.scopes_supported is not None:
-        return " ".join(authorization_server_metadata.scopes_supported)  # pragma: no cover
-    else:
-        # Priority 3: Omit scope parameter
-        return None
+        selected_scope = " ".join(authorization_server_metadata.scopes_supported)
+
+    # SEP-2207: append offline_access when the AS supports it and the client can use refresh tokens
+    if (
+        selected_scope is not None
+        and authorization_server_metadata is not None
+        and authorization_server_metadata.scopes_supported is not None
+        and "offline_access" in authorization_server_metadata.scopes_supported
+        and client_grant_types is not None
+        and "refresh_token" in client_grant_types
+        and "offline_access" not in selected_scope.split()
+    ):
+        selected_scope = f"{selected_scope} offline_access"
+
+    return selected_scope
+
+
+def union_scopes(previous_scope: str | None, new_scope: str | None) -> str | None:
+    """Merge two space-delimited scope strings, preserving order and dropping duplicates.
+
+    SEP-2350: on step-up re-authorization the client requests the union of previously requested
+    scopes and the newly challenged scopes, so escalating one operation does not drop the
+    permissions granted for another. Previously requested scopes come first; new scopes are
+    appended in order.
+    """
+    if not previous_scope:
+        return new_scope
+    if not new_scope:
+        return previous_scope
+
+    merged = previous_scope.split()
+    seen = set(merged)
+    for scope in new_scope.split():
+        if scope not in seen:
+            merged.append(scope)
+            seen.add(scope)
+    return " ".join(merged)
 
 
 def build_oauth_authorization_server_metadata_discovery_urls(auth_server_url: str | None, server_url: str) -> list[str]:
-    """
-    Generate ordered list of (url, type) tuples for discovery attempts.
+    """Generate an ordered list of URLs for authorization server metadata discovery.
 
     Args:
-        auth_server_url: URL for the OAuth Authorization Metadata URL if found, otherwise None
+        auth_server_url: OAuth Authorization Server Metadata URL if found, otherwise None
         server_url: URL for the MCP server, used as a fallback if auth_server_url is None
     """
 
@@ -173,13 +201,12 @@ def build_oauth_authorization_server_metadata_discovery_urls(auth_server_url: st
 async def handle_protected_resource_response(
     response: Response,
 ) -> ProtectedResourceMetadata | None:
-    """
-    Handle protected resource metadata discovery response.
+    """Handle protected resource metadata discovery response.
 
     Per SEP-985, supports fallback when discovery fails at one URL.
 
     Returns:
-        True if metadata was successfully discovered, False if we should try next URL
+        ProtectedResourceMetadata if successfully discovered, None if we should try next URL
     """
     if response.status_code == 200:
         try:
@@ -208,14 +235,53 @@ async def handle_auth_metadata_response(response: Response) -> tuple[bool, OAuth
     return True, None
 
 
+def validate_authorization_response_iss(iss: str | None, oauth_metadata: OAuthMetadata | None) -> None:
+    """Validate the RFC 9207 `iss` authorization-response parameter.
+
+    Per RFC 9207 section 2.4, the client compares `iss` against the issuer of the
+    authorization server the request was sent to, using simple string comparison
+    (RFC 3986 section 6.2.1, i.e. without URL normalization), and rejects on mismatch.
+    A response that omits `iss` is rejected only when the server advertised support via
+    `authorization_response_iss_parameter_supported`.
+
+    Raises:
+        OAuthFlowError: If `iss` is present and does not match, or is absent when the
+            authorization server advertised support.
+    """
+    expected = str(oauth_metadata.issuer) if oauth_metadata else None
+
+    if iss is not None:
+        if iss != expected:
+            raise OAuthFlowError(f"Authorization response iss mismatch: {iss} != {expected}")
+        return
+
+    if oauth_metadata is not None and oauth_metadata.authorization_response_iss_parameter_supported:
+        raise OAuthFlowError("Authorization response missing iss parameter advertised by the authorization server")
+
+
+def validate_metadata_issuer(oauth_metadata: OAuthMetadata, expected_issuer: str) -> None:
+    """Validate that authorization server metadata `issuer` matches the discovery issuer.
+
+    Per RFC 8414 section 3.3 / SEP-2468, the `issuer` in the metadata must match the issuer
+    used to construct the well-known URL, compared as a simple string (RFC 3986 section 6.2.1).
+
+    Raises:
+        OAuthFlowError: If the metadata issuer does not match `expected_issuer`.
+    """
+    if str(oauth_metadata.issuer) != expected_issuer:
+        raise OAuthFlowError(
+            f"Authorization server metadata issuer mismatch: {oauth_metadata.issuer} != {expected_issuer}"
+        )
+
+
 def create_oauth_metadata_request(url: str) -> Request:
-    return Request("GET", url, headers={MCP_PROTOCOL_VERSION: LATEST_PROTOCOL_VERSION})
+    return Request("GET", url, headers={MCP_PROTOCOL_VERSION_HEADER: LATEST_PROTOCOL_VERSION})
 
 
 def create_client_registration_request(
     auth_server_metadata: OAuthMetadata | None, client_metadata: OAuthClientMetadata, auth_base_url: str
 ) -> Request:
-    """Build registration request or skip if already registered."""
+    """Build a client registration request."""
 
     if auth_server_metadata and auth_server_metadata.registration_endpoint:
         registration_url = str(auth_server_metadata.registration_endpoint)
@@ -235,12 +301,17 @@ async def handle_registration_response(response: Response) -> OAuthClientInforma
 
     try:
         content = await response.aread()
-        client_info = OAuthClientInformationFull.model_validate_json(content)
-        return client_info
-        # self.context.client_info = client_info
-        # await self.context.storage.set_client_info(client_info)
-    except ValidationError as e:  # pragma: no cover
-        raise OAuthRegistrationError(f"Invalid registration response: {e}")
+        body = from_json(content)
+        # `issuer` is the SDK's own binding of these credentials to the server they were
+        # registered with (SEP-2352), stamped by the auth flow - never sourced from the
+        # wire, so it is dropped before the body is parsed rather than trusted or cleared.
+        if isinstance(body, dict):
+            cast(dict[str, Any], body).pop("issuer", None)
+        return OAuthClientInformationFull.model_validate(body)
+    except ValueError as e:
+        # `from_json` reports malformed bytes/JSON as ValueError, and pydantic's
+        # ValidationError is itself a ValueError, so both parse layers surface here.
+        raise OAuthRegistrationError(f"Invalid registration response: {e}") from e
 
 
 def is_valid_client_metadata_url(url: str | None) -> bool:
@@ -263,6 +334,26 @@ def is_valid_client_metadata_url(url: str | None) -> bool:
         return False
 
 
+def credentials_match_issuer(
+    client_info: OAuthClientInformationFull, issuer: str, client_metadata_url: str | None
+) -> bool:
+    """Whether stored client credentials may be reused against `issuer` (SEP-2352).
+
+    A URL-based client ID (CIMD) is portable across authorization servers — the same self-hosted
+    document is resolved by whichever server is in use — so it always matches; CIMD is identified
+    by the client ID being the configured `client_metadata_url`, not by URL shape (a registration
+    server may also issue URL-shaped IDs that are bound to it). Credentials with a recorded issuer
+    match only when it equals `issuer` (simple string comparison). Credentials with no recorded
+    issuer (pre-registered, or stored before issuer binding existed) carry no binding to enforce
+    and are left as-is.
+    """
+    if client_metadata_url is not None and client_info.client_id == client_metadata_url:
+        return True
+    if client_info.issuer is None:
+        return True
+    return client_info.issuer == issuer
+
+
 def should_use_client_metadata_url(
     oauth_metadata: OAuthMetadata | None,
     client_metadata_url: str | None,
@@ -270,7 +361,7 @@ def should_use_client_metadata_url(
     """Determine if URL-based client ID (CIMD) should be used instead of DCR.
 
     URL-based client IDs should be used when:
-    1. The server advertises client_id_metadata_document_supported=true
+    1. The server advertises client_id_metadata_document_supported=True
     2. The client has a valid client_metadata_url configured
 
     Args:
@@ -299,8 +390,8 @@ def create_client_info_from_metadata_url(
 
     Args:
         client_metadata_url: The URL to use as the client_id
-        redirect_uris: The redirect URIs from the client metadata (passed through for
-            compatibility with OAuthClientInformationFull which inherits from OAuthClientMetadata)
+        redirect_uris: The redirect URIs from the client metadata, recorded on the client
+            information alongside the client_id
 
     Returns:
         OAuthClientInformationFull with the URL as client_id
@@ -315,7 +406,7 @@ def create_client_info_from_metadata_url(
 async def handle_token_response_scopes(
     response: Response,
 ) -> OAuthToken:
-    """Parse and validate token response with optional scope validation.
+    """Parse and validate a token response.
 
     Parses token response JSON. Callers should check response.status_code before calling.
 

@@ -1,31 +1,27 @@
 import argparse
 import logging
 import sys
+import warnings
 from functools import partial
 from urllib.parse import urlparse
 
 import anyio
-from anyio.streams.memory import MemoryObjectReceiveStream, MemoryObjectSendStream
+import mcp_types as types
 
-import mcp.types as types
-from mcp.client.session import ClientSession
+from mcp.client._transport import ReadStream, WriteStream
+from mcp.client.session import ClientSession, IncomingMessage
 from mcp.client.sse import sse_client
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from mcp.shared.message import SessionMessage
-from mcp.shared.session import RequestResponder
 
 if not sys.warnoptions:
-    import warnings
-
     warnings.simplefilter("ignore")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("client")
 
 
-async def message_handler(
-    message: RequestResponder[types.ServerRequest, types.ClientResult] | types.ServerNotification | Exception,
-) -> None:
+async def message_handler(message: IncomingMessage) -> None:
     if isinstance(message, Exception):
         logger.error("Error: %s", message)
         return
@@ -34,8 +30,8 @@ async def message_handler(
 
 
 async def run_session(
-    read_stream: MemoryObjectReceiveStream[SessionMessage | Exception],
-    write_stream: MemoryObjectSendStream[SessionMessage],
+    read_stream: ReadStream[SessionMessage | Exception],
+    write_stream: WriteStream[SessionMessage],
     client_info: types.Implementation | None = None,
 ):
     async with ClientSession(

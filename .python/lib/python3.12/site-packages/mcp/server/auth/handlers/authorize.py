@@ -2,7 +2,8 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from pydantic import AnyUrl, BaseModel, Field, RootModel, ValidationError
+# TODO(Marcelo): We should drop the `RootModel`.
+from pydantic import AnyUrl, BaseModel, Field, RootModel, ValidationError  # noqa: TID251
 from starlette.datastructures import FormData, QueryParams
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
@@ -116,7 +117,7 @@ class AuthorizationHandler:
                     pass
 
             # the error response MUST contain the state specified by the client, if any
-            if state is None:  # pragma: no cover
+            if state is None:
                 # make last-ditch effort to load state
                 state = best_effort_extract_string("state", params)
 

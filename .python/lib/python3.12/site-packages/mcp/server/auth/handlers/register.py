@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 from uuid import uuid4
 
-from pydantic import BaseModel, RootModel, ValidationError
+from pydantic import BaseModel, ValidationError
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -12,13 +12,11 @@ from mcp.server.auth.errors import stringify_pydantic_error
 from mcp.server.auth.json_response import PydanticJSONResponse
 from mcp.server.auth.provider import OAuthAuthorizationServerProvider, RegistrationError, RegistrationErrorCode
 from mcp.server.auth.settings import ClientRegistrationOptions
-from mcp.shared.auth import OAuthClientInformationFull, OAuthClientMetadata
+from mcp.shared.auth import JWT_BEARER_GRANT_TYPE, OAuthClientInformationFull, OAuthClientMetadata
 
-
-class RegistrationRequest(RootModel[OAuthClientMetadata]):
-    # this wrapper is a no-op; it's just to separate out the types exposed to the
-    # provider from what we use in the HTTP handler
-    root: OAuthClientMetadata
+# this alias is a no-op; it's just to separate out the types exposed to the
+# provider from what we use in the HTTP handler
+RegistrationRequest = OAuthClientMetadata
 
 
 class RegistrationErrorResponse(BaseModel):
@@ -34,9 +32,8 @@ class RegistrationHandler:
     async def handle(self, request: Request) -> Response:
         # Implements dynamic client registration as defined in https://datatracker.ietf.org/doc/html/rfc7591#section-3.1
         try:
-            # Parse request body as JSON
-            body = await request.json()
-            client_metadata = OAuthClientMetadata.model_validate(body)
+            body = await request.body()
+            client_metadata = OAuthClientMetadata.model_validate_json(body)
 
             # Scope validation is handled below
         except ValidationError as validation_error:
@@ -53,6 +50,18 @@ class RegistrationHandler:
         # If auth method is None, default to client_secret_post
         if client_metadata.token_endpoint_auth_method is None:
             client_metadata.token_endpoint_auth_method = "client_secret_post"
+        # This server authenticates token requests with the client secret it mints; it holds
+        # no client key to verify a private_key_jwt assertion, so confirming that method would
+        # register a client whose every token request is then rejected. Refuse it instead
+        # (RFC 7591 §3.2.2), before minting credentials the client could never use.
+        if client_metadata.token_endpoint_auth_method == "private_key_jwt":
+            return PydanticJSONResponse(
+                content=RegistrationErrorResponse(
+                    error="invalid_client_metadata",
+                    error_description="token_endpoint_auth_method 'private_key_jwt' is not supported",
+                ),
+                status_code=400,
+            )
 
         client_secret = None
         if client_metadata.token_endpoint_auth_method != "none":  # pragma: no branch
@@ -73,11 +82,26 @@ class RegistrationHandler:
                     ),
                     status_code=400,
                 )
-        if not {"authorization_code", "refresh_token"}.issubset(set(client_metadata.grant_types)):
+        if "authorization_code" not in client_metadata.grant_types:
             return PydanticJSONResponse(
                 content=RegistrationErrorResponse(
                     error="invalid_client_metadata",
-                    error_description="grant_types must be authorization_code and refresh_token",
+                    error_description="grant_types must include 'authorization_code'",
+                ),
+                status_code=400,
+            )
+
+        # SEP-990 §5.1 / draft-ietf-oauth-identity-assertion-authz-grant §8.1: the ID-JAG flow is
+        # for confidential clients provisioned out of band. Refuse to grant it through DCR so a
+        # self-registered client cannot reach the identity-assertion provider hook.
+        if JWT_BEARER_GRANT_TYPE in client_metadata.grant_types:
+            return PydanticJSONResponse(
+                content=RegistrationErrorResponse(
+                    error="invalid_client_metadata",
+                    error_description=(
+                        f"grant_types must not include '{JWT_BEARER_GRANT_TYPE}'; "
+                        "the identity-assertion grant requires a pre-registered client"
+                    ),
                 ),
                 status_code=400,
             )
@@ -94,33 +118,27 @@ class RegistrationHandler:
             )
 
         client_id_issued_at = int(time.time())
-        client_secret_expires_at = (
-            client_id_issued_at + self.options.client_secret_expiry_seconds
-            if self.options.client_secret_expiry_seconds is not None
-            else None
-        )
+        # RFC 7591 §3.2.1: client_secret_expires_at is REQUIRED whenever a client_secret is
+        # issued, with 0 (not omission) meaning it never expires; a public client gets none.
+        client_secret_expires_at = None
+        if client_secret is not None:
+            client_secret_expires_at = (
+                client_id_issued_at + self.options.client_secret_expiry_seconds
+                if self.options.client_secret_expiry_seconds is not None
+                else 0
+            )
 
-        client_info = OAuthClientInformationFull(
-            client_id=client_id,
-            client_id_issued_at=client_id_issued_at,
-            client_secret=client_secret,
-            client_secret_expires_at=client_secret_expires_at,
-            # passthrough information from the client request
-            redirect_uris=client_metadata.redirect_uris,
-            token_endpoint_auth_method=client_metadata.token_endpoint_auth_method,
-            grant_types=client_metadata.grant_types,
-            response_types=client_metadata.response_types,
-            client_name=client_metadata.client_name,
-            client_uri=client_metadata.client_uri,
-            logo_uri=client_metadata.logo_uri,
-            scope=client_metadata.scope,
-            contacts=client_metadata.contacts,
-            tos_uri=client_metadata.tos_uri,
-            policy_uri=client_metadata.policy_uri,
-            jwks_uri=client_metadata.jwks_uri,
-            jwks=client_metadata.jwks,
-            software_id=client_metadata.software_id,
-            software_version=client_metadata.software_version,
+        # RFC 7591 §3.2.1: the response returns all registered metadata about the client, so
+        # the record is the whole validated request plus the credentials minted here - built
+        # from the request's dump so no metadata field can be silently omitted from the echo.
+        client_info = OAuthClientInformationFull.model_validate(
+            {
+                **client_metadata.model_dump(),
+                "client_id": client_id,
+                "client_id_issued_at": client_id_issued_at,
+                "client_secret": client_secret,
+                "client_secret_expires_at": client_secret_expires_at,
+            }
         )
         try:
             # Register client
