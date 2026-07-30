@@ -39,10 +39,7 @@ export function SiteFooter() {
       </div>
       <div className="footer-rule">
         <span>MedCP © 2025-2026</span>
-        <span>
-          Wanjun Gu · Gianmarco Bellucci ·{" "}
-          <ProductLink href={baranziniLabUrl}>Baranzini Lab</ProductLink>
-        </span>
+        <ProductLink href={baranziniLabUrl}>Baranzini Lab</ProductLink>
       </div>
     </footer>
   );

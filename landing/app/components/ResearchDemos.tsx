@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ProductLink } from "./ProductLink";
 
 type ArchitectureStep = "question" | "host" | "medcp" | "ehr" | "kg";
 
@@ -528,6 +529,7 @@ type ReplicationStudy = "cerono" | "anagnostakis";
 const replications = {
   cerono: {
     label: "Cerono et al.",
+    paperUrl: "https://doi.org/10.1002/ana.78033",
     endpoint: "Literature replication",
     originalN: "813",
     medcpN: "714",
@@ -538,6 +540,7 @@ const replications = {
   },
   anagnostakis: {
     label: "Anagnostakis et al.",
+    paperUrl: "https://doi.org/10.1111/dom.70336",
     endpoint: "Matched comparison",
     originalN: "32,542",
     medcpN: "1,046",
@@ -585,7 +588,9 @@ export function ReplicationDemo() {
         <div className="performance-head">
           <div>
             <span className="comparison-label">{selected.endpoint}</span>
-            <h3>{selected.label}</h3>
+            <h3>
+              <ProductLink href={selected.paperUrl}>{selected.label}</ProductLink>
+            </h3>
           </div>
           <div className="segmented-control" role="group" aria-label="Replication study">
             <button

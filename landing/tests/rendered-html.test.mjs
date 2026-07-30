@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render(pathname = "/") {
@@ -29,6 +30,7 @@ test("server-renders the MedCP landing page", async () => {
 
   const html = await response.text();
   assert.match(html, /The private data port for medical AI/);
+  assert.match(html, /One read-only port for OMOP records and biomedical knowledge graphs/);
   assert.match(html, /One interface\. Two key components\./);
   assert.match(html, /Preconfigured for the SPOKE knowledge graph/);
   assert.match(html, /MedCP \+ SPOKE compared with MedCP EHR-only/);
@@ -42,9 +44,12 @@ test("server-renders the MedCP landing page", async () => {
   assert.match(html, /What the study found/);
   assert.match(html, /It does not show cause and effect/);
   assert.match(html, /Control the full data path/);
+  assert.match(html, /USB port/);
   assert.match(html, /BioRouter/);
   assert.match(html, /Codex CLI/);
-  assert.match(html, /Wanjun Gu · Gianmarco Bellucci/);
+  assert.match(html, /MedCP © 2025-2026/);
+  assert.match(html, />Baranzini Lab<\/a>/);
+  assert.match(html, /https:\/\/doi\.org\/10\.1002\/ana\.78033/);
   assert.match(html, /https:\/\/biorouter\.ucsf\.edu\//);
   assert.match(html, /https:\/\/learn\.chatgpt\.com\/docs\/codex\/cli/);
   assert.match(html, /https:\/\/claude\.com\/product\/claude-code/);
@@ -59,8 +64,20 @@ test("server-renders the MedCP landing page", async () => {
   assert.doesNotMatch(html, /Cross-source association|Hypothesis-generating association/);
   assert.doesNotMatch(html, /184,356 prescriptions|Without database access, illustrative/);
   assert.doesNotMatch(html, /1\.19|0\.925|BH-adjusted p=\.091/);
+  assert.doesNotMatch(html, /USB-C|Wanjun Gu|Gianmarco Bellucci/);
   assert.doesNotMatch(html, /react-loading-skeleton|Your site is taking shape/i);
   assert.doesNotMatch(html, /\u2014/);
+});
+
+test("links both literature replications to their papers", async () => {
+  const source = await readFile(
+    new URL("../app/components/ResearchDemos.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /https:\/\/doi\.org\/10\.1002\/ana\.78033/);
+  assert.match(source, /https:\/\/doi\.org\/10\.1111\/dom\.70336/);
+  assert.match(source, /<ProductLink href=\{selected\.paperUrl\}>/);
 });
 
 test("server-renders complete documentation", async () => {

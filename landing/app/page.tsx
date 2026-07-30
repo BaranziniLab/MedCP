@@ -42,10 +42,9 @@ export default function Home() {
           <p className="eyebrow">A standard port for clinical and biological evidence</p>
           <h1>The private data port for medical AI.</h1>
           <p className="hero-copy">
-            MedCP gives MCP-compatible hosts up to four read-only tools for OMOP
-            clinical records and biomedical knowledge graphs. Databases can be local
-            or remote. Pair it with a local or institution-hosted model when the
-            workflow must remain inside an approved environment.
+            One read-only port for OMOP records and biomedical knowledge graphs. Run
+            MedCP locally when sensitive work must stay inside your approved
+            environment.
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href={sitePath("/docs/#install")}>
@@ -73,7 +72,7 @@ export default function Home() {
             </div>
           </div>
           <div className="port-analogy">
-            <span aria-hidden="true">USB-C</span>
+            <span aria-hidden="true">USB port</span>
             <p>
               MCP standardizes how clients connect, negotiate features, and discover
               tools. MedCP applies it to clinical and biological data.
