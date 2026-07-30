@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
 import { IntegrationChooser } from "../components/IntegrationChooser";
+import { ProductLink } from "../components/ProductLink";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
-import { repositoryUrl, releasesUrl, sitePath } from "../site-config";
+import {
+  bioRouterUrl,
+  claudeCodeUrl,
+  claudeDesktopUrl,
+  codexCliUrl,
+  repositoryUrl,
+  releasesUrl,
+  sitePath,
+} from "../site-config";
 
 export const metadata: Metadata = {
   title: "Documentation",
@@ -110,26 +119,45 @@ uv run --locked medcp`}</code>
                       <td>Python 3.11-3.13 on Linux, macOS, and Windows</td>
                     </tr>
                     <tr>
-                      <td>BioRouter</td>
-                      <td>BioRouter and uv</td>
+                      <td>
+                        <ProductLink href={bioRouterUrl}>BioRouter</ProductLink>
+                      </td>
+                      <td>
+                        <ProductLink href={bioRouterUrl}>BioRouter</ProductLink> and uv
+                      </td>
                       <td>
                         1.88.6 across SQLite, Amazon RDS for MySQL, Amazon RDS for SQL
                         Server, and SPOKE
                       </td>
                     </tr>
                     <tr>
-                      <td>Codex CLI</td>
-                      <td>Codex with MCP support and uv</td>
+                      <td>
+                        <ProductLink href={codexCliUrl}>Codex CLI</ProductLink>
+                      </td>
+                      <td>
+                        <ProductLink href={codexCliUrl}>Codex CLI</ProductLink> with MCP
+                        support and uv
+                      </td>
                       <td>0.145.0 across the same release matrix</td>
                     </tr>
                     <tr>
-                      <td>Claude Code</td>
-                      <td>Claude Code 2.x+ and uv</td>
+                      <td>
+                        <ProductLink href={claudeCodeUrl}>Claude Code</ProductLink>
+                      </td>
+                      <td>
+                        <ProductLink href={claudeCodeUrl}>Claude Code</ProductLink> 2.x+
+                        and uv
+                      </td>
                       <td>Integration provided; not in the v0.10.0 verified host matrix</td>
                     </tr>
                     <tr>
-                      <td>Claude Desktop</td>
-                      <td>Claude Desktop with MCPB support</td>
+                      <td>
+                        <ProductLink href={claudeDesktopUrl}>Claude Desktop</ProductLink>
+                      </td>
+                      <td>
+                        <ProductLink href={claudeDesktopUrl}>Claude Desktop</ProductLink>{" "}
+                        with MCPB support
+                      </td>
                       <td>Current bundled runtime is macOS Apple silicon only</td>
                     </tr>
                   </tbody>
@@ -269,7 +297,8 @@ export CLINICAL_RECORDS_PASSWORD='use-a-secret-store'`}</code>
                   <strong>100 questions</strong>
                   <p>
                     Ten complexity tiers, two current models, and MedCP with SPOKE
-                    compared with MedCP EHR-only through BioRouter.
+                    compared with MedCP EHR-only through{" "}
+                    <ProductLink href={bioRouterUrl}>BioRouter</ProductLink>.
                   </p>
                 </div>
               </div>
@@ -295,11 +324,12 @@ export CLINICAL_RECORDS_PASSWORD='use-a-secret-store'`}</code>
 
               <h3>Research evaluations are separate</h3>
               <p>
-                The clinical-question benchmark uses UCSF OMOP_DEID through BioRouter,
-                not the AWS demo fixture. The reported benchmark contains 399 completed
-                evaluations across GPT-5.5 and Claude Opus 4.8. BiomixQA separately evaluates
-                617 gene-disease items. Literature replication turns a published study
-                into an auditable cohort, analysis, and comparison report.
+                The clinical-question benchmark uses UCSF OMOP_DEID through{" "}
+                <ProductLink href={bioRouterUrl}>BioRouter</ProductLink>, not the AWS
+                demo fixture. The reported benchmark contains 399 completed evaluations
+                across GPT-5.5 and Claude Opus 4.8. BiomixQA separately evaluates 617
+                gene-disease items. Literature replication turns a published study into
+                an auditable cohort, analysis, and comparison report.
               </p>
               <div className="code-card">
                 <div className="code-label">Run the network-free suite</div>
@@ -318,10 +348,11 @@ uv run --locked pytest tests`}</code>
                 stdio, but databases may be remote and query results return to the host.
               </p>
               <p>
-                A private deployment can pair MedCP with BioRouter or another approved
-                harness, a local or institution-hosted model, and on-premises data
-                systems. Review the complete host, model, network, logging, retention,
-                access-control, and contractual path.
+                A private deployment can pair MedCP with{" "}
+                <ProductLink href={bioRouterUrl}>BioRouter</ProductLink> or another
+                approved harness, a local or institution-hosted model, and on-premises
+                data systems. Review the complete host, model, network, logging,
+                retention, access-control, and contractual path.
               </p>
               <div className="privacy-checklist">
                 <div>
@@ -334,7 +365,11 @@ uv run --locked pytest tests`}</code>
                   </p>
                 </div>
                 <div>
-                  <strong>Codex CLI, Claude Code, Claude Desktop</strong>
+                  <strong>
+                    <ProductLink href={codexCliUrl}>Codex CLI</ProductLink>,{" "}
+                    <ProductLink href={claudeCodeUrl}>Claude Code</ProductLink>,{" "}
+                    <ProductLink href={claudeDesktopUrl}>Claude Desktop</ProductLink>
+                  </strong>
                   <p>
                     Use non-PHI or appropriately de-identified data unless your
                     institution has approved the host, model provider, network, logging,
@@ -342,12 +377,15 @@ uv run --locked pytest tests`}</code>
                   </p>
                 </div>
                 <div>
-                  <strong>BioRouter</strong>
+                  <strong>
+                    <ProductLink href={bioRouterUrl}>BioRouter</ProductLink>
+                  </strong>
                   <p>
-                    BioRouter can store values entered through its secret-setting flow
-                    in the configured OS keyring. In the evaluated benchmark harness,
-                    limited prompt-injection and PHI patterns were annotated for review,
-                    not blocked.
+                    <ProductLink href={bioRouterUrl}>BioRouter</ProductLink> can store
+                    values entered through its secret-setting flow in the configured OS
+                    keyring. In the evaluated benchmark harness, limited
+                    prompt-injection and PHI patterns were annotated for review, not
+                    blocked.
                   </p>
                 </div>
                 <div>
@@ -360,9 +398,14 @@ uv run --locked pytest tests`}</code>
                 </div>
               </div>
               <p className="fine-print">
-                Keep credentials out of prompts and commits. Codex and Claude Code
-                settings can be plaintext. Claude Desktop protects sensitive manifest
-                fields. BioRouter can store secrets in its configured OS keyring.
+                Keep credentials out of prompts and commits.{" "}
+                <ProductLink href={codexCliUrl}>Codex CLI</ProductLink> and{" "}
+                <ProductLink href={claudeCodeUrl}>Claude Code</ProductLink> settings can
+                be plaintext.{" "}
+                <ProductLink href={claudeDesktopUrl}>Claude Desktop</ProductLink>{" "}
+                protects sensitive manifest fields.{" "}
+                <ProductLink href={bioRouterUrl}>BioRouter</ProductLink> can store
+                secrets in its configured OS keyring.
               </p>
             </section>
 
@@ -372,8 +415,11 @@ uv run --locked pytest tests`}</code>
               <p>
                 All four v0.10.0 files pass the checked-in SHA-256 checksums. They are
                 staged in the repository, but v0.10.0 is not yet a published Git tag or
-                GitHub release. The Codex and Claude Code packages still default to that
-                missing tag, so use the source setup above for those two hosts.
+                GitHub release. The{" "}
+                <ProductLink href={codexCliUrl}>Codex CLI</ProductLink> and{" "}
+                <ProductLink href={claudeCodeUrl}>Claude Code</ProductLink> packages
+                still default to that missing tag, so use the source setup above for
+                those two hosts.
               </p>
               <div className="download-grid">
                 <a href="https://raw.githubusercontent.com/BaranziniLab/MedCP/main/releases/MedCP%20v0.10.0/MedCP.brxt">
@@ -398,6 +444,10 @@ uv run --locked pytest tests`}</code>
                 </a>
               </div>
               <div className="inline-links">
+                <ProductLink href={bioRouterUrl}>BioRouter website ↗</ProductLink>
+                <ProductLink href={codexCliUrl}>Codex CLI documentation ↗</ProductLink>
+                <ProductLink href={claudeCodeUrl}>Claude Code website ↗</ProductLink>
+                <ProductLink href={claudeDesktopUrl}>Claude Desktop download ↗</ProductLink>
                 <a href={`${repositoryUrl}/tree/main/releases/MedCP%20v0.10.0`}>
                   Checksums and install notes ↗
                 </a>

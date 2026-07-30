@@ -3,13 +3,21 @@ import Image from "next/image";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import { IntegrationChooser } from "./components/IntegrationChooser";
+import { ProductLink } from "./components/ProductLink";
 import {
   ArchitectureDemo,
   BenchmarkDemo,
   NetworkDemo,
   ReplicationDemo,
 } from "./components/ResearchDemos";
-import { repositoryUrl, sitePath } from "./site-config";
+import {
+  bioRouterUrl,
+  claudeCodeUrl,
+  claudeDesktopUrl,
+  codexCliUrl,
+  repositoryUrl,
+  sitePath,
+} from "./site-config";
 
 export const metadata: Metadata = {
   title: "The private data port for medical AI",
@@ -178,9 +186,12 @@ export default function Home() {
                 <span>02</span>
                 <h3>Approved host and model</h3>
                 <p>
-                  BioRouter can orchestrate local or institution-approved models.
-                  Codex and Claude integrations are suitable only when their complete
-                  data paths are approved for the dataset.
+                  <ProductLink href={bioRouterUrl}>BioRouter</ProductLink> can
+                  orchestrate local or institution-approved models.{" "}
+                  <ProductLink href={codexCliUrl}>Codex CLI</ProductLink> and{" "}
+                  <ProductLink href={claudeCodeUrl}>Claude Code</ProductLink>{" "}
+                  integrations are suitable only when their complete data paths are
+                  approved for the dataset.
                 </p>
               </article>
               <article>
@@ -198,6 +209,28 @@ export default function Home() {
                 MedCP supplies the read-only adapter. HIPAA compliance depends on the
                 approved end-to-end environment and is not certified by MedCP alone.
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="integrations" className="section">
+          <div className="content-shell">
+            <div className="section-heading split-heading">
+              <div>
+                <p className="eyebrow">Integrations</p>
+                <h2>Choose the host you already use.</h2>
+              </div>
+              <p>
+                Every integration launches the same MedCP core.{" "}
+                <ProductLink href={bioRouterUrl}>BioRouter</ProductLink> is the
+                canonical benchmark harness.
+              </p>
+            </div>
+            <IntegrationChooser compact />
+            <div className="section-cta">
+              <a className="text-link" href={sitePath("/docs/#install")}>
+                Open the complete installation guide <span aria-hidden="true">→</span>
+              </a>
             </div>
           </div>
         </section>
@@ -220,27 +253,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="integrations" className="section">
-          <div className="content-shell">
-            <div className="section-heading split-heading">
-              <div>
-                <p className="eyebrow">Integrations</p>
-                <h2>Choose the host you already use.</h2>
-              </div>
-              <p>
-                Every integration launches the same MedCP core. BioRouter is the
-                canonical benchmark harness.
-              </p>
-            </div>
-            <IntegrationChooser compact />
-            <div className="section-cta">
-              <a className="text-link" href={sitePath("/docs/#install")}>
-                Open the complete installation guide <span aria-hidden="true">→</span>
-              </a>
-            </div>
-          </div>
-        </section>
-
         <section className="privacy-band">
           <div className="content-shell privacy-grid">
             <div>
@@ -250,8 +262,11 @@ export default function Home() {
             <div>
               <p>
                 MedCP does not make an AI host or model provider HIPAA compliant. Do not
-                use PHI with Codex CLI, Claude Code, Claude Desktop, BioRouter, or another
-                host unless your institution has approved the full database, host, model,
+                use PHI with <ProductLink href={codexCliUrl}>Codex CLI</ProductLink>,{" "}
+                <ProductLink href={claudeCodeUrl}>Claude Code</ProductLink>,{" "}
+                <ProductLink href={claudeDesktopUrl}>Claude Desktop</ProductLink>,{" "}
+                <ProductLink href={bioRouterUrl}>BioRouter</ProductLink>, or another host
+                unless your institution has approved the full database, host, model,
                 network, logging, credential, and governance path.
               </p>
               <p>

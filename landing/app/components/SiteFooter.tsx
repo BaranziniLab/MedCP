@@ -1,5 +1,11 @@
 import Image from "next/image";
-import { issuesUrl, repositoryUrl, sitePath } from "../site-config";
+import {
+  baranziniLabUrl,
+  issuesUrl,
+  repositoryUrl,
+  sitePath,
+} from "../site-config";
+import { ProductLink } from "./ProductLink";
 
 export function SiteFooter() {
   return (
@@ -18,7 +24,8 @@ export function SiteFooter() {
             <span>MedCP</span>
           </a>
           <p>
-            Research software from the Baranzini Lab at UCSF.
+            Research software from the{" "}
+            <ProductLink href={baranziniLabUrl}>Baranzini Lab</ProductLink> at UCSF.
             <br />
             MIT licensed. Not for patient-care decisions.
           </p>
@@ -32,7 +39,10 @@ export function SiteFooter() {
       </div>
       <div className="footer-rule">
         <span>MedCP © 2025-2026</span>
-        <span>Wanjun Gu · Gianmarco Bellucci</span>
+        <span>
+          Wanjun Gu · Gianmarco Bellucci ·{" "}
+          <ProductLink href={baranziniLabUrl}>Baranzini Lab</ProductLink>
+        </span>
       </div>
     </footer>
   );

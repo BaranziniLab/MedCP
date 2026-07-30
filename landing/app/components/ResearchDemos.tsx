@@ -13,7 +13,7 @@ const architectureCopy: Record<ArchitectureStep, { title: string; body: string }
   host: {
     title: "2. The approved host plans",
     body:
-      "BioRouter, Codex CLI, Claude Code, Claude Desktop, or another MCP client decides which advertised tool to call.",
+      "The selected MCP client decides which advertised tool to call for the research question.",
   },
   medcp: {
     title: "3. MedCP validates",
@@ -126,8 +126,9 @@ function FlowNode({
 function FlowArrow() {
   return (
     <span className="flow-arrow" aria-hidden="true">
-      <i />
-      <b>›</b>
+      <svg viewBox="0 0 48 16" focusable="false">
+        <path d="M2 8H44M38 2L44 8L38 14" />
+      </svg>
     </span>
   );
 }
@@ -137,66 +138,76 @@ type BenchmarkModel = "gpt" | "opus";
 const benchmarkModels = {
   gpt: {
     name: "GPT-5.5",
-    withKg: 1.19,
+    withKg: 1.265,
     ehrOnly: 1.045,
-    difference: "+0.145",
-    runtime: "30.1% lower runtime",
+    difference: "+0.220",
+    runtime: "30.1% lower than EHR-only",
     calls: "SPOKE used in 37 of 100 questions",
-    note: "Raw paired p=.030; BH-adjusted p=.091",
+    note: "Score comparison: paired t-test p=0.0026; signed-rank p=0.0040",
   },
   opus: {
     name: "Claude Opus 4.8",
-    withKg: 0.925,
+    withKg: 1.015,
     ehrOnly: 0.835,
-    difference: "+0.090",
-    runtime: "41.0% lower runtime",
+    difference: "+0.180",
+    runtime: "41.0% lower than EHR-only",
     calls: "SPOKE used in 32 of 100 questions",
-    note: "Raw paired p=.118",
+    note: "Score comparison: paired t-test p=0.0049; signed-rank p=0.0086",
   },
 };
 
 export function BenchmarkDemo() {
   const [model, setModel] = useState<BenchmarkModel>("gpt");
   const selected = benchmarkModels[model];
-  const scale = 1.3;
+  const scale = 2;
 
   return (
     <article className="research-demo benchmark-demo">
       <div className="demo-kicker">
-        <span>Clinical answer evidence</span>
-        <strong>From a general explanation to a measured cohort answer</strong>
+        <span>Paired benchmark example</span>
+        <strong>One real question, with and without SPOKE</strong>
+      </div>
+      <div className="benchmark-question">
+        <span>GPT-5.5 · Q6.10</span>
+        <p>
+          In sickle cell disease, which infection diagnoses occur most frequently,
+          and what immune or hemolysis processes might explain susceptibility?
+        </p>
       </div>
       <div className="answer-comparison">
         <div className="answer-panel">
-          <span className="comparison-label">Without database access, illustrative</span>
-          <h3>A general explanation</h3>
+          <span className="comparison-label">MedCP EHR-only</span>
+          <h3>Ad hoc filters missed the target</h3>
           <p>
-            Immunosuppressant use may have changed in 2020. Several therapies could
-            contribute, but the answer has no direct cohort counts or database trace.
+            The EHR-only run used diagnosis-name filters on 1,226 patients. It ranked
+            acute chest syndrome (386) and fever (367) first, although neither is an
+            infection diagnosis.
           </p>
           <ul>
-            <li>Broad medical context</li>
-            <li>No queried cohort</li>
-            <li>No source-linked trend</li>
+            <li>Name-filtered cohort and phenotypes</li>
+            <li>10 EHR calls in 766 seconds</li>
+            <li>Mean expert score: 0 of 2</li>
           </ul>
         </div>
         <div className="answer-panel answer-panel-accent">
-          <span className="comparison-label">With MedCP clinical data access</span>
-          <h3>A measured cohort answer</h3>
+          <span className="comparison-label">MedCP EHR + SPOKE</span>
+          <h3>A hierarchy-grounded answer</h3>
           <p>
-            The evaluated query returned 184,356 prescriptions in 2019 and 199,432 in
-            2020, an 8.2% increase across the queried OMOP cohort.
+            The fully enabled run defined 1,783 patients using standard descendants and
+            excluded sickle cell trait. The leading infections were acute upper
+            respiratory infection (327), pneumonia (322), viral disease (255), and
+            urinary tract infection (239).
           </p>
           <ul>
-            <li>9,522 to 10,399 unique patients</li>
-            <li>Methotrexate: +21.3%</li>
-            <li>Quarterly change exposed for review</li>
+            <li>8 SPOKE calls and 10 EHR calls</li>
+            <li>Linked HBB, splenic dysfunction, hemolysis, and oxidative stress</li>
+            <li>Mean expert score: 2 of 2</li>
           </ul>
         </div>
       </div>
       <p className="comparison-note">
-        The left panel illustrates an answer without database access. It is not a
-        benchmark result.
+        Observed paired GPT-5.5 benchmark example. Both panels used MedCP. This compares
+        EHR-only with EHR + SPOKE, not an unaided model with MedCP.
       </p>
 
       <div className="performance-panel">
@@ -243,7 +254,7 @@ export function BenchmarkDemo() {
             <strong>{selected.difference}</strong>
           </div>
           <div>
-            <span>Runtime versus EHR-only</span>
+            <span>Mean elapsed time, descriptive</span>
             <strong>{selected.runtime}</strong>
           </div>
           <div>
@@ -252,8 +263,9 @@ export function BenchmarkDemo() {
           </div>
         </div>
         <p className="figure-note">
-          {selected.note}. Results are model and deployment specific. Score bars use a
-          common 0 to 1.3 scale and do not compare against an unaided model.
+          {selected.note}. Each condition contains the same 100 questions. Scores are
+          the mean of physician and bioinformatician ratings on the 0 to 2 scale.
+          Results are model and deployment specific.
         </p>
       </div>
     </article>
@@ -468,16 +480,24 @@ export function NetworkDemo() {
             </div>
           </div>
           <aside className="study-result">
-            <span>Cross-source association</span>
-            <div>
-              <strong>ρ 0.58</strong>
-              <em>p &lt; 0.0001</em>
-            </div>
-            <p>
-              Biological similarity in SPOKE tracked adjusted comorbidity patterns in
-              the EHR.
-            </p>
-            <small>Hypothesis-generating association, not a causal estimate.</small>
+            <span>What the study found</span>
+            <h3>
+              Disease pairs that were more biologically connected in SPOKE also tended
+              to co-occur more often in the EHR.
+            </h3>
+            <dl className="study-result-stats" aria-label="Statistical summary">
+              <div>
+                <dt>Spearman correlation</dt>
+                <dd>0.58</dd>
+              </div>
+              <div>
+                <dt>p-value</dt>
+                <dd>&lt; 0.0001</dd>
+              </div>
+            </dl>
+            <small>
+              This describes an association. It does not show cause and effect.
+            </small>
           </aside>
         </div>
 

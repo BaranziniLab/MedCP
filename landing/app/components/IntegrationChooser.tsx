@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import {
+  bioRouterUrl,
+  claudeCodeUrl,
+  claudeDesktopUrl,
+  codexCliUrl,
+} from "../site-config";
+import { ProductLink } from "./ProductLink";
 
 type IntegrationKey =
   | "biorouter"
@@ -17,6 +24,7 @@ type Integration = {
   requirements: string;
   command: string;
   note: string;
+  officialUrl?: string;
   download?: {
     label: string;
     href: string;
@@ -29,13 +37,14 @@ const integrations: Integration[] = [
     label: "BioRouter",
     status: "Verified host",
     summary:
-      "The canonical MedCP benchmark harness, with local orchestration and keyring-backed secret storage.",
-    requirements: "BioRouter, uv, and an approved database path",
+      "The canonical MedCP benchmark harness, with local orchestration and an OS-keyring path for values entered as secrets.",
+    requirements: "uv and an approved database path",
     command: `biorouter extension install MedCP.brxt \\
   --env CLINICAL_RECORDS_BACKEND=sqlite \\
   --env CLINICAL_RECORDS_SQLITE_PATH=/absolute/path/database.sqlite`,
     note:
-      "Verified with BioRouter 1.88.6. Values entered through its secret-setting flow can use the configured OS keyring. The full model and data path still needs institutional approval.",
+      "Version 1.88.6 was verified. Values entered through its secret-setting flow can use the configured OS keyring. The full model and data path still needs institutional approval.",
+    officialUrl: bioRouterUrl,
     download: {
       label: "Get staged MedCP.brxt",
       href: "https://raw.githubusercontent.com/BaranziniLab/MedCP/main/releases/MedCP%20v0.10.0/MedCP.brxt",
@@ -46,15 +55,16 @@ const integrations: Integration[] = [
     label: "Codex CLI",
     status: "Verified host",
     summary:
-      "Register a locked source checkout with Codex, then inspect the MCP registration before querying data.",
-    requirements: "Codex with MCP support, Git, and uv",
+      "Register a locked source checkout, then inspect the MCP registration before querying data.",
+    requirements: "MCP support, Git, and uv",
     command: `git clone https://github.com/BaranziniLab/MedCP.git
 cd MedCP
 uv sync --locked
 MEDCP_SOURCE="$PWD" integrations/codex/install.sh
 codex mcp get medcp`,
     note:
-      "Codex CLI settings may retain environment values in plaintext. Use non-PHI or appropriately de-identified data unless the complete Codex path is institutionally approved.",
+      "Host settings may retain environment values in plaintext. Use non-PHI or appropriately de-identified data unless the complete path is institutionally approved.",
+    officialUrl: codexCliUrl,
   },
   {
     key: "claude-code",
@@ -62,13 +72,14 @@ codex mcp get medcp`,
     status: "Source setup",
     summary:
       "Install the MedCP plugin from a source checkout while the staged package awaits a matching release tag.",
-    requirements: "Claude Code 2.x or newer, Git, and uv",
+    requirements: "Version 2.x or newer, Git, and uv",
     command: `git clone https://github.com/BaranziniLab/MedCP.git
 cd MedCP
 /plugin marketplace add /absolute/path/to/MedCP/integrations
 /plugin install medcp@medcp-integrations`,
     note:
-      "Claude Code can inherit or persist configuration values. Use non-PHI or appropriately de-identified data unless the complete Claude path is institutionally approved.",
+      "The host can inherit or persist configuration values. Use non-PHI or appropriately de-identified data unless the complete path is institutionally approved.",
+    officialUrl: claudeCodeUrl,
   },
   {
     key: "claude-desktop",
@@ -76,13 +87,14 @@ cd MedCP
     status: "macOS Apple silicon",
     summary:
       "Install the self-contained MCPB, approve its requested fields, and configure MedCP under Extensions.",
-    requirements: "Claude Desktop with MCPB support on Apple silicon",
+    requirements: "MCPB support on Apple silicon",
     command: `1. Download MedCP.mcpb
 2. Double-click the package
 3. Open Settings > Extensions > MedCP
 4. Configure a read-only database account, or start with SPOKE only`,
     note:
-      "Sensitive manifest fields are protected in Claude Desktop. That does not certify the model, network, retention, or data-governance path for PHI.",
+      "Sensitive manifest fields are protected by the desktop host. That does not certify the model, network, retention, or data-governance path for PHI.",
+    officialUrl: claudeDesktopUrl,
     download: {
       label: "Get staged MedCP.mcpb",
       href: "https://raw.githubusercontent.com/BaranziniLab/MedCP/main/releases/MedCP%20v0.10.0/MedCP.mcpb",
@@ -176,7 +188,13 @@ export function IntegrationChooser({ compact = false }: { compact?: boolean }) {
       >
         <div className="integration-copy">
           <span className="status-pill">{active.status}</span>
-          <h3>{active.label}</h3>
+          <h3>
+            {active.officialUrl ? (
+              <ProductLink href={active.officialUrl}>{active.label}</ProductLink>
+            ) : (
+              active.label
+            )}
+          </h3>
           <p>{active.summary}</p>
           <dl>
             <div>

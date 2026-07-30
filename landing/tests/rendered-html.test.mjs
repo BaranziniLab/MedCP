@@ -32,12 +32,33 @@ test("server-renders the MedCP landing page", async () => {
   assert.match(html, /One interface\. Two key components\./);
   assert.match(html, /Preconfigured for the SPOKE knowledge graph/);
   assert.match(html, /MedCP \+ SPOKE compared with MedCP EHR-only/);
+  assert.match(html, /In sickle cell disease, which infection diagnoses/);
+  assert.match(html, /1,783 patients using standard descendants/);
+  assert.match(html, /Mean expert score: 2 of 2/);
+  assert.match(html, /1\.265/);
+  assert.match(html, /Score comparison: paired t-test p=0\.0026/);
   assert.match(html, /How MedCP links EHR comorbidity to SPOKE biology/);
   assert.match(html, /Read-only Cypher/);
+  assert.match(html, /What the study found/);
+  assert.match(html, /It does not show cause and effect/);
   assert.match(html, /Control the full data path/);
   assert.match(html, /BioRouter/);
   assert.match(html, /Codex CLI/);
+  assert.match(html, /Wanjun Gu · Gianmarco Bellucci/);
+  assert.match(html, /https:\/\/biorouter\.ucsf\.edu\//);
+  assert.match(html, /https:\/\/learn\.chatgpt\.com\/docs\/codex\/cli/);
+  assert.match(html, /https:\/\/claude\.com\/product\/claude-code/);
+  assert.match(html, /https:\/\/claude\.com\/download/);
+  assert.match(html, /https:\/\/baranzinilab\.ucsf\.edu\//);
+  assert.match(html, /M2 8H44M38 2L44 8L38 14/);
+  assert.ok(
+    html.indexOf('id="integrations"') < html.indexOf('id="evidence"'),
+    "integrations should appear before measured evidence",
+  );
   assert.doesNotMatch(html, /MedCP-(?:list|query|get)_/);
+  assert.doesNotMatch(html, /Cross-source association|Hypothesis-generating association/);
+  assert.doesNotMatch(html, /184,356 prescriptions|Without database access, illustrative/);
+  assert.doesNotMatch(html, /1\.19|0\.925|BH-adjusted p=\.091/);
   assert.doesNotMatch(html, /react-loading-skeleton|Your site is taking shape/i);
   assert.doesNotMatch(html, /\u2014/);
 });
@@ -52,5 +73,9 @@ test("server-renders complete documentation", async () => {
   assert.match(html, /MedCP alone does not establish HIPAA compliance/);
   assert.match(html, /Staged source-tree packages/);
   assert.match(html, /Open source research software/);
+  assert.match(html, /https:\/\/biorouter\.ucsf\.edu\//);
+  assert.match(html, /https:\/\/learn\.chatgpt\.com\/docs\/codex\/cli/);
+  assert.match(html, /https:\/\/claude\.com\/product\/claude-code/);
+  assert.match(html, /https:\/\/claude\.com\/download/);
   assert.doesNotMatch(html, /\u2014/);
 });
